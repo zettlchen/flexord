@@ -3,3 +3,4 @@
 export(.projectIntofx)
 export(distGDM2)
 export(kccaFamilyGDM2)
+import(flexclust)

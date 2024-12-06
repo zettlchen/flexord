@@ -166,10 +166,11 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
   }
 }
 
+#' @import flexclust
 #' @export
 kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL, trim=0,
                            groupFun='minSumClusters') {
-  kccaFamily(dist=distGDM2, cent=cent, preproc=preproc,
-             trim=trim, genDist=function(x, xrange) .projectIntofx(x, xrange),
-             groupFun=groupFun)
+  flexclust::kccaFamily(dist=distGDM2,
+                        genDist=function(x, xrange) .projectIntofx(x, xrange),
+                        cent=cent, preproc=preproc, trim=trim, groupFun=groupFun)
 }
