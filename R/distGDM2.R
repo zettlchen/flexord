@@ -1,3 +1,5 @@
+# 06.12.24
+
 #' Helper functions for K-centroids clustering using GDM2 distance
 #'
 #'@usage
@@ -119,9 +121,9 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
 .projectIntofx <- function(x, xrange=NULL){
   if(is.null(xrange)) xrange <- 'data range'
   
-  if(sum(xrange=='data range')) {
+  if(all(xrange=='data range')) {
     rng <- rep(range(x, na.rm=TRUE), ncol(x)) |> matrix(nrow=2)
-  } else if(sum(xrange=='variable specific')) {
+  } else if(all(xrange=='variable specific')) {
     rng <- apply(x, 2, range, na.rm=TRUE)
   } else if(is.vector(xrange, mode='numeric')) {
     rng <- rep(xrange, ncol(x)) |> matrix(nrow=2)
