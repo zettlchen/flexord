@@ -86,8 +86,8 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
   if(!is.null(genDist)) {
     if(!is.function(genDist)) stop("Error: parameter genDist is not a function.")
     fmly <- kccaFamilyGDM2()
-    fmly@genDist$genDist <- fmly@genDist$genDist(x, xrange)
-    fmly@genDist$storage <- fmly@genDist$genDist(x)
+    fmly@genDist <- fmly@genDist(x, xrange)
+    fmly@infosOnX$distribution <- fmly@genDist(x)
   } else {
     whereisfamily <- sapply(sys.frames(), ls)
     whereisfamily <- which(sapply(whereisfamily, function(y) "family" %in% y))[1]
@@ -95,14 +95,14 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
       fmly <- get('family', envir=sys.frame(whereisfamily),
                   inherits=FALSE)
     } else {
-      fmly <- get('from', envir=parent.frame())
+      fmly <- get('z', envir=parent.frame())
       fmly <- fmly@family
     }
   }
   
   N <- nrow(x)
-  fx <- fmly@genDist$storage
-  fc <- fmly@genDist$genDist(centers)
+  fx <- fmly@infosOnX$distribution
+  fc <- fmly@genDist(centers)
   
   for(k in 1:nrow(centers)) {
     for(i in 1:N) {
@@ -121,17 +121,7 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
 .projectIntofx <- function(x, xrange=NULL){
   if(is.null(xrange)) xrange <- 'data range'
   
-  if(all(xrange=='data range')) {
-    rng <- rep(range(x, na.rm=TRUE), ncol(x)) |> matrix(nrow=2)
-  } else if(all(xrange=='variable specific')) {
-    rng <- apply(x, 2, range, na.rm=TRUE)
-  } else if(is.vector(xrange, mode='numeric')) {
-    rng <- rep(xrange, ncol(x)) |> matrix(nrow=2)
-  } else {
-    if(length(xrange) != ncol(x))
-      stop('Either supply 1 range vector, or list of ranges for all variables')
-    rng <- unlist(xrange) |> matrix(nrow=2)
-  }
+  rng <- .rangeMatrix(xrange=xrange)(x) #code for this lies in centroids.R
   
   hats <- lapply(1:ncol(x), function(y) {
     level <- factor(x[,y], levels=seq(rng[1,y], rng[2,y]))
@@ -173,6 +163,6 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
 kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL, trim=0,
                            groupFun='minSumClusters') {
   flexclust::kccaFamily(dist=distGDM2,
-                        genDist=function(x, xrange) .projectIntofx(x, xrange),
+                        genDist=.projectIntofx,#function(x, xrange) .projectIntofx(x, xrange),
                         cent=cent, preproc=preproc, trim=trim, groupFun=groupFun)
 }
