@@ -3,10 +3,11 @@
 #' Helper functions for K-centroids clustering using GDM2 distance
 #'
 #'@usage
-#' distGDM2(x, centers, genDist=NULL, xrange=NULL, ...)
+#' distGDM2(x, centers, genDist=NULL, xrange=NULL)
 #' .projectIntofx(x, xrange=NULL)
-#' kccaFamilyGDM2(cent=NULL, preproc=NULL, trim=0,
-#'                groupFun='minSumClusters')
+#' kccaFamilyGDM2(cent=NULL, preproc=NULL,
+#'                xrange=NULL, xmethods=NULL,
+#'                trim=0, groupFun='minSumClusters')
 #'
 #'@description
 #' `distGDM2` implements the GDM2 distance first presented by Walesiak (1993)
@@ -29,7 +30,9 @@
 #'
 #' @param x A matrix of numerically coded ordinal data points. The ordinal
 #' variables need to be coded as `1:length(levels(x[,i]))`.
-#' @param centers A numeric matrix of cluster centers.
+#' @param centers A numeric matrix with the same coding scheme as in `x`,
+#' `ncol(centers)==ncol(x)`, and `nrow(centers)<=nrow(x)`.
+#' Within `kcca`, this is filled with the cluster centers.
 #' @param genDist Function for creating a distance function that will be
 #'    primed on `x`, such as f.i. `.projectIntofx`. For more information, see
 #'    the 'Details' section.
@@ -51,8 +54,8 @@
 #'   Default is `'minSumClusters'`.
 #'
 #' @return
-#' - `distGDM2`: A distance matrix for each row in `x` from the `centers` in the
-#'    clustering process.
+#' - `distGDM2`: A distance matrix for each row in `x` from each row in `centers`
+#'    with dimensions `c(nrow(x), nrow(centers)`.
 #' - `.projectIntofx`: A function with parameter `new_x`that will project the
 #'    new data object `new_x` into the space of `x`'s epdf, ecdf, and \( \tilde{F} \).
 #' - `kccaFamilyGDM2`: A custom `kccaFamily` object using `distGDM2` as the 
@@ -62,13 +65,16 @@
 #' @examples
 #' ## Example usage
 #' #creating a distance matrix between two matrices based on GDM2 distance
-#' data <- matrix(sample(1:5, 50, replace = TRUE),
-#'                nrow = 10, ncol = 5)
-#' initcenters <- data[sample(1:10, 3),]
-#' distGDM2(data, initcenters, genDist=.projectIntofx)
+#' dat <- matrix(sample(1:5, 50, replace = TRUE),
+#'               nrow = 10, ncol = 5)
+#' initcenters <- dat[sample(1:10, 3),]
+#' distGDM2(dat, initcenters, genDist=.projectIntofx)
+#' 
+#' #a classical distance matrix for a single matrix can be obtained via:
+#' as.dist(distGDM2(dat, dat, genDist=.projectIntofx))
 #' 
 #' #K-centroids clustering using GDM2 distance
-#' flexclust::kcca(data, k=3, family=kccaFamilyGDM2())
+#' flexclust::kcca(dat, k=3, family=kccaFamilyGDM2())
 #' 
 #' @seealso - [flexclust::kcca()](https://cran.r-project.org/package=flexclust)
 #'
@@ -162,7 +168,8 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
 kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL,
                            xrange=NULL, xmethods=NULL,
                            trim=0, groupFun='minSumClusters') {
-  flexclust::kccaFamily(dist=distGDM2,
+  flexclust::kccaFamily(name='kGDM2',
+                        dist=distGDM2,
                         genDist=.projectIntofx,
                         cent=cent, preproc=preproc,
                         xrange=xrange, xmethods=xmethods,
