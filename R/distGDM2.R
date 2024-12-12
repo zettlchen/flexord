@@ -78,7 +78,8 @@
 #'   Austrian Statistics Journal. _Submitted manuscript_.
 #'
 #' @export
-distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
+distGDM2 <- function(x, centers, family=NULL,
+                     genDist=NULL, xrange=NULL, ...) {
   if (ncol(x) != ncol(centers))
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   z <- matrix(0, nrow=nrow(x), ncol=nrow(centers))
@@ -87,7 +88,7 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
     if(!is.function(genDist)) stop("Error: parameter genDist is not a function.")
     fmly <- kccaFamilyGDM2()
     fmly@genDist <- fmly@genDist(x, xrange)
-    fmly@infosOnX$distribution <- fmly@genDist(x)
+    #fmly@infosOnX$distribution <- fmly@genDist(x)
   } else {
     whereisfamily <- sapply(sys.frames(), ls)
     whereisfamily <- which(sapply(whereisfamily, function(y) "family" %in% y))[1]
@@ -99,9 +100,15 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
       fmly <- fmly@family
     }
   }
+  # if(is.null(family)) {
+  #   if(!is.function(genDist)) stop('Error: no family argument given and parameter genDist is not a function.')
+  #   fmly <- kccaFamilyGDM2()
+  #   fmly@genDist <- fmly@genDist(x, xrange)
+  # } else { fmly <- family }
   
   N <- nrow(x)
-  fx <- fmly@infosOnX$distribution
+  #fx <- fmly@infosOnX$distribution
+  fx <- get('fx', envir=environment(fmly@genDist))
   fc <- fmly@genDist(centers)
   
   for(k in 1:nrow(centers)) {
@@ -142,8 +149,8 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
   
   names(hats) <- colnames(x)
   
-  function(new_x) {
-    fxs <- sapply(c('epdf', 'ecdf'), function(type) {
+  projectNew <- function(new_x) {
+    fnew_x <- sapply(c('epdf', 'ecdf'), function(type) {
       z <- matrix(0, nrow=nrow(new_x), ncol=ncol(new_x),
                   dimnames=dimnames(new_x))
       for(j in 1:ncol(new_x)) {
@@ -153,9 +160,13 @@ distGDM2 <- function(x, centers,  genDist=NULL, xrange=NULL, ...) {
       }
       z
     }, simplify = FALSE)
-    fxs$Ftildex <- fxs$ecdf - (fxs$epdf/2)
-    return(fxs)
+    fnew_x$Ftildex <- fnew_x$ecdf - (fnew_x$epdf/2)
+    return(fnew_x)
   }
+  
+  fx <- projectNew(x)
+  
+  return(projectNew)
 }
 
 #' @import flexclust
