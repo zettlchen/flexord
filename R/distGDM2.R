@@ -170,10 +170,9 @@ kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL,
                            trim=0, groupFun='minSumClusters') {
   if(is.null(cent)) {
     cent <- function(x) {
+      genDist <- .projectIntofx(x, xrange=xrange)
       flexclust::centOptim(x, dist = \(y, centers) {
-        distGDM2(y, centers,
-                 genDist=.projectIntofx,
-                 xrange=xrange)
+        distGDM2(y, centers, genDist=genDist)
       })
     }
   }
