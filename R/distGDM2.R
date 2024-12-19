@@ -122,6 +122,11 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
 .projectIntofx <- function(x, xrange=NULL){
   if(is.null(xrange)) xrange <- 'data range'
   
+  if('xrange' %in% names(xrange)) xrange <- xrange$xrange
+  #this is for the case within kcca where I pass genDist(x, family@infosOnX)
+  #to make that step there more generalizable, so I can use the call in kcca
+  #for different functions with different formals
+  
   rng <- .rangeMatrix(xrange=xrange)(x) #code for this lies in centroids.R
   
   hats <- lapply(1:ncol(x), function(y) {
@@ -169,11 +174,11 @@ kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL,
                            xrange=NULL, xmethods=NULL,
                            trim=0, groupFun='minSumClusters') {
   if(is.null(cent)) {
-    cent <- function(x) {
-      genDist <- .projectIntofx(x, xrange=xrange)
-      flexclust::centOptim(x, dist = \(y, centers) {
-        distGDM2(y, centers, genDist=genDist)
-      })
+    cent <- function(x){
+    #genDist <- .projectIntofx(x, xrange=xrange)
+    flexclust::centOptim(x, dist = \(y, centers) {
+      distGDM2(y, centers, genDist=genDist)
+      }) #filler cent, will be recreated in the function
     }
   }
   flexclust::kccaFamily(name='kGDM2',

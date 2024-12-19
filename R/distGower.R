@@ -2,37 +2,17 @@
 
 #Gower's distance
 
-#distGower
-# - writing an option where, depending on variable, distEuclidean,
-#   distGower.ordinal, or distSimMatch is called.
-#   they are then united in the Gower formula
+#old distGower_ordinal that was used in paper (written just for ordinal, not mixed)
+#' @param xrange 'data range' for range(x); 'variable specific' for apply(x, 2, range);
+#'               range vector of c(min,max); or list of range vectors for each variable
+#'               (length of list == ncol(x), each item is num. vector c(min,max))
 .distGower_ordinal <- function(x, centers, xrange=NULL) {
-  #xrange: response level range of the variables,
-  #       implemented options:
-  #       'data range': range of x, same for all variables
-  #       'variable specific': range of each variable in the data
-  #       c(lower, upper): range vector specified by user, upper and lower limit for all variables
-  #       list(x1= c(lower, upper), x2=c(lower, upper), ...): list of range vectors specified by user, upper and lower limits are variable specific
   
   if (ncol(x) != ncol(centers))
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   z <- matrix(0, nrow=nrow(x), ncol=nrow(centers))
   
-  if(is.null(xrange)) xrange <- 'data range'
-  if(all(xrange=='data range')) {
-    rng <- rep(range(x), ncol(x)) |>
-      matrix(nrow=2)
-  } else if(all(xrange=='variable specific')) {
-    rng <- apply(x, 2, range)
-  } else if(is.vector(xrange, mode='numeric')) {
-    rng <- rep(xrange, ncol(x)) |> 
-      matrix(nrow=2)
-  } else {
-    if(length(xrange) != ncol(x))
-      stop('Either supply 1 range vector, or list of ranges for all variables')
-    rng <- unlist(xrange) |> 
-      matrix(nrow=2)
-  }
+  rng <- .rangeMatrix(xrange)(x)
   
   scl <- apply(rng, 2, diff)
   scl <- ifelse(scl==0, 1, scl)
@@ -46,34 +26,43 @@
   z  
 }
 
-.ChooseVarDists <- function(x, ...) {
-  #xmethods...Character vector of length=ncol(x) of methods for each variable.
-  #           Implemented options:
-  #           - 'distEuclidean': squared Euclidean distance*, recommended for symmetric
-  #             interval variables or symmetric binary variables.
-  #           - 'distManhattan': absolute (Manhattan) distance*, robust alternative
-  #             for interval variables or symmetric binary variables, recommended
-  #             for appropriately coded ordinal variables/ranking variables.
-  #           - 'distSimMatch': simple Matching distance (proportion of equal respones),
-  #                            recommended for nominal or symmetric binary variables.
-  #           - 'distJaccard': Jaccard distance (proportion of agreements), recommended
-  #                           for asymmetric binary variables.
-  #           *For 'distEuclidean' and 'distManhattan', variables are centered around their
-  #             minimum value and scaled by their range.
-  #xclass...Character vector of length=ncol(x) of classes of variables in x.
-  #         Only used if xmethods=NULL, maps default methods to each class:
-  #         - 'numeric' or 'integer': squared Euclidean distance
-  #         - 'logical': Jaccard distance
-  #         - 'ordered factor': Manhattan distance (after adequate preprocessing)
-  #         - 'factor' (i.e. categorical): Simple Matching Distance
-  #           The treatment of the different variables can thus also be influenced
-  #           by their coding. F.i. for a symmetric logical variable, symmetric treatment
-  #           can be achieved by coding them either as categorical or numeric instead of
-  #           logical.
-  #written after: Gower (1971), Kaufman & Rousseeuw (1990)
-  if(!is.data.frame(x)) x <- as.data.frame(x)
+#' Function can't actually be used directly on x in dist, as dist is 'data.matriced'
+#' and thus loses class information. Instead, I added an if-clause in kcca, where
+#' I extract the class info is extracted previously, and stored in the (at)infosOnX slot)
+#' @param xclass Character vector of length=ncol(x) of EITHER:
+#'                1) distances to be used for each variable. Available options are
+#'                   'distEuclidean' (squared Euclidean distance), 'distManhattan'
+#'                   (absolute distance), 'distJaccard' (Jaccard distance for
+#'                   asymmetric binary variables), and 'distSimMatch' (simple Matching
+#'                   distance, i.e. inequality between values). OR:
+#'                2) classes of variables in x, for example as obtained by
+#'                   sapply(as.data.frame(x), \(y) paste(class(y), collapse=' ')).
+#'                   Default methods will be mapped to each variable class:
+#'                     - 'numeric' or 'integer': squared Euclidean distance
+#'                     - 'logical': Jaccard distance
+#'                     - 'ordered factor': Manhattan distance (after adequate preprocessing)
+#'                     - 'factor' (i.e. categorical): Simple Matching Distance
+#'                  The treatment of the different variables can thus also be influenced
+#'                  by their coding. F.i. for a symmetric logical variable, symmetric treatment
+#'                  can be achieved by coding them either as categorical or numeric instead of
+#'                  logical.
+#' written after: Gower (1971), Kaufman & Rousseeuw (1990).
+#' Note: for by-the-book clustering with Gower's distance, scale-centering x by
+#'       min and range is necessary for numeric or ordered variables. A helper
+#'       for this can be found in .ScaleGower. (which applies it to all variables.
+#'       BUT, scaling has no effect for logical and unordered factor variables,
+#'       so no problem.)
+.ChooseVarDists <- function(xclass) {
   
-  xclass <- sapply(x, \(y) paste(class(y), collapse=' '))
+  if(!is.null(dim(xclass))) {#the case where the function *could* be used outside of kcca, directly on x
+    #this should never evaluate to TRUE within kcca, else it'll just return
+    #rep('distEuclidean', ncol(x)), and then we've got a problem
+    if(!is.data.frame(xclass)) {
+      xclass <- rep('numeric', ncol(xclass))
+    } else {
+      xclass <- sapply(xclass, \(y) paste(class(y), collapse=' '))
+    }
+  }
   
   ifelse(xclass %in% c('numeric', 'integer'), 'distEuclidean',
          ifelse(xclass == 'logical', 'distJaccard',
@@ -103,6 +92,8 @@
       apply(x, 2, range, na.rm=T)
     }
   } else if(is.vector(xrange, mode='numeric')) {
+    if(length(xrange) != 2)
+      stop('Either supply 1 range vector, or list of ranges for all variables')
     rng <- function(x) {
       rep(xrange, ncol(x)) |>
         matrix(nrow=2)
@@ -160,111 +151,11 @@
   scale(x, center=rng[1,], scale=scl)
 }
 
-#for now, I am expecting that genDist contains the output of
-#.ChooseVarDists(x), still need to add the switch there that
-#it returns family@infosOnX$xmethods in case that exists
-#(for that, I also need to rewrite the distGDM2-genDist,
-#where I right now pass family@infosOnX$xrange. Future:
-#pass only family, and have function choose relevant slot-list-item-combo)
 #' @param genDist i.e. genDist expects char.vector with dist to be used
-#for each variable, written as described in .ChooseVarDists
+#'                 for each variable, as for example created by .ChooseVarDists
+#' @param x, centers: dist expects these to be already scaled 'gowerly'
 
-distGower <- function(x, centers, genDist) { #I think I don't need xrange here
-  #(xrange is used in preproc)
-  
-  #would it be sufficient here to just call flexclust::distEuclidean etc.
-  #on the relevant columns, replace NAs, and sum up the different parts?
-  #no: too many NAs in the end (after all, not only 1 spot NA, but the
-  #whole row xdistEuclidean)
-  
-  if (ncol(x) != ncol(centers))
-    stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
-  
-  xsep <- sapply(unique(genDist), \(y) {
-    x[,which(genDist==y), drop=F]
-  }, simplify = F)
-  centsep <- sapply(unique(genDist), \(y) {
-    centers[,which(genDist==y), drop=F]
-  }, simplify = F)
-  
-  delta <- sapply(1:nrow(centers),
-                  \(y) !(is.na(x) | is.na(y)),
-                  simplify = 'array')
-  #brauch i des überhaupt, oder ist das net leichter, nachher nur die
-  #NAs durch 0 zu ersetzen?
-  #nein, ich brauch's ja auch für den Nenner
-  #außerdem ist 0 ja auch falsch, müsste eher +Inf sein
-  #(setze die NAs in den nächsten Schritten trotzdem zu 0, damit
-  #sie mir nicht im weiteren die Rechnungen verhauen)
-  delta <- sapply(1:nrow(centers), \(i) {
-    centrep <- matrix(centsep$distJaccard[i,],
-                      nrow=nrow(x),
-                      ncol=sum(genDist=='distJaccard'),
-                      byrow=T)
-    dlt <- xsep$distJaccard+centrep
-    dlt <- ifelse(is.na(dlt), 0, dlt)
-    delta[,genDist=='distJaccard', i][dlt==0] <- 0
-    delta[,,i]
-  }, simplify = 'array')
-  
-  #making a test object here to fill up
-  tst <- xsep
-  tst$distEuclidean <- sapply(1:nrow(centers), \(i) { #leaving this '1:nrow(centers)' instead of just centsep$distManhatttan, cause I guess that makes it more compatible to the others
-    d <- sqrt((xsep$distEuclidean - matrix(centsep$distEuclidean[i,],
-                                           nrow=nrow(x),
-                                           ncol=sum(genDist=='distEuclidean'),
-                                           byrow=T))^2)
-    ifelse(is.na(d), 1, d) #1 hier als Platzhalter, kein sinnvoller Wert hier
-  }, simplify = 'array')
-  tst$distManhattan <- sapply(1:nrow(centers), \(i) { #leaving this '1:nrow(centers)' instead of just centsep$distManhatttan, cause I guess that makes it more compatible to the others
-    d <- abs(xsep$distManhattan - matrix(centsep$distManhattan[i,],
-                                         nrow=nrow(x),
-                                         ncol=sum(genDist=='distManhattan'),
-                                         byrow=T))
-    ifelse(is.na(d), 1, d) #s.o.
-  }, simplify = 'array') #alternatively tried it via sweep, but I didn't use the right dims I guess
-  tst$distSimMatch <- sapply(1:nrow(centers), \(i) {
-    d <- xsep$distSimMatch != matrix(centsep$distSimMatch[i,],
-                                     nrow=nrow(x),
-                                     ncol=sum(genDist=='distSimMatch'),
-                                     byrow=T)
-    ifelse(is.na(d), 1, d)
-  }, simplify = 'array')
-  tst$distJaccard <- sapply(1:nrow(centers), \(i) {
-    d <- xsep$distJaccard != matrix(centsep$distJaccard[i,],
-                                    nrow=nrow(x),
-                                    ncol=sum(genDist=='distJaccard'),
-                                    byrow=T)
-    d <- ifelse(is.na(d), 1, d) #das sollte im nächsten Schritt eh auch
-    #mitgehandelt werden, aber zur Sicherheit explizit
-    d[xsep$distJaccard==0] <- 1 #außerdem könnte ich mir den Schritt eh
-    #sparen, die Info muss ja sowieso ins delta
-    d
-  }, simplify = 'array')
-  
-  tst <- sapply(1:nrow(centers),
-                \(i) do.call(cbind, lapply(tst, \(y) y[,,i])),
-                simplify = 'array')
-  z <- sapply(1:nrow(centers),
-              \(i) rowSums(tst[,,i]*delta[,,i])/rowSums(delta[,,i]))
-  #tst*delta/apply(delta, 3, rowSums) should get close to this, but let's not risk it
-  #wellwellwell, something went wrong.
-  #dists get bigger than 1
-  #ooooooooooh right, I haven't scaled yet!!!
-  return(z)
-}
-
-#for now, I am expecting that genDist contains the output of
-#.ChooseVarDists(x), still need to add the switch there that
-#it returns family@infosOnX$xmethods in case that exists
-#(for that, I also need to rewrite the distGDM2-genDist,
-#where I right now pass family@infosOnX$xrange. Future:
-#pass only family, and have function choose relevant slot-list-item-combo)
-#' @param genDist i.e. genDist expects char.vector with dist to be used
-#for each variable, written as described in .ChooseVarDists
-#' @param x, centers: furthermore, expects these to be already scaled 'gowerly'
-
-distGowernew <- function(x, centers, genDist) {
+distGower <- function(x, centers, genDist) {
   
   #would it be sufficient here to just call flexclust::distEuclidean etc.
   #on the relevant columns, replace NAs, and sum up the different parts?
@@ -367,24 +258,9 @@ distGowernew <- function(x, centers, genDist) {
 
 
 
-kccaFamilyGower <- function(cent=NULL, genDist=NULL,
+kccaFamilyGower <- function(cent=NULL,
                             xrange=NULL, xmethods=NULL,
                             trim=0, groupFun='minSumClusters') {
-  
-  if(is.null(xmethods)) {
-    xmethods <- function(x) .ChooseVarDists(x)
-  }
-  
-  if(is.null(cent)) {
-    cent <- function(x) {
-      if(is.function(xmethods)) xmethods <- xmethods(x)
-      centMin(x, xrange=xrange,
-              dist = \(y, centers) {
-                distGower(y, centers,
-                          xmethods=xmethods) #noup, WIP
-      })
-    }
-  }
   
   rng <- .rangeMatrix(xrange)
   
@@ -393,9 +269,47 @@ kccaFamilyGower <- function(cent=NULL, genDist=NULL,
   #more complicated cause in case of is.null(xmethods),
   #I'd need to access the primed family to get xclass
   
+  
+  if(is.null(xmethods)) {
+    warning('No column-wise distance measures specified, default measures
+            will be used. Make sure that the data object x for your clustering
+            procedure is a correctly coded dataframe.') #in fact, it won't work if is.null(xmethods) && is.matrix(x)
+    distGen <- function(x, xclass) {
+      if('xclass' %in% names(xclass)) xclass <- xclass$xclass #again, the necessary catcher for the family@infosOnX
+      .ChooseVarDists(xclass=xclass) #adding x here cause that's the setup I need for the relevant code line, but fun is independent of x (at this stage, x is already 'numericized')
+    }
+  } else {
+    distGen <- function(x, xmethods) {
+      if('xmethods' %in% names(xmethods)) xmethods <- xmethods$xmethods #s.o.
+      if(!all(xmethods %in% c('distEuclidean', 'distManhattan',
+                              'distSimMatch', 'distJaccard')))
+        stop('Specified distance not implemented in xmethod!')
+      return(xmethods)
+    }
+  }
+  
+  # if(is.null(cent)) {
+  #   cent <- function(x) {
+  #     #if(is.function(xmethods)) xmethods <- xmethods(x) #this is now handled directly in dist
+  #     centMin(x, xrange=xrange,
+  #             dist = \(y, centers) {
+  #               distGower(y, centers,
+  #                         genDist=xmethods)
+  #     })
+  #   }
+  # }
+  #now that the variables are scaled, is centOptim sufficient?
+  if(is.null(cent)) {
+    cent <- function(x){
+      flexclust::centOptim(x, dist = \(y, centers) {
+        distGower(y, centers, genDist=genDist)
+      }) #filler cent, will be recreated in the function
+    }
+  }
+  
   flexclust::kccaFamily(name='kGower',
                         dist=distGower,
-                        genDist=.ChooseVarDists,
+                        genDist=distGen,
                         cent=cent,
                         preproc=preproc,
                         xrange=rng, xmethods=xmethods,
@@ -485,4 +399,17 @@ if(FALSE){
   distGowernew(.ScaleGower(x),
                .ScaleGower(centers), genDist=.ChooseVarDists(x))
   #yas!
+  #now replacing distGower with distGowernew
+  #checken, ob das das gleiche Ergebnis bringt wie die anderen
+  distEuclidean(.ScaleGower(x), .ScaleGower(centers))
+  #noup, these are in fact different results and get bigger than 1
+  identical(distGower(.ScaleGower(x), .ScaleGower(centers),
+               genDist=rep('distManhattan', ncol(x))),
+            .distGower_ordinal(x, centers))
+  #yas!
+  microbenchmark::microbenchmark(
+    distGower(.ScaleGower(x), .ScaleGower(centers),
+                 genDist=rep('distManhattan', ncol(x))),
+    .distGower_ordinal(x, centers)
+  ) #uiuiuiuiui das ist schon deeeutlich langsamer
 }
