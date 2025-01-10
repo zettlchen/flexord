@@ -36,11 +36,11 @@
 #'                   asymmetric binary variables), and 'distSimMatch' (simple Matching
 #'                   distance, i.e. inequality between values). OR:
 #'                2) classes of variables in x, for example as obtained by
-#'                   sapply(as.data.frame(x), \(y) paste(class(y), collapse=' ')).
+#'                   sapply(data.frame(x), data.class).
 #'                   Default methods will be mapped to each variable class:
 #'                     - 'numeric' or 'integer': squared Euclidean distance
 #'                     - 'logical': Jaccard distance
-#'                     - 'ordered factor': Manhattan distance (after adequate preprocessing)
+#'                     - 'ordered': Manhattan distance (after adequate preprocessing)
 #'                     - 'factor' (i.e. categorical): Simple Matching Distance
 #'                  The treatment of the different variables can thus also be influenced
 #'                  by their coding. F.i. for a symmetric logical variable, symmetric treatment
@@ -57,16 +57,16 @@
   if(!is.null(dim(xclass))) {#the case where the function *could* be used outside of kcca, directly on x
     #this should never evaluate to TRUE within kcca, else it'll just return
     #rep('distEuclidean', ncol(x)), and then we've got a problem
-    if(!is.data.frame(xclass)) {
-      xclass <- rep('numeric', ncol(xclass))
+    if(is.data.frame(xclass)) {
+      xclass <- sapply(xclass, data.class)
     } else {
-      xclass <- sapply(xclass, \(y) paste(class(y), collapse=' '))
+      xclass <- rep('numeric', ncol(xclass))
     }
   }
   
-  ifelse(xclass %in% c('numeric', 'integer'), 'distEuclidean',
+  ifelse(xclass == 'numeric', 'distEuclidean', #data.class returns 'numeric' also for 'integer'
          ifelse(xclass == 'logical', 'distJaccard',
-                ifelse(xclass == 'ordered factor', 'distManhattan',
+                ifelse(xclass == 'ordered', 'distManhattan',
                        ifelse(xclass == 'factor', 'distSimMatch',
                               'Error: no default method implemented for this class'
                        )
@@ -75,7 +75,7 @@
   ) |> setNames(names(xclass))
 }
 
-.rangeMatrix <- function(xrange) {
+.rangeMatrix <- function(xrange) { #TODO: this is also created in centroidFunctions. Choose place to avoid duplicates. Either leave in centroidFunctions.R, or start the generic.R file, where I stash all .-Functions
   #xrange: response level range of the variables,
   #       implemented options:
   #       'data range': range of x, same for all variables
@@ -274,16 +274,20 @@ kccaFamilyGower <- function(cent=NULL,
     warning('No column-wise distance measures specified, default measures
             will be used. Make sure that the data object x for your clustering
             procedure is a correctly coded dataframe.') #in fact, it won't work if is.null(xmethods) && is.matrix(x)
-    distGen <- function(x, xclass) {
-      if('xclass' %in% names(xclass)) xclass <- xclass$xclass #again, the necessary catcher for the family@infosOnX
-      .ChooseVarDists(xclass=xclass) #adding x here cause that's the setup I need for the relevant code line, but fun is independent of x (at this stage, x is already 'numericized')
+    distGen <- function(x, ...) { #TODO: remove ... when GDM2's genDist is fixed
+#      if('xclass' %in% names(xclass)) xclass <- xclass$xclass #again, the necessary catcher for the family@infosOnX
+#      .ChooseVarDists(xclass=xclass) #adding x here cause that's the setup I need for the relevant code line, but fun is independent of x (at this stage, x is already 'numericized')
+      #now: trying to create a function factory, so that when calling family@genDist in kcca, it'll just create the function (x doesn't do anything), and the function then has access to the xclass object that was created a few lines ago in kcca
+      #not successfull, had to work with parent.frame(). I think it's okay in this case though, as this function is only used in this instance, and not other, lower-lying ones. Also, it's not supposed to run outside of kcca, right? (if one wanted to use it, could just use .ChooseVarDists)
+      xcls <- get('xclass', parent.frame())
+      .ChooseVarDists(xcls)
     }
   } else {
-    distGen <- function(x, xmethods) {
-      if('xmethods' %in% names(xmethods)) xmethods <- xmethods$xmethods #s.o.
+    distGen <- function(x, ...) { #TODO: dots necessary right now, remove when distGDM2 is updated
+#      if('xmethods' %in% names(xmethods)) xmethods <- xmethods$xmethods #s.o.
       if(!all(xmethods %in% c('distEuclidean', 'distManhattan',
                               'distSimMatch', 'distJaccard')))
-        stop('Specified distance not implemented in xmethod!')
+        stop('Specified columnwise xmethod not implemented!')
       return(xmethods)
     }
   }
@@ -416,59 +420,78 @@ if(FALSE){
   kcca(x, k, family=kccaFamilyGower(xmethods=rep('distManhattan', ncol(x))))
   kcca(x, k, family=kccaFamilyGower())
   kcca(dat, k, family=kccaFamilyGower())
+  #Error in y[, , i, drop = F] : incorrect number of dimensions
+  kcca(dat, k, family=kccaFamilyGower(xmethods=.ChooseVarDists(sapply(dat, data.class))))
+  #same error
   kcca(datNA, k, family=kccaFamilyGower())
+  #same error
   
   #Error occurs within the allcent step
-  #family@allcent at this step is:
-  function(x, cluster, k=max(cluster, na.rm=TRUE))
+  #so:
+  TestFam <- kccaFamilyGower()
+  allcentenvir <- environment(TestFam@allcent)
+  TestFam@allcent
+  TestFam@allcent <- function(x, cluster, k=max(cluster, na.rm=TRUE))
   {
     centers <- matrix(NA, nrow=k, ncol=ncol(x))
     for(n in 1:k){
+      browser()
       if(sum(cluster==n, na.rm=TRUE)>0){
         centers[n,] <- z@cent(x[cluster==n,,drop=FALSE])
       }
     }
     centers
   }
-  #The error is:
-  #get('z', environment(family@allcent))@cent(x[cluster==1,,drop=F])
-  #Error in y[, , i, drop = F] : incorrect number of dimensions
-  #and z@cent at this step is:
-  #get('z', environment(family@allcent))@cent
-  function(x) {
-    eval(bquote({
-      .(origCent)
-    }))
+  environment(TestFam@allcent) <- allcentenvir
+  kcca(dat,k,TestFam)
+  #error occurs only for n==2
+  ##cluster 2 occurs only once, all the others occurr multiple times
+  # Browse[1]> cluster
+  # [1] 2 3 3 1 1 3 3 3 4 4
+  # Browse[1]> x[cluster==1,,drop=F]
+  # cont   bin_sym  bin_asym ord_levmis ord_levfull       nom
+  # [1,] 0.1860465 0.1162791 0.1162791  0.5813953   0.1162791 0.4651163
+  # [2,] 0.7209302 0.1162791 0.1162791  0.2325581   0.4651163 0.3488372
+  # Browse[1]> x[cluster==2,,drop=F]
+  # cont bin_sym  bin_asym ord_levmis ord_levfull       nom
+  # [1,]    1       0 0.1162791  0.2325581   0.2325581 0.1162791
+  #soooo wait, would the kcca run if I repeated dat?
+  kcca(dat[rep(1:nrow(dat), 5),], k, kccaFamilyGower())
+  #YAAAS! so the issue doesn't 'really' lie in my code, but rather cause
+  #the example is so small
+  #well, gonna fix this anyway, but this is good news
+  allcentenvir$z@cent
+  allcentenvir$z@cent(x[1:3,,drop=F])
+  allcentenvir$z@cent(x[1,,drop=F])
+  #let's see whether the error occurs in the normal 'cent' as well,
+  #cause this eval(bquote...) thing is a bit hard to debug
+  #need to add genDist to the environment of @cent, cause this one
+  #wasn't 'primed' in kcca:
+  environment(TestFam@cent)$genDist <- .ChooseVarDists(dat)
+  TestFam@cent(x[1:3,,drop=F])
+  TestFam@cent(x[1,,drop=F]) #grreeeat, error created. Now let's debug
+  centOptimNA <- function(x, dist) function(x, dist) {
+    browser()
+    foo <- function(p)
+      sum(dist(x, matrix(p, nrow=1)), na.rm=TRUE)
+    optim(colMeans(x, na.rm=TRUE), foo)$par
   }
- # <environment: 0x563599f12d20>
-  #and this environment contains:
-  #ls(environment(get('z', environment(family@allcent))@cent))
-  #[1] "centers"   "cluster"   "clustold"  "control"   "distmat"   "family"   
-  #[7] "genDist"   "group"     "iter"      "k"         "MYCALL"    "N"        
-  #[13] "origCent"  "origDist"  "sannprob"  "save.data" "simple"    "weights"  
-  #[19] "x" 
-  #with origCent being:
-  #get('origCent', environment(get('z', environment(family@allcent))@cent))
-  {
-    centOptimNA(x, dist = function(y, centers) {
-      distGower(y, centers, genDist = genDist)
-    })
-  }
-  #and genDist being:
-  #get('genDist', environment(get('z', environment(family@allcent))@cent))
-  #cont         bin_sym        bin_asym      ord_levmis     ord_levfull 
-  #"distEuclidean"   "distJaccard"   "distJaccard" "distManhattan" "distManhattan" 
-  #nom 
-  #"distSimMatch"
-  
-  #so let's do:
-  centOptimNA(datmatrix, dist= \(y, centers) {
-    distGower(y, centers, genDist = c('distEuclidean',
-                                      'distJaccard',
-                                      'distJaccard',
-                                      'distManhattan',
-                                      'distManhattan',
-                                      'distSimMatch'))
-  })
-  
+  TestFam@cent(x[1,,drop=F]) #noup, doesn't access it
+  rm(centOptimNA)
+  h <- datmatrix[1,,drop=F]
+  foo <- function(p) sum(distGower(h, matrix(p, nrow=1),
+                                   genDist=.ChooseVarDists(dat)), na.rm=T)
+  optim(colMeans(h, na.rm=T), foo)$par #Error occurs
+  foo(colMeans(h, na.rm=T)) #Error occurs
+  distGower(h, matrix(colMeans(h, na.rm=T), nrow=1),
+            genDist=.ChooseVarDists(dat)) |> sum(na.rm=T) #Error occurs
+  distGower(h, matrix(colMeans(h, na.rm=T), nrow=1),
+            genDist=.ChooseVarDists(dat)) #Error occurs
+  #so, let's debug within distGower
+  rm(foo)
+  #in distGower, the line y[,,i,drop=F] is found only in line88
+  #hi
+  #on Monday: run distGower with h; and also with datmatrix instead of h,
+  #so I know what it's actually supposed to look like
+  #go on debugging there
 }
