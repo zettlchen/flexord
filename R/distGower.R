@@ -301,7 +301,7 @@ kccaFamilyGower <- function(cent=NULL,
   #now that the variables are scaled, is centOptim sufficient?
   if(is.null(cent)) {
     cent <- function(x){
-      flexclust::centOptim(x, dist = \(y, centers) {
+      centOptimNA(x, dist = \(y, centers) {
         distGower(y, centers, genDist=genDist)
       }) #filler cent, will be recreated in the function
     }
@@ -412,4 +412,63 @@ if(FALSE){
                  genDist=rep('distManhattan', ncol(x))),
     .distGower_ordinal(x, centers)
   ) #uiuiuiuiui das ist schon deeeutlich langsamer
+  
+  kcca(x, k, family=kccaFamilyGower(xmethods=rep('distManhattan', ncol(x))))
+  kcca(x, k, family=kccaFamilyGower())
+  kcca(dat, k, family=kccaFamilyGower())
+  kcca(datNA, k, family=kccaFamilyGower())
+  
+  #Error occurs within the allcent step
+  #family@allcent at this step is:
+  function(x, cluster, k=max(cluster, na.rm=TRUE))
+  {
+    centers <- matrix(NA, nrow=k, ncol=ncol(x))
+    for(n in 1:k){
+      if(sum(cluster==n, na.rm=TRUE)>0){
+        centers[n,] <- z@cent(x[cluster==n,,drop=FALSE])
+      }
+    }
+    centers
+  }
+  #The error is:
+  #get('z', environment(family@allcent))@cent(x[cluster==1,,drop=F])
+  #Error in y[, , i, drop = F] : incorrect number of dimensions
+  #and z@cent at this step is:
+  #get('z', environment(family@allcent))@cent
+  function(x) {
+    eval(bquote({
+      .(origCent)
+    }))
+  }
+ # <environment: 0x563599f12d20>
+  #and this environment contains:
+  #ls(environment(get('z', environment(family@allcent))@cent))
+  #[1] "centers"   "cluster"   "clustold"  "control"   "distmat"   "family"   
+  #[7] "genDist"   "group"     "iter"      "k"         "MYCALL"    "N"        
+  #[13] "origCent"  "origDist"  "sannprob"  "save.data" "simple"    "weights"  
+  #[19] "x" 
+  #with origCent being:
+  #get('origCent', environment(get('z', environment(family@allcent))@cent))
+  {
+    centOptimNA(x, dist = function(y, centers) {
+      distGower(y, centers, genDist = genDist)
+    })
+  }
+  #and genDist being:
+  #get('genDist', environment(get('z', environment(family@allcent))@cent))
+  #cont         bin_sym        bin_asym      ord_levmis     ord_levfull 
+  #"distEuclidean"   "distJaccard"   "distJaccard" "distManhattan" "distManhattan" 
+  #nom 
+  #"distSimMatch"
+  
+  #so let's do:
+  centOptimNA(datmatrix, dist= \(y, centers) {
+    distGower(y, centers, genDist = c('distEuclidean',
+                                      'distJaccard',
+                                      'distJaccard',
+                                      'distManhattan',
+                                      'distManhattan',
+                                      'distSimMatch'))
+  })
+  
 }

@@ -3,6 +3,7 @@
 export(.projectIntofx)
 export(centMin)
 export(centMode)
+export(centOptimNA)
 export(distGDM2)
 export(distSimMatch)
 export(kccaFamilyGDM2)

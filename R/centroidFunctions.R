@@ -9,6 +9,7 @@
 #' @usage
 #' centMode(x)
 #' centMin(x, dist, xrange=NULL)
+#' centOptimNA(x, dist)
 #'
 #' @description
 #' Functions to calculate cluster centroids that extend the options available
@@ -16,6 +17,7 @@
 #' 
 #' `centMode` calculates centroids based on the mode of each variable.
 #' `centMin` minimizes the applied distance metric to find centroids within a specified range.
+#' `centOptimNA` replicates the exact behaviour of `flexclust::centOptim`, just with NA removal.
 #' 
 #' These functions are designed for use within `flexclust::kcca` or functions that are built
 #' upon it.
@@ -27,6 +29,10 @@
 #'
 #' - **`centMin`**: Column-wise centroids are calculated by minimizing the
 #'  specified distance measure between a value of `x`, and all possible levels of `x`.
+#'  
+#'  - **centOptimNA**: Column-wise centroids are calculated by minimizing the
+#'  specified distance measure via a general purpose optimizer. Unlike in `flexclust::centOptim`,
+#'  NAs are removed from the starting search values.
 #'
 #' @param x A numeric matrix or data frame. Categorical/ordinal variables
 #'    need to be coded as `1:length(levels(x[,i]))`.
@@ -56,9 +62,15 @@
 #' # Example: Centroid is level for which distance is minimal
 #' centMin(y, distGower, xrange = 'data range')
 #' ## within kcca
-#'kcca(x, 3, family=kccaFamily(dist= distGower,
+#' kcca(x, 3, family=kccaFamily(dist= distGower,
 #'                              cent=\(y) centMin(y, distGower))
-#'
+#'                              
+#' # Example: General purpose optimizer with NA removal
+#' nas <- sample(c(T, F), prod(dim(dat)),
+#'               replace=T, prob=c(0.1,0.9)) |> 
+#'        matrix(nrow=nrow(dat))
+#' dat[nas] <- NA
+#' centOptimNA(dat, distManhattan)
 #' @export
 centMode <- function(x) {
   apply(x, 2, \(cat) {
@@ -111,4 +123,12 @@ centMin <- function(x, dist, xrange=NULL) {
       names() |> as.numeric()
   }
   return(cntrs)
+}
+
+#' @export
+centOptimNA <- function(x, dist) {
+  foo <- function(p)
+    sum(dist(x, matrix(p, nrow=1)), na.rm=TRUE)
+  
+  optim(colMeans(x, na.rm=TRUE), foo)$par
 }
