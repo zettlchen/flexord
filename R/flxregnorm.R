@@ -15,10 +15,9 @@
 #' @importFrom mvtnorm dmvnorm
 #' 
 #' @export
-FLXMCregnorm <- function(formula=.~., G, kappa_p=0.01, nu_p=3)
-{
-    z <- methods::new("FLXMC", weighted=TRUE, formula=formula,
-                      name="FLXMCregnorm")
+FLXMCregnorm <- function(formula=.~., xi_p, kappa_p=0.01, nu_p=3) {
+    z <- new("FLXMC", weighted=TRUE, formula=formula,
+             name="FLXMCregnorm")
 
     force(G)
 
