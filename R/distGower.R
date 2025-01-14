@@ -166,123 +166,147 @@ distGower <- function(x, centers, genDist) {
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   
   k <- nrow(centers)
+  typs <- unique(genDist)
   
-  xsep <- sapply(unique(genDist), \(y) {
-    x[,which(genDist==y), drop=F]
-  }, simplify = F)
-  centsep <- sapply(unique(genDist), \(y) {
-    centers[,which(genDist==y), drop=F]
-  }, simplify = F)
-
-  #calculating the weights (used both in numer and denom)  
-  delta <- sapply(1:k,
-                  \(y) !(is.na(x) | is.na(y)),
-                  simplify = 'array')
-  #weight adjustment for Jaccard case happens below
-  
-  hlp <- xsep
-  
-  for(dist_type in unique(genDist)) {
+  if(length(typs)==1) { #the single vartype case
+    if(all(typs=='distEuclidean')) {
+      distnc <- function(x, centers) flexclust::distEuclidean(x, centers)
+    } else if(all(typs=='distManhattan')) {
+      distnc <- function(x, centers) flexclust::distManhattan(x, centers)
+    } else if(all(typs=='distJaccard')) {
+      distnc <- function(x, centers) flexclust::distJaccard(x, centers)
+    } else if(all(typs=='distSimMatch')) {
+      distnc <- function(x, centers) distSimMatch(x, centers)
+    } else {stop('Specified distance not implemented in flexord::distGower')}
     
-    dist_cols <- sum(genDist==dist_type)
+    distnc(x, centers)
     
-    if(dist_type == 'distEuclidean') {
-      hlp[[dist_type]] <- sapply(1:k, \(i) { 
-        d <- sqrt((xsep[[dist_type]] - matrix(centsep[[dist_type]][i,],
+  } else {
+    xsep <- sapply(typs, \(y) {
+      x[,which(genDist==y), drop=F]
+    }, simplify = F)
+    centsep <- sapply(typs, \(y) {
+      centers[,which(genDist==y), drop=F]
+    }, simplify = F)
+    
+    #calculating the weights (used both in numer and denom)  
+    delta <- sapply(1:k,
+                    \(y) !(is.na(x) | is.na(y)),
+                    simplify = 'array')
+    #weight adjustment for Jaccard case happens below
+    
+    hlp <- xsep
+    
+    for(dist_type in typs) {
+      
+      dist_cols <- sum(genDist==dist_type)
+      
+      if(dist_type == 'distEuclidean') {
+        hlp[[dist_type]] <- sapply(1:k, \(i) { 
+          d <- sqrt((xsep[[dist_type]] - matrix(centsep[[dist_type]][i,],
+                                                nrow=nrow(x),
+                                                ncol=dist_cols,
+                                                byrow=T))^2)
+          ifelse(is.na(d), 1, d) #using 1 (=max.dist for the scaled vars) as placeholder
+        }, simplify = 'array')
+        if(k == 1) {
+          hlp[[dist_type]] <- array(hlp[[dist_type]],
+                                    dim=c(nrow(x), dist_cols, k),
+                                    dimnames=list(NULL,
+                                                  names(which(dist_type==genDist)), NULL))
+        }
+      }
+      
+      if(dist_type == 'distManhattan') {
+        hlp[[dist_type]] <- sapply(1:k, \(i) {
+          d <- abs(xsep[[dist_type]] - matrix(centsep[[dist_type]][i,],
                                               nrow=nrow(x),
                                               ncol=dist_cols,
-                                              byrow=T))^2)
-        ifelse(is.na(d), 1, d) #using 1 (=max.dist for the scaled vars) as placeholder
-      }, simplify = 'array')
-      if(k == 1) {
-        array(hlp[[dist_type]],
-              dim=c(nrow(x), dist_cols, k),
-              dimnames=list(NULL,
-                            names(which(dist_type==genDist)), NULL))
+                                              byrow=T))
+          ifelse(is.na(d), 1, d) #s.o.
+        }, simplify = 'array')
+        if(k == 1) {
+          hlp[[dist_type]] <- array(hlp[[dist_type]],
+                                    dim=c(nrow(x), dist_cols, k),
+                                    dimnames=list(NULL,
+                                                  names(which(dist_type==genDist)), NULL))
+        }
+      }
+      
+      if(dist_type == 'distSimMatch') {
+        hlp[[dist_type]] <- sapply(1:k, \(i) {
+          d <- xsep[[dist_type]] != matrix(centsep[[dist_type]][i,],
+                                           nrow=nrow(x),
+                                           ncol=dist_cols,
+                                           byrow=T)
+          ifelse(is.na(d), 1, d)
+        }, simplify = 'array')
+        if(k == 1) {
+          hlp[[dist_type]] <- array(hlp[[dist_type]],
+                                    dim=c(nrow(x), dist_cols, k),
+                                    dimnames=list(NULL,
+                                                  names(which(dist_type==genDist)), NULL))
+        }
+      }
+      
+      if(dist_type == 'distJaccard') {
+        
+        centrep <- sapply(1:k, \(i) {
+          matrix(centsep[[dist_type]][i,],
+                 nrow=nrow(x),
+                 ncol=dist_cols,
+                 byrow=T)
+        }, simplify = 'array')
+        
+        hlp[[dist_type]] <- sapply(1:k, \(i) {
+          d <- xsep[[dist_type]] != centrep[,,i]
+          d <- ifelse(is.na(d), 1, d) #das sollte im nächsten Schritt eh auch
+          #mitgehandelt werden, aber zur Sicherheit explizit
+          d[xsep[[dist_type]]==0] <- 1 #außerdem könnte ich mir den Schritt eh
+          #sparen, die Info muss ja sowieso ins delta
+          d
+        }, simplify = 'array')
+        if(k == 1) {
+          hlp[[dist_type]] <- array(hlp[[dist_type]],
+                                    dim=c(nrow(x), dist_cols, k),
+                                    dimnames=list(NULL,
+                                                  names(which(dist_type==genDist)), NULL))
+        }
+        
+        delta <- sapply(1:k, \(i) {
+          dlt <- xsep[[dist_type]]+centrep[,,i]
+          dlt <- ifelse(is.na(dlt), 0, dlt)
+          tmp_dlt <- array(delta[,,i,drop=F],
+                           dim=dim(x), dimnames=dimnames(x))
+          tmp_dlt[,genDist==dist_type][dlt==0] <- 0
+          tmp_dlt
+        }, simplify = 'array')
       }
     }
     
-    if(dist_type == 'distManhattan') {
-      hlp[[dist_type]] <- sapply(1:k, \(i) {
-        d <- abs(xsep[[dist_type]] - matrix(centsep[[dist_type]][i,],
-                                             nrow=nrow(x),
-                                             ncol=dist_cols,
-                                             byrow=T))
-        ifelse(is.na(d), 1, d) #s.o.
-      }, simplify = 'array')
-      if(k == 1) {
-        array(hlp[[dist_type]],
-              dim=c(nrow(x), dist_cols, k),
-              dimnames=list(NULL,
-                            names(which(dist_type==genDist)), NULL))
-      }
-    }
-  
-    if(dist_type == 'distSimMatch') {
-      hlp[[dist_type]] <- sapply(1:k, \(i) {
-        d <- xsep[[dist_type]] != matrix(centsep[[dist_type]][i,],
-                                         nrow=nrow(x),
-                                         ncol=dist_cols,
-                                         byrow=T)
-        ifelse(is.na(d), 1, d)
-      }, simplify = 'array')
-      if(k == 1) {
-        array(hlp[[dist_type]],
-              dim=c(nrow(x), dist_cols, k),
-              dimnames=list(NULL,
-                            names(which(dist_type==genDist)), NULL))
-      }
-    }
+    hlp <- sapply(1:k, \(i) {
+      # arr <- lapply(hlp, \(y) y[,,i, drop=F])
+      # dims <- sapply(lapply(arr, dim), `[`, 2) #equivalent to sapply(hlp, ncol)
+      # 
+      # arr[dims==1] <- lapply(arr[dims==1],
+      #                        \(y) matrix(y, dimnames=dimnames(y)[1:2]))
+      # arr[dims>1] <- lapply(arr[dims>1], \(y) y[,,1])
+      
+      arr <- sapply(hlp, \(y) {
+        arr <- y[,,i, drop=F]
+        array(arr, dim=dim(arr)[1:2], dimnames=dimnames(arr)[1:2])
+      })
+      
+      do.call(cbind, arr)
+    }, simplify = 'array')
+    hlp <- hlp[,colnames(x),,drop=F] #ordering by original column order
     
-    if(dist_type == 'distJaccard') {
-      
-      centrep <- sapply(1:k, \(i) {
-        matrix(centsep[[dist_type]][i,],
-               nrow=nrow(x),
-               ncol=dist_cols,
-               byrow=T)
-      }, simplify = 'array')
-      
-      hlp[[dist_type]] <- sapply(1:k, \(i) {
-        d <- xsep[[dist_type]] != centrep[,,i]
-        d <- ifelse(is.na(d), 1, d) #das sollte im nächsten Schritt eh auch
-        #mitgehandelt werden, aber zur Sicherheit explizit
-        d[xsep[[dist_type]]==0] <- 1 #außerdem könnte ich mir den Schritt eh
-        #sparen, die Info muss ja sowieso ins delta
-        d
-      }, simplify = 'array')
-      if(k == 1) {
-        array(hlp[[dist_type]],
-              dim=c(nrow(x), dist_cols, k),
-              dimnames=list(NULL,
-                            names(which(dist_type==genDist)), NULL))
-      }
-      
-      delta <- sapply(1:k, \(i) {
-        dlt <- xsep[[dist_type]]+centrep[,,i]
-        dlt <- ifelse(is.na(dlt), 0, dlt)
-        tmp_dlt <- array(delta[,,i,drop=F],
-                         dim=dim(x), dimnames=dimnames(x))
-        tmp_dlt[,genDist==dist_type][dlt==0] <- 0
-        tmp_dlt
-      }, simplify = 'array')
-    }
+    z <- sapply(1:k,
+                \(i) rowSums(hlp[,,i]*delta[,,i])/rowSums(delta[,,i]))
+    return(z)
   }
-  
-  hlp <- sapply(1:k, \(i) {
-    arr <- lapply(hlp, \(y) y[,,i, drop=F])
-    dims <- sapply(lapply(arr, dim), `[`, 2)
-    
-    arr[dims==1] <- lapply(arr[dims==1],
-                           \(y) matrix(y, dimnames=dimnames(y)[1:2]))
-    arr[dims>1] <- lapply(arr[dims>1], \(y) y[,,1])
-    do.call(cbind, arr)[,colnames(x)]
-  }, simplify = 'array')
-
-  z <- sapply(1:k,
-              \(i) rowSums(hlp[,,i]*delta[,,i])/rowSums(delta[,,i]))
-  return(z)
 }
+
 
 
 
@@ -522,4 +546,10 @@ if(FALSE){
   #on Monday: run distGower with h; and also with datmatrix instead of h,
   #so I know what it's actually supposed to look like
   #go on debugging there
+  
+  
+  #hi: right now: seems to work on distGower(datmatrix, centnoNAscaled, .ChooseVarDists(dat));
+  #and distGower(x, centers, .ChooseVarDists(x)).
+  #test these some more, and try out other edge cases
+  #specifically with nrow(x)+nrow(centers) == 1
 }
