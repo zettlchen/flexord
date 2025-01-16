@@ -181,46 +181,121 @@
 }
 
 
-#helper function to Gower's distance on a _single vartype_
+#helper function to Gower's distance on _mixed vartypes_
 #     (i.e. x needs to be scaled previously, distance function is
 #      chosen for the single vartype).
 #      output: array of dim nrow(x) X ncol(x) X nrow(centers)
 #               (Weighting with delta, and summing up happens at the end of the distGower function)
 #' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
-.distGower_singleType <- function(x, centers, distances) {
+.distGower_mixedType <- function(x, centers, distances) {
   
+  #  dists <- unique(distances)
+  z <- array(0, dim=c(dim(x), nrow(centers)),
+             dimnames=c(dimnames(x), list(NULL)))
+  K <- nrow(centers)
+  distE <- distances %in% 'distEuclidean'
+  distM <- distances %in% 'distManhattan'
+  distS <- distances %in% 'distSimMatch'
+  distJ <- distances %in% 'distJaccard'
+  if(sum(distE, distM, distS, distJ)!=ncol(x)) stop('Specified distance(s) not implemented in flexord::distGower')
+  
+  if(any(distE)) {
+    xE <- x[, distE, drop=F]
+    cE <- centers[, distE, drop=F]
+    for(k in 1:K){
+      z[, distE, k] <- t(sqrt((t(xE) - cE[k,])^2))
+    }
+  }
+  if(any(distM)) {
+    xM <- x[, distM, drop=F]
+    cM <- centers[, distM, drop=F]
+    for(k in 1:K){
+      z[, distM, k] <- t(abs(t(xM)-cM[k,]))
+    }
+  }
+  if(any(distS)) {
+    xS <- x[, distS, drop=F]
+    cS <- centers[, distS, drop=F]
+    for(k in 1:K){
+      z[, distS, k] <- t(t(xS) != cS[k,])
+    }
+  }
+  if(any(distJ)) {
+    xJ <- x[, distJ, drop=F]
+    cJ <- centers[, distJ, drop=F]
+    for(k in 1:K){
+      z[, distJ, k] <- t((t(xJ) + cJ[k,])<2)
+    }
+  }
+
+#  if(any(is.na(x))) { #(initial) centers after all will only be NA if x is, too
+    z[which(is.na(z))] <- 1 #just a placeholder, NA cases are removed by weights==0
+#  } #z <- ifelse(is.na(z), 1, z)
+
+  z
+}
+#test
+#check if there is any significant time improvement for .distGower_singleType
+#for singletype variables
+#all tested, now check if there is still a time improvement for singleType
+#I guess not. I could still also do a version for singleType+noNAs, cause
+#then I can do flexclust::.../ncol(x)
+if(FALSE) {
+microbenchmark::microbenchmark(.distGower_singleType(x, centers, .ChooseVarDists(x)),
+                               .distGower_mixedType(x, centers, .ChooseVarDists(x)))
+#single type is three times as slow
+microbenchmark::microbenchmark(.distGower_singleType(xNAs, centersNA, .ChooseVarDists(x)),
+                               .distGower_mixedType(xNAs, centersNA, .ChooseVarDists(x)))
+#single type is a third faster
+microbenchmark::microbenchmark(.distGower_singleType(x[1,,drop=F], centers[1,,drop=F], .ChooseVarDists(x)),
+                               .distGower_mixedType(x[1,,drop=F], centers[1,,drop=F], .ChooseVarDists(x)))
+#single type is a *bit* slower in most cases
+microbenchmark::microbenchmark(.distGower_singleType(x, centers[1,,drop=F], .ChooseVarDists(x)),
+                               .distGower_mixedType(x, centers[1,,drop=F], .ChooseVarDists(x)))
+#single type is a third slower in most cases
+#well, let's write a singletype+noNAs version, to see if it's any faster
+}
+#helper function to Gower's distance on a _single vartype_ with no NAs
+#checks need to happen outside of it
+#     (i.e. x needs to be scaled previously, distance function is
+#      chosen for the single vartype).
+#      output: array of dim nrow(x) X ncol(x) X nrow(centers)
+#               (Weighting with delta, and summing up happens at the end of the distGower function)
+#' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
+.distGower_singleTypeNoNAs <- function(x, centers, distances) {
+#meine Vermutung ist, dass distJaccard ohne /ncol(x) passt
+  #hi
   dists <- unique(distances)
   z <- array(0, dim=c(dim(x), nrow(centers)),
              dimnames=c(dimnames(x), list(NULL)))
   
   if(dists=='distEuclidean') {
-      for(k in 1:nrow(centers)){
-        d <- t(sqrt((t(x) - centers[k,])^2))
-        z[,,k] <- ifelse(is.na(d), 1, d) #just a placeholder, NA cases are removed by weights==0
-      }
+    for(k in 1:nrow(centers)){
+      d <- t(sqrt((t(x) - centers[k,])^2))
+      z[,,k] <- ifelse(is.na(d), 1, d) #just a placeholder, NA cases are removed by weights==0
+    }
   } else if(dists=='distManhattan') {
-      for(k in 1:nrow(centers)){
-        d <- t(abs(t(x)-centers[k,]))
-        z[,,k] <- ifelse(is.na(d), 1, d)
-      }
+    for(k in 1:nrow(centers)){
+      d <- t(abs(t(x)-centers[k,]))
+      z[,,k] <- ifelse(is.na(d), 1, d)
+    }
   } else if(dists %in% c('distSimMatch', 'distJaccard')) {
+    for(k in 1:nrow(centers)){
+      d <- t(t(x) != centers[k,])
+      z[,,k] <- ifelse(is.na(d), 1, d)
+    }
+    if(dists=='distJaccard') {
       for(k in 1:nrow(centers)){
-        d <- t(t(x) != centers[k,])
-        z[,,k] <- ifelse(is.na(d), 1, d)
+        z[,,k][x==0] <- 1 #auch nur ein placeholder, das wird auch mit dem delta=0 rausgenommen
       }
-      if(dists=='distJaccard') {
-        for(k in 1:nrow(centers)){
-          z[,,k][x==0] <- 1 #auch nur ein placeholder, das wird auch mit dem delta=0 rausgenommen
-        }
-      }
-  
+    }
+    
   } else {stop('Specified distance not implemented in flexord::distGower')}
   #ifelse part could ofc also go here, but the dimensions are retained easier for z[,,k]
   z
 }
 #hi, testing, (on nrowx=1, nrowcent=1, NA, onevartype...)
-#then create the mixedtype version. See if I can use that one for it
-
+#then compare with mixedtype+NAs
 
 #' @param genDist i.e. genDist expects char.vector with dist to be used
 #'                 for each variable, as for example created by .ChooseVarDists
