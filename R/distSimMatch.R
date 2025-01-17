@@ -102,6 +102,6 @@ kccaFamilyKmodes <- function(preproc=NULL, trim=0, groupFun='minSumClusters') {
   flexclust::kccaFamily(name='kmodes',
                         dist=distSimMatch,
                         cent=centMode,
-                        genDist=NULL, xrange=NULL, xmethods=NULL,
+                        genDist=NULL,
                         preproc=preproc, trim=trim, groupFun=groupFun)
 }

@@ -1,62 +1,33 @@
-# 09.12.24
-
-#Gower's distance
+# Stand: 18.01.25
 
 #old distGower_ordinal that was used in paper (written just for ordinal, not mixed)
-#' @param xrange 'data range' for range(x); 'variable specific' for apply(x, 2, range);
-#'               range vector of c(min,max); or list of range vectors for each variable
-#'               (length of list == ncol(x), each item is num. vector c(min,max))
-.distGower_ordinal <- function(x, centers, xrange=NULL) {
-  
-  if (ncol(x) != ncol(centers))
-    stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
-  z <- matrix(0, nrow=nrow(x), ncol=nrow(centers))
-  
-  rng <- .rangeMatrix(xrange)(x)
-  
-  scl <- apply(rng, 2, diff)
-  scl <- ifelse(scl==0, 1, scl)
-  
-  xr <- scale(x, center=rng[1,], scale=scl)
-  centr <- scale(centers, center=rng[1,], scale=scl)
-  
-  for(k in 1:nrow(centers)) {
-    z[, k] <- colMeans(abs(t(xr) - centr[k, ]))
-  }
-  z  
-}
+#can be found in the AJS paper folder, is now replaced here as the other options work properly
 
-#' Function can't actually be used directly on x in dist, as dist is 'data.matriced'
-#' and thus loses class information. Instead, I added an if-clause in kcca, where
-#' I extract the class info is extracted previously, and stored in the (at)infosOnX slot)
-#' @param xclass Character vector of length=ncol(x) of EITHER:
-#'                1) distances to be used for each variable. Available options are
-#'                   'distEuclidean' (squared Euclidean distance), 'distManhattan'
-#'                   (absolute distance), 'distJaccard' (Jaccard distance for
-#'                   asymmetric binary variables), and 'distSimMatch' (simple Matching
-#'                   distance, i.e. inequality between values). OR:
-#'                2) classes of variables in x, for example as obtained by
-#'                   sapply(data.frame(x), data.class).
-#'                   Default methods will be mapped to each variable class:
-#'                     - 'numeric' or 'integer': squared Euclidean distance
-#'                     - 'logical': Jaccard distance
-#'                     - 'ordered': Manhattan distance (after adequate preprocessing)
-#'                     - 'factor' (i.e. categorical): Simple Matching Distance
-#'                  The treatment of the different variables can thus also be influenced
-#'                  by their coding. F.i. for a symmetric logical variable, symmetric treatment
-#'                  can be achieved by coding them either as categorical or numeric instead of
-#'                  logical.
+# .ChooseVarDists: helper that maps default distances to 4 different variable types.
+#                  A different option is to specifically provide a character vector
+#                  of length ncol(x) to kccaFamilyGower(xmethods) that specifies the
+#                  distance for each variable. In the latter case, this helper is
+#                  circumvented.
+#' @param xclass Character vector of length=ncol(x) of classes of variables in x,
+#'               for example as obtained by sapply(data.frame(x), data.class).
+#'                   Default variable specific methods will be mapped to each variable class:
+#'                     - 'numeric' or 'integer': squared Euclidean distance ('distEuclidean'),
+#'                                               expects data to be scaled previously (f.i. by
+#'                                               .ScaleVarSpecific) 
+#'                     - 'logical': Jaccard distance ('distJaccard')
+#'                     - 'ordered': Manhattan distance ('distManhattan'),
+#'                                               expects data to be scaled previously (f.i. by
+#'                                               .ScaleVarSpecific) 
+#'                     - 'factor' (i.e. categorical): Simple Matching Distance ('distSimMatch')
+#'                  The treatment of the different variables can thus influenced in two ways:
+#'                  First, by specifing the xmethods parameter in kccaFamilyGower(),
+#'                  Secondly by their coding. F.i. for a symmetric logical variable,
+#'                  symmetric treatment can be achieved by coding them either as
+#'                  categorical or numeric instead of logical.
 #' written after: Gower (1971), Kaufman & Rousseeuw (1990).
-#' Note: for by-the-book clustering with Gower's distance, scale-centering x by
-#'       min and range is necessary for numeric or ordered variables. A helper
-#'       for this can be found in .ScaleGower. (which applies it to all variables.
-#'       BUT, scaling has no effect for logical and unordered factor variables,
-#'       so no problem.)
 .ChooseVarDists <- function(xclass) {
   
-  if(!is.null(dim(xclass))) {#the case where the function *could* be used outside of kcca, directly on x
-    #this should never evaluate to TRUE within kcca, else it'll just return
-    #rep('distEuclidean', ncol(x)), and then we've got a problem
+  if(!is.null(dim(xclass))) {#compatibility option, where .ChooseVarDists is used outside of kcca, and directly on x
     if(is.data.frame(xclass)) {
       xclass <- sapply(xclass, data.class)
     } else {
@@ -75,38 +46,6 @@
   ) |> setNames(names(xclass))
 }
 
-.rangeMatrix <- function(xrange) { #TODO: this is also created in centroidFunctions. Choose place to avoid duplicates. Either leave in centroidFunctions.R, or start the generic.R file, where I stash all .-Functions
-  #xrange: response level range of the variables,
-  #       implemented options:
-  #       'data range': range of x, same for all variables
-  #       'variable specific': range of each variable in the data
-  #       c(lower, upper): range vector specified by user, upper and lower limit for all variables
-  #       list(x1= c(lower, upper), x2=c(lower, upper), ...): list of range vectors specified by user, upper and lower limits are variable specific
-  if(all(xrange=='data range')) {
-    rng <- function(x) {
-      rep(range(x, na.rm=T), ncol(x)) |>
-        matrix(nrow=2)
-    }
-  } else if(all(xrange=='variable specific')) {
-    rng <- function(x) {
-      apply(x, 2, range, na.rm=T)
-    }
-  } else if(is.vector(xrange, mode='numeric')) {
-    if(length(xrange) != 2)
-      stop('Either supply 1 range vector, or list of ranges for all variables')
-    rng <- function(x) {
-      rep(xrange, ncol(x)) |>
-        matrix(nrow=2)
-    }
-  } else {
-    rng <- function(x) {
-      if(length(xrange) != ncol(x))
-        stop('Either supply 1 range vector, or list of ranges for all variables')
-      unlist(xrange) |> matrix(nrow=2)
-    }
-  }
-  return(rng)
-}
 
 #Variable scaling after Gower and Kaufman+Rousseeuw (center around
 #the minimum value, and divide by range). Only performed on numeric
@@ -119,10 +58,11 @@
 #'                 as obtained by `.ChooseVarDists(x)`;
 #'               with `length(xclass)==ncol(x)`
 #' @param rangeMatrix expects a function that has been previously created
-#'                    with .rangeMatrix(xrange). If it is NULL, see the next param.
+#'                    with `.rangeMatrix(xrange).` If it is NULL, it will be
+#'                    created on `xrange`.
 #' @param xrange is a compatibility parameter so the helper runs outside
-#'               of the kccaFamilyGower concept, but within kccaFamilyGower,
-#'               .rangeMatrix(xrange) is run previously
+#'               of the `kccaFamilyGower` concept, but within `kccaFamilyGower`,
+#'               `.rangeMatrix(xrange)` is run previously
 .ScaleVarSpecific <- function(x, xclass,
                               rangeMatrix=NULL, xrange=NULL) {
   
@@ -132,7 +72,7 @@
     rng <- rangeMatrix
   }
   
-  if(is.null(colnames(x))) colnames(x) <- 1:ncol(x) #don't need this here but later in the dist
+  if(is.null(colnames(x))) colnames(x) <- 1:ncol(x) #don't need this here but later in the dist #I think it's actually obsolete now
   
   cols2scl <- xclass %in% c('numeric', 'ordered', #compatibility with xclass=sapply(dat, data.class)
                             'distEuclidean', 'distManhattan') #compatibility with xmethods
@@ -145,38 +85,19 @@
   return(x)
 }
 
-##this is the option that just scales over all, cause it doesn't matter for binary and nominal:
-#NO, ERROR! It doesn't matter if range is calculated variable specific,
-#or if user specifies for each variable. HOWEVER, it does destroy distJaccard
-#for ranges that cover the whole data set, variables aren't 0,1 anymore afterward
-#NEED TO REACTIVATE VARIABLE SPECIFIC SCALING, this is archived
-#' @param rangeMatrix expects a function that has been previously created
-#'                    with .rangeMatrix(xrange). If it is NULL, see the next param.
-#' @param xrange is a compatibility parameter so the helper runs outside
-#'               of the kccaFamilyGower concept, but within kccaFamilyGower,
-#'               .rangeMatrix(xrange) is run previously
-.ScaleGower <- function(x, rangeMatrix=NULL,
-                        xrange=NULL) {
-
-  if(is.null(rangeMatrix)) {
-    rng <- .rangeMatrix(xrange)
-  } else {
-    rng <- rangeMatrix
-  }
-  
-  if(is.null(colnames(x))) colnames(x) <- 1:ncol(x) #don't need this here but later in the dist
-  
-  rng <- rng(x)
-  scl <- apply(rng, 2, diff)
-  scl <- ifelse(scl==0, 1, scl)
-  
-  scale(x, center=rng[1,], scale=scl)
-}
-
-#helper function to calculate Gower's weights
-#     (i.e. both values non-missing, and in the case of distJaccard,
-#      not both values =0)
-#' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
+#helper function to calculate weights for Gower's distance
+#' @param x a numerically coded matrix.
+#' @param centers a numerically coded matrix that is compatible with,
+#'                or a subset of, `x`. `ncol(x)==ncol(centers)`, and
+#'                `nrow(x)>=nrow(centers)`.
+#' @param distances character vector of variable specific distances,
+#'                  f.i. as derived from `.ChooseVarDists(x)`. Length
+#'                  needs to be equal to `ncol(x)`.
+#' @return a logical array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`.
+#'         `TRUE` in `ijk` if `x[i,j]` and `centers[k,j]` are both non-
+#'         missing, and, in the case of logical variables calculated with
+#'         `distJaccard`, not more than one variables is equal to 0; `FALSE`
+#'         otherwise. 
 .delta <- function(x, centers, distances) {
   K <- nrow(centers)
   delta <- sapply(1:K,
@@ -198,15 +119,29 @@
 }
 
 
-#helper function to Gower's distance on _mixed vartypes_
-#     (i.e. x needs to be scaled previously, distance function is
-#      chosen for each column, NAs are handled as: omitted, nonmissing vars are upweighted).
-#      output: array of dim nrow(x) X ncol(x) X nrow(centers)
-#               (Weighting with delta, and summing up happens at the end of the distGower function)
-#' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
+#helper function to calculate Gower's distance on _mixed variable types_, and/or
+#in the presence of missing values
+#' @param x a numerically coded matrix. If `distEuclidean` or
+#'          `distManhattan` are to be used on some columns, these
+#'          columns need to be scaled previously, f.i. by
+#'          `.ScaleVarSpecific(x)`.
+#' @param centers a numerically coded matrix that is compatible with,
+#'                or a subset of, `x`. `ncol(x)==ncol(centers)`, and
+#'                `nrow(x)>=nrow(centers)`.
+#' @param distances character vector of variable specific distances,
+#'                  f.i. as derived from `.ChooseVarDists(x)`. Length
+#'                  needs to be equal to `ncol(x)`.
+#' @return a numeric array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`
+#'         that in each `ijk` contains the distance between `x[i,j]`
+#'         and `centers[k,j]`. Weighting with `delta`, and summing up
+#'         over `j` happens in the next step.
+#' @details NA handling: As proposed by Gower, and Kaufman+Rousseeuw. NAs
+#'          are filled with placeholder values, and handled in the weighting
+#'          step (Pairs of `c(x[i,j], centers[k,j])` with missing values receive
+#'          weight 0, and values that are present in `c(x[i,], centers[k,])` are
+#'          upweighted.
 .distGower_mixedType <- function(x, centers, distances) {
   
-  #  dists <- unique(distances)
   z <- array(0, dim=c(dim(x), nrow(centers)),
              dimnames=c(dimnames(x), list(NULL)))
   K <- nrow(centers)
@@ -250,13 +185,39 @@
   z
 }
 
-#helper function to Gower's distance on a _single vartype_ with no NAs
-#checks need to happen outside of it
-#     (i.e. x needs to be scaled previously, distance function is
-#      chosen for the single vartype).
-#      output: array of dim nrow(x) X ncol(x) X nrow(centers)
-#               (Weighting with delta, and summing up happens at the end of the distGower function)
-#' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
+#helper function to calculate Gower's distance on _single variable types_,
+#and no missing values.
+#' @param x a numerically coded matrix. If `distEuclidean` or
+#'          `distManhattan` are to be used on some columns, these
+#'          columns need to be scaled previously, f.i. by
+#'          `.ScaleVarSpecific(x)`.
+#' @param centers a numerically coded matrix that is compatible with,
+#'                or a subset of, `x`. `ncol(x)==ncol(centers)`, and
+#'                `nrow(x)>=nrow(centers)`.
+#' @param distances character vector of distance to be used on all variables.
+#'                  Length needs to be equal to `ncol(x)`, but needs to be the
+#'                  same for all columns. Can f.i. be derived from `.ChooseVarDists(x)`.
+#' @return a numeric matrix of dim `nrow(x)`X`nrow(centers)`
+#'         that in each `ik` contains the distance between `x[i,]`
+#'         and `centers[k,]`
+#' @details
+#' This helper is added for the speed increase it provides when using
+#' Gower's distance on all numeric or all ordered variables without
+#' missing values.
+#' 
+#' The difference between this option, and using `distEuclidean` or 
+#' `distManhattan` directly is that 1) when using these distances within
+#' Gower's distance, they are scaled previously as described by Gower and
+#' Kaufman+Rousseeuw, and 2) the are then divided by the number of columns
+#' (as all weights will be 1). This results in a distance that ranges from 0-1.
+#' 
+#' Due to compatibility reasons, this function can also handle Jaccard distance,
+#' #or Simple Matching Distance over all variables. However, in this case it
+#' brings no advantages. Thus, it is recommended to use `flexclust::distJaccard`
+#' or `distSimMatch` directly.
+#' 
+#' The checks for this helper to run (`length(unique(distances))==1` and
+#' `!any(is.na(x))` happen outside of it.
 .distGower_singleTypeNoNAs <- function(x, centers, distances) {
 
   dists <- unique(distances)
@@ -277,21 +238,48 @@
   dstfnc(x, centers)/p
 }
 
-
-#' @param genDist i.e. genDist expects char.vector with dist to be used
-#'                 for each variable, as for example created by .ChooseVarDists
-#' @param x, centers: dist expects these to be already scaled 'gowerly'
+#Function to calculate Gower's distance as written by Gower (1971) and
+#Kaufman+Rousseeuw (1990), on numeric, ordered, logical, categorical,
+#or mixed data sets, that possibly contain missing values.
+#' @param x a numerically coded matrix. If `distEuclidean` or
+#'          `distManhattan` are to be used on some columns, these
+#'          columns need to be scaled previously, f.i. by
+#'          `.ScaleVarSpecific(x)`.
+#' @param centers a numerically coded matrix that is compatible with,
+#'                or a subset of, `x`. `ncol(x)==ncol(centers)`, and
+#'                `nrow(x)>=nrow(centers)`.
+#' @param genDist character vector of variable specific distances to be used,
+#'                  f.i. as derived from `.ChooseVarDists(x)`. Length
+#'                  needs to be equal to `ncol(x)`. Can contain the options:
+#'                  - `distEuclidean`: squared Euclidean distance between the
+#'                                     scaled variables
+#'                  - `distManhattan`: absolute distance between the scaled variables
+#'                  - `distJaccard`: counts of zero if both binary variables are
+#'                                   equal to 1, and 1 otherwise
+#'                  - `distSimMatch`: Simple Matching Distance, i.e. the number of agreements
+#'                                    between variables.
+#'                These are then weighted, summed and normalized according to Gower and
+#'                Kaufman+Rousseeuw.
+#' @return a numeric matrix of dim `nrow(x)`X`nrow(centers)`
+#'         that in each `ik` contains the distance between `x[i,]`
+#'         and `centers[k,]`
+#' @details
+#' NA handling:
+#' As proposed by Gower, and Kaufman+Rousseeuw. NAs are filled with
+#' placeholder values, and handled by weighting (Pairs of
+#' `c(x[i,j], centers[k,j])` with missing values receive weight 0,
+#' and values that are present in `c(x[i,], centers[k,])` are upweighted.
+#' 
+#' This distance is designed for mixed variable types and/or data with
+#' missing values. It can also bring advantages in cases of strictly numeric
+#' or strictly ordered variables without missing values, but is not recommended
+#' in cases of only binary or only categorical variables.
+#' @export
 distGower <- function(x, centers, genDist) {
   
   if (ncol(x) != ncol(centers))
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   
-  #if single vartype, and no NAs --> z=simpledistancemethod/ncol(x)
-  #for distEuclidean, distManhattan (as in our study), this still follows
-  #Gower, as the variables have been scaled previously, and are didided by
-  #the number of parameters (i.e. dist will always range between 0 and 1).
-  #For distJaccard and distSimMatch it is redundant, but I still included
-  #them for now
   if(length(unique(genDist))==1 && !any(is.na(x))) {
     
     .distGower_singleTypeNoNAs(x, centers, distances=genDist)
@@ -310,87 +298,39 @@ distGower <- function(x, centers, genDist) {
   }
 }
 
-
-
-
+#A wrapper for `flexclust::kccaFamily` to conduct
+# K-centroids clustering with Gower's distance. It is intended for use in
+# `flexclust::kcca` functions built upon it.
+#' @param cent See [flexclust::kccaFamily()]: Function for determining cluster
+#'   centroids. `NULL` (default) defaults to `flexclust::centOptim`, a general
+#'   purpose optimizer.
+#' @param preproc See [flexclust::kccaFamily()]: Preprocessing function to be
+#' applied to the data before clustering.
+#' @param trim See [flexclust::kccaFamily()]: Proportion of points trimmed in
+#' robust clustering.
+#' @param groupFun See [flexclust::kccaFamily()]: A character string specifying
+#' the function for clustering.
+#'   Default is `'minSumClusters'`.
+#' @return A custom `kccaFamily` object using `distGower` as the 
+#'    distance function; `.ScaleVarSpecific` (scaling of numeric and ordinal
+#'    variables as proposed by Gower, 1970, and Kaufman+Rousseeuw, 1990) for
+#'    data preprocessing (slot `preproc`); and chooses the distances for each
+#'    variable either as specified by the user in `xmethods`, or proposes default
+#'    methods via `.ChooseVarDists` (slot `genDist`).
+#'@export
 kccaFamilyGower <- function(cent=NULL,
-                            xrange=NULL, xmethods=NULL,
+                            xrange='columnwise', xmethods=NULL,
                             trim=0, groupFun='minSumClusters') {
   
   rng <- .rangeMatrix(xrange)
   
-  preproc <- function(x) .ScaleGower(x, rangeMatrix=rng)
-  #if I were to use .ScaleVarSpecific, this would get
-  #more complicated cause in case of is.null(xmethods),
-  #I'd need to access the primed family to get xclass
-  
+#  preproc <- function(x) .ScaleGower(x, rangeMatrix=rng) #archived, simpler version, as in data wide xrange options, the scaling destroys binary variables
   
   if(is.null(xmethods)) {
     warning('No column-wise distance measures specified, default measures
             will be used. Make sure that the data object x for your clustering
             procedure is a correctly coded dataframe.') #in fact, it won't work if is.null(xmethods) && is.matrix(x)
-    distGen <- function(x, ...) { #TODO: remove ... when GDM2's genDist is fixed
-#      if('xclass' %in% names(xclass)) xclass <- xclass$xclass #again, the necessary catcher for the family@infosOnX
-#      .ChooseVarDists(xclass=xclass) #adding x here cause that's the setup I need for the relevant code line, but fun is independent of x (at this stage, x is already 'numericized')
-      #now: trying to create a function factory, so that when calling family@genDist in kcca, it'll just create the function (x doesn't do anything), and the function then has access to the xclass object that was created a few lines ago in kcca
-      #not successfull, had to work with parent.frame(). I think it's okay in this case though, as this function is only used in this instance, and not other, lower-lying ones. Also, it's not supposed to run outside of kcca, right? (if one wanted to use it, could just use .ChooseVarDists)
-      xcls <- get('xclass', parent.frame())
-      .ChooseVarDists(xcls)
-    }
-  } else {
-    distGen <- function(x, ...) { #TODO: dots necessary right now, remove when distGDM2 is updated
-#      if('xmethods' %in% names(xmethods)) xmethods <- xmethods$xmethods #s.o.
-      if(!all(xmethods %in% c('distEuclidean', 'distManhattan',
-                              'distSimMatch', 'distJaccard')))
-        stop('Specified columnwise xmethod not implemented!')
-      return(xmethods)
-    }
-  }
-  
-  # if(is.null(cent)) {
-  #   cent <- function(x) {
-  #     #if(is.function(xmethods)) xmethods <- xmethods(x) #this is now handled directly in dist
-  #     centMin(x, xrange=xrange,
-  #             dist = \(y, centers) {
-  #               distGower(y, centers,
-  #                         genDist=xmethods)
-  #     })
-  #   }
-  # }
-  #now that the variables are scaled, is centOptim sufficient?
-  if(is.null(cent)) {
-    cent <- function(x){
-      centOptimNA(x, dist = \(y, centers) {
-        distGower(y, centers, genDist=genDist)
-      }) #filler cent, will be recreated in the function
-    }
-  }
-  
-  flexclust::kccaFamily(name='kGower',
-                        dist=distGower,
-                        genDist=distGen,
-                        cent=cent,
-                        preproc=preproc,
-                        xrange=rng, xmethods=xmethods,
-                        trim=trim, groupFun=groupFun)
-}
-
-kccaFamilyGowerTestDataRange <- function(cent=NULL,
-                            xrange=NULL, xmethods=NULL,
-                            trim=0, groupFun='minSumClusters') {
-  
-  rng <- .rangeMatrix(xrange)
-  
-#  preproc <- function(x) .ScaleGower(x, rangeMatrix=rng)
-  #archived, simpler version, as in the case of xrange='data range' or xrange=c(min,max)
-  #the scaling destroys binary variables
-  
-  
-  if(is.null(xmethods)) {
-    warning('No column-wise distance measures specified, default measures
-            will be used. Make sure that the data object x for your clustering
-            procedure is a correctly coded dataframe.') #in fact, it won't work if is.null(xmethods) && is.matrix(x)
-    distGen <- function(x, ...) { #TODO: remove ... when GDM2's genDist is fixed
+    distGen <- function(x) {
       #I apologize for the use of parent.frame(), but didn't know how else to fix it.
       #however I do think it's ok here because 1) 'xclass' is not a generic method
       #and 2) because I only use them once in the beginning (unlike the dists),
@@ -404,8 +344,7 @@ kccaFamilyGowerTestDataRange <- function(cent=NULL,
                         xclass=xcls)
     }
   } else {
-    distGen <- function(x, ...) { #TODO: dots necessary right now, remove when distGDM2 is updated
-      #      if('xmethods' %in% names(xmethods)) xmethods <- xmethods$xmethods #s.o.
+    distGen <- function(x, ...) {
       if(!all(xmethods %in% c('distEuclidean', 'distManhattan',
                               'distSimMatch', 'distJaccard')))
         stop('Specified columnwise xmethod not implemented!')
@@ -415,9 +354,7 @@ kccaFamilyGowerTestDataRange <- function(cent=NULL,
                                              xclass=xmethods)
   }
   
-  #the default combo in the paper for distGower was centMin.
-  #now that x is scaled in the beginning, I think centOptim is
-  #sufficient
+  #the default combo in the paper for distGower was centMin. now that x is scaled in the beginning, I think centOptim is sufficient
   if(is.null(cent)) {
     cent <- function(x){
       centOptimNA(x, dist = \(y, centers) {
@@ -431,76 +368,72 @@ kccaFamilyGowerTestDataRange <- function(cent=NULL,
                         genDist=distGen,
                         cent=cent,
                         preproc=preproc,
-                        xrange=rng, xmethods=xmethods,
                         trim=trim, groupFun=groupFun)
 }
 
-if(FALSE){ #Example zone
-  #mixed data case
-  (dat <- data.frame(cont = sample(1:100, 10, replace=T)/10,
-                     bin_sym = as.logical(sample(0:1, 10, replace=T)),
-                     bin_asym = as.logical(sample(0:1, 10, replace=T)),                     
-                     ord_levmis = factor(sample(1:5, 10, replace=T),
-                                         levels=1:6, ordered=T),
-                     ord_levfull = factor(sample(1:4, 10, replace=T),
-                                          levels=1:4, ordered=T),
-                     nom = factor(sample(letters[1:4], 10, replace=T),
-                                  levels=letters[1:4])))
-  
-  datrng <- apply(datmat, 2, range) |> data.frame() |> 
-    as.list()
-  datmat <- data.matrix(dat) |> 
-    .ScaleGower(xrange='variable specific')
-  datcent <- datmat[sample(1:nrow(dat), 3, replace=F),]
-  
-  #mixed data with NAs
-  datNA <- dat
-  nas <- sample(c(T,F), prod(dim(dat)),
-                replace=T, prob=c(0.1,0.9))
-  datNA[nas] <- NA
-  datNAmat <- data.matrix(datNA) |> 
-    .ScaleGower(xrange=datrng)
-  datcentNA <- datmatNA[sample(1:nrow(dat), 3, replace=F),]
-
-  #hi
-  #(hopefully) correct .ScaleVarSpecific exists now,
-  #test it, and test clustering with kccaFamilyGowerTestDataRange
-  
-  genDist <- .ChooseVarDists(dat)
-  
-  datmatNAscld <- .ScaleGower(datmatNAscld, xrange=datrng)
-  datcentNAscld <- .ScaleGower(datcentNA, xrange=datrng)
-  
-  #single variable type case
-  data('risk', package='MSA')
-  riskcent <- risk[sample(1:nrow(risk), 3, replace=F),]
-  
-  
-  datmatscld |> distGower(datcent)
-
-  datmatrixscaled |> distGower(centnoNAscaled, .ChooseVarDists(dat))
-  datmatrixscaled |> distGower(datmatrix, .ChooseVarDists(dat)) |> as.dist()
-  #testing the 1-vartype case (with Euclidean distance)
-  xscld <- .ScaleGower(x)
-  centscld <- .ScaleGower(centers)
-  distGower(xscld, centscld, .ChooseVarDists(x))
-  distGower(xscld, xscld, .ChooseVarDists(x)) |> as.dist()
-  #testing the 1-vartype case (with Jaccard)
-  distGower(xscld, centscld, rep('distJaccard', 6))
-  #testing the nrow(centers)=1 case
-  distGower(datmatrixscaled, centnoNAscaled[1,,drop=F], .ChooseVarDists(dat))
-  #testing the nrow(x) && nrow(centers) == 1 case
-  (h <- datmatrixscaled[1,,drop=F])
-  distGower(h, h, .ChooseVarDists(dat))
-  distGower(x[1,,drop=F], x[1,,drop=F], .ChooseVarDists(x))
-  
-  #testing the NA case
-  distGower(datNAmatrixscaled, centNAscaled, .ChooseVarDists(dat))
-  #-within kcca, stepFlexclust, bootFlexclust
-  # *for the cases: mixed vars, one vartype, with centOptim (1 var case usually
-  # happens for the datmatrix object), with NAs
-  kcca(datmatrix, k, family=kccaFamilyGower()) #worked for now
-  stepFlexclust(datmatrix, k=2:4, family=kccaFamilyGower())
-  bootFlexclust(datmatrix, k=2:4, nboot=3,
-                family=kccaFamilyGower())
-}
+#' @examples
+#' #1) single variable type case with no missings:
+#' 
+#' dat <- matrix(sample(1:5, 60, replace = TRUE), nrow = 10)
+#' #1.1) choose distances for each variable
+#' (xcls <- .ChooseVarDists(dat)) #defaults to 'distEuclidean' for all.
+#' #alternative treatment can be specified, f.i. rep('disManhattan', ncol(dat))
+#' #1.2) scale according to Gower and Kaufman and Rousseeuw:
+#' (dat <- .ScaleVarSpecific(dat, xclass=xcls,
+#'                          xrange=c(1,6))) #let's assume that the option 6 was available for all variables, but was never used
+#' #1.3) choose centers:                                     
+#' initcenters <- dat[sample(1:10, 3),]
+#' #1.4) calculate Gower's distance
+#' distGower(dat, initcenters, genDist=xcls)
+#' 
+#' #calculate distance matrix (f.i. for PAM) via:
+#' distGower(dat, dat, genDist=xcls) |> as.dist()
+#' 
+#' #within k-centroids clustering:
+#' flexclust::kcca(dat, 3, kccaFamilyGower(xrange=c(1,6)))
+#' #or using Manhattan distance:
+#' kcca(dat, 3, kccaFamilyGower(xmethods=rep('distManhattan', 6)))
+#' 
+#' #2) single variable type case with missing values:
+#' nas <- sample(c(T,F), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
+#'    matrix(nrow=nrow(dat))
+#' dat[nas] <- NA
+#' #repeat steps as above...or just do:
+#' kcca(dat, 3, kccaFamilyGower())
+#' 
+#' #3) mixed variable type case with no missings:
+#' dat <- data.frame(cont = sample(1:100, 10, replace=T)/10,
+#'                    bin_sym = as.logical(sample(0:1, 10, replace=T)),
+#'                    bin_asym = as.logical(sample(0:1, 10, replace=T)),                     
+#'                    ord_levmis = factor(sample(1:5, 10, replace=T),
+#'                                        levels=1:6, ordered=T),
+#'                    ord_levfull = factor(sample(1:4, 10, replace=T),
+#'                                         levels=1:4, ordered=T),
+#'                    nom = factor(sample(letters[1:4], 10, replace=T),
+#'                                 levels=letters[1:4]))
+#' #3.1) choose distances for each variable
+#' (xcls <- .ChooseVarDists(dat))
+#' #uses default distance for each variable type. If f.i. for 'bin_sym',
+#' #symmetric instead of asymmetric treatment is desired, the vector needs
+#' #to be created by hand (f.i. c('distEuclidean', 'distEuclidean', ...))
+#' #3.2) convert to matrix, and scale:
+#' datmat <- .ScaleVarSpecific(data.matrix(dat), xclass=xcls,
+#'                             xrange='columnwise')
+#' #caution, xrange='all' would not make sense in this case
+#' #if we wanted to acknowledge that not all available levels are used in
+#' #variable 'ord_levmis', we could instead provide a list of range vectors
+#' #for xrange
+#' #3.3) choose centers:                                     
+#' initcenters <- datmat[sample(1:10, 3),]
+#' #3.4) calculate Gower's distance
+#' distGower(datmat, initcenters, genDist=xcls)
+#' 
+#' #calculate distance matrix via:
+#' distGower(datmat, datmat, genDist=xcls) |> as.dist()
+#' 
+#' #within kcca:
+#' kcca(dat, 3, kccaFamilyGower()) #using defaults for centroid, xrange, and xmethods
+#'
+#' #4) mixed variable type case with missing values:
+#' dat[nas] <- NA
+#' kcca(dat, 3, kccaFamilyGower(xrange='columnwise'))

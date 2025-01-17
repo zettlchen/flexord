@@ -1,8 +1,8 @@
-#06.12.24
-#Other, non-refined centroid methods were written: `centOptimLB`, `centMedoid`.  
+#Stand: 17.01.25
+
+#Other centroid methods were drafted: `centOptimLB`, `centMedoid`.  
 # TODO: adapt examples when distGower and the wrapper are done. should prolly be
 #       in the wrapper anyways
-# TODO: centroid that contains the switching thing from Gower's distance
 
 #' Additional Centroid Functions for K-centroids clustering of (ordinal) categorical data
 #'
@@ -35,14 +35,15 @@
 #'  NAs are removed from the starting search values.
 #'
 #' @param x A numeric matrix or data frame. Categorical/ordinal variables
-#'    need to be coded as `1:length(levels(x[,i]))`.
+#'    need to be coded as `1:length(levels(x[,i]))` in steps of one.
 #' @param dist The distance measure function to be minimized in `centMin`.
 #' @param xrange Range specification for the variables. Possible values are:
-#'   - `NULL` (default): defaults to `'data range'`.
-#'   - `'data range'`: Uses the range of the entire dataset.
-#'   - `'variable specific'`: Uses column-specific ranges.
-#'   - A numeric vector: Applies the same range to all columns.
-#'   - A list of numeric vectors: Specifies column-specific ranges.
+#'   - `NULL` (default): defaults to `'all'`.
+#'   - `'all'`: Uses the range of the entire data set.
+#'   - `'columnwise'`: Uses column-specific ranges.
+#'   - A numeric vector of c(min, max): Applies the specified range to all columns.
+#'   - A list of numeric vectors of c(min,max): Uses the user-specified columnwise
+#'       ranges, the length of the list must be equal to the number of columns to be scaled.
 #'
 #' @return 
 #' A named numeric vector containing the centroid values for each variable.
@@ -77,32 +78,6 @@ centMode <- function(x) {
     matrix(tabulate(cat), nrow = 1) |>
       max.col(ties.method = 'random') # Other options: first, last
   })
-}
-
-#helper function for the different options regarding the xrange parameter
-.rangeMatrix <- function(xrange) {
-  if(all(xrange=='data range')) {
-    rng <- function(x) {
-      rep(range(x), ncol(x)) |>
-        matrix(nrow=2)
-    }
-  } else if(all(xrange=='variable specific')) {
-    rng <- function(x) {
-      apply(x, 2, range)
-    }
-  } else if(is.vector(xrange, mode='numeric')) {
-    rng <- function(x) {
-      rep(xrange, ncol(x)) |>
-        matrix(nrow=2)
-    }
-  } else {
-    rng <- function(x) {
-      if(length(xrange) != ncol(x))
-        stop('Either supply 1 range vector, or list of ranges for all variables')
-      unlist(xrange) |> matrix(nrow=2)
-    }
-  }
-  return(rng)
 }
 
 #' @export

@@ -66,7 +66,7 @@
 #' ## Example usage
 #' #creating a distance matrix between two matrices based on GDM2 distance
 #' dat <- matrix(sample(1:5, 50, replace = TRUE),
-#'               nrow = 10, ncol = 5)
+#'               nrow = 10)
 #' initcenters <- dat[sample(1:10, 3),]
 #' distGDM2(dat, initcenters, genDist=.projectIntofx)
 #' 
@@ -118,16 +118,22 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
   z 
 }
 
-#' @export
-.projectIntofx <- function(x, xrange=NULL){
-  if(is.null(xrange)) xrange <- 'data range'
+#' @param x a numerically coded matrix.
+#' @param rangeMatrix expects a function that has been previously created
+#'                    with `.rangeMatrix(xrange)`. If it is NULL, it is created on x.
+#' @param xrange is a compatibility parameter so the helper runs outside
+#'               of the `kccaFamilyGDM2` concept, but within `kccaFamilyGDM2`,
+#'               `.rangeMatrix(xrange)` is run previously
+.projectIntofx <- function(x, rangeMatrix=NULL,
+                           xrange=NULL){
   
-  if('xrange' %in% names(xrange)) xrange <- xrange$xrange
-  #this is for the case within kcca where I pass genDist(x, family@infosOnX)
-  #to make that step there more generalizable, so I can use the call in kcca
-  #for different functions with different formals
+  if(is.null(rangeMatrix)) {
+    rng <- .rangeMatrix(xrange)
+  } else {
+    rng <- rangeMatrix
+  }
   
-  rng <- .rangeMatrix(xrange=xrange)(x) #code for this lies in centroids.R
+  rng <- rng(x)
   
   hats <- lapply(1:ncol(x), function(y) {
     level <- factor(x[,y], levels=seq(rng[1,y], rng[2,y]))
@@ -171,8 +177,13 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
 #' @import flexclust
 #' @export
 kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL,
-                           xrange=NULL, xmethods=NULL,
+                           xrange='all', xmethods=NULL, #currently not used but if GDM2 were to be extended for mixed data, it could be used just like in kGower
                            trim=0, groupFun='minSumClusters') {
+  
+  rng <- .rangeMatrix(xrange)
+  
+  distGen <- function(x) .projectIntofx(x, rangeMatrix=rng)
+  
   if(is.null(cent)) {
     cent <- function(x){
     #genDist <- .projectIntofx(x, xrange=xrange)
@@ -183,8 +194,7 @@ kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL,
   }
   flexclust::kccaFamily(name='kGDM2',
                         dist=distGDM2,
-                        genDist=.projectIntofx,
+                        genDist=distGen,
                         cent=cent, preproc=preproc,
-                        xrange=xrange, xmethods=xmethods,
                         trim=trim, groupFun=groupFun)
 }
