@@ -108,34 +108,56 @@
   return(rng)
 }
 
-.ScaleVarSpecific <- function(x, xrange, xmethods) {
-  #making scale Y/N dependent on vartype. BUT I could just scale over all
-  #vartypes, it wouldn't change the resulting distances.
-  #x...data matrix
-  #xrange...same options as before, will be handled by .rangeMatrix
-  #xmethods...character vector of length=ncol(x). Either dists to be
-  #           applied to each variable, or variable class (latter one
-  #           will be converted to char. vector of dists by .ChooseVarDists)
-  if(!all(startsWith(xmethods, 'dist'))) xmethods <- .ChooseVarDists(xclass=xmethods)
- 
-  cols2scale <- xmethods %in% c('distEuclidean', 'distManhattan')
+#Variable scaling after Gower and Kaufman+Rousseeuw (center around
+#the minimum value, and divide by range). Only performed on numeric
+#or ordinal variables. In the latter case, the function expects the
+#variables to be coded numerically ranging from `1:max(level)` in steps of 1.
+#' @param x a numerically coded matrix.
+#' @param xclass character vector of either:
+#'               - variable classes as obtained by `data.class`; or:
+#'               - proposed variable-specific default distances, f.i.
+#'                 as obtained by `.ChooseVarDists(x)`;
+#'               with `length(xclass)==ncol(x)`
+#' @param rangeMatrix expects a function that has been previously created
+#'                    with .rangeMatrix(xrange). If it is NULL, see the next param.
+#' @param xrange is a compatibility parameter so the helper runs outside
+#'               of the kccaFamilyGower concept, but within kccaFamilyGower,
+#'               .rangeMatrix(xrange) is run previously
+.ScaleVarSpecific <- function(x, xclass,
+                              rangeMatrix=NULL, xrange=NULL) {
   
-  rng <- .rangeMatrix(xrange)(x[,cols2scale])
+  if(is.null(rangeMatrix)) {
+    rng <- .rangeMatrix(xrange)
+  } else {
+    rng <- rangeMatrix
+  }
+  
+  if(is.null(colnames(x))) colnames(x) <- 1:ncol(x) #don't need this here but later in the dist
+  
+  cols2scl <- xclass %in% c('numeric', 'ordered', #compatibility with xclass=sapply(dat, data.class)
+                            'distEuclidean', 'distManhattan') #compatibility with xmethods
+  
+  rng <- rng(x[, cols2scl, drop=F])
   scl <- apply(rng, 2, diff)
   scl <- ifelse(scl==0, 1, scl)
   
-  x[,cols2scale] <- scale(x[,cols2scale], center=rng[1,], scale=scl)
+  x[,cols2scl] <- scale(x[,cols2scl], center=rng[1,], scale=scl)
   return(x)
 }
 
+##this is the option that just scales over all, cause it doesn't matter for binary and nominal:
+#NO, ERROR! It doesn't matter if range is calculated variable specific,
+#or if user specifies for each variable. HOWEVER, it does destroy distJaccard
+#for ranges that cover the whole data set, variables aren't 0,1 anymore afterward
+#NEED TO REACTIVATE VARIABLE SPECIFIC SCALING, this is archived
+#' @param rangeMatrix expects a function that has been previously created
+#'                    with .rangeMatrix(xrange). If it is NULL, see the next param.
+#' @param xrange is a compatibility parameter so the helper runs outside
+#'               of the kccaFamilyGower concept, but within kccaFamilyGower,
+#'               .rangeMatrix(xrange) is run previously
 .ScaleGower <- function(x, rangeMatrix=NULL,
                         xrange=NULL) {
-  #this is the option that just scales over all, cause it doesn't matter for binary and nominal:
-  #' @param rangeMatrix expects a function that has been previously created
-  #'                    with .rangeMatrix(xrange). If it doesn't exist, see the next param.
-  #' @param xrange is a compatibility parameter so the helper runs outside
-  #'               of the kccaFamilyGower concept, but within kccaFamilyGower,
-  #'               .rangeMatrix(xrange) will be run previously
+
   if(is.null(rangeMatrix)) {
     rng <- .rangeMatrix(xrange)
   } else {
@@ -156,34 +178,29 @@
 #      not both values =0)
 #' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
 .delta <- function(x, centers, distances) {
-  k <- nrow(centers)
-  centrep <- sapply(1:k,
-                    \(i) matrix(centers[i,], nrow=nrow(x),
-                                ncol=ncol(x), byrow=T),
-                    simplify = 'array')
+  K <- nrow(centers)
+  delta <- sapply(1:K,
+                  \(k) t(!(is.na(t(x)) | is.na(centers[k,]))),
+                  simplify='array')
+  distJ <- distances=='distJaccard'
   
-  delta <- sapply(1:k,
-                  \(i) !(is.na(x) | is.na(centrep[,,i])),
-                  simplify = 'array')
-  
-  if('distJaccard' %in% distances) {
-    cols <- distances=='distJaccard'
-    delta <- sapply(1:k, \(i) {
-      dlt <- x[,cols,drop=F] + centrep[,cols,i] #erstes drop=F reicht (im 1var-Fall reicht es, wenn eines die gewünschten Dims hat, dann tut es schon das richtige)
-      dlt <- ifelse(is.na(dlt), 0, dlt)
-      tmp_dlt <- array(delta[,,i,drop=F], #necessary cause in the 1var case it else turns into a vector
-                       dim=dim(x), dimnames=dimnames(x))
-      tmp_dlt[,cols][dlt==0] <- 0
-      tmp_dlt
-    }, simplify = 'array')
+  if(any(distJ)) {
+    xJ <- x[, distJ, drop=F]
+    cJ <- centers[, distJ, drop=F]
+    for(k in 1:K){
+      delta[, distJ, k] <- t((t(xJ) + cJ[k,])>0)
+    }
+    delta[which(is.na(delta))] <- FALSE
   }
+  
   delta
+  
 }
 
 
 #helper function to Gower's distance on _mixed vartypes_
 #     (i.e. x needs to be scaled previously, distance function is
-#      chosen for the single vartype).
+#      chosen for each column, NAs are handled as: omitted, nonmissing vars are upweighted).
 #      output: array of dim nrow(x) X ncol(x) X nrow(centers)
 #               (Weighting with delta, and summing up happens at the end of the distGower function)
 #' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
@@ -228,33 +245,11 @@
     }
   }
 
-#  if(any(is.na(x))) { #(initial) centers after all will only be NA if x is, too
     z[which(is.na(z))] <- 1 #just a placeholder, NA cases are removed by weights==0
-#  } #z <- ifelse(is.na(z), 1, z)
-
+                            #z <- ifelse(is.na(z), 1, z)
   z
 }
-#test
-#check if there is any significant time improvement for .distGower_singleType
-#for singletype variables
-#all tested, now check if there is still a time improvement for singleType
-#I guess not. I could still also do a version for singleType+noNAs, cause
-#then I can do flexclust::.../ncol(x)
-if(FALSE) {
-microbenchmark::microbenchmark(.distGower_singleType(x, centers, .ChooseVarDists(x)),
-                               .distGower_mixedType(x, centers, .ChooseVarDists(x)))
-#single type is three times as slow
-microbenchmark::microbenchmark(.distGower_singleType(xNAs, centersNA, .ChooseVarDists(x)),
-                               .distGower_mixedType(xNAs, centersNA, .ChooseVarDists(x)))
-#single type is a third faster
-microbenchmark::microbenchmark(.distGower_singleType(x[1,,drop=F], centers[1,,drop=F], .ChooseVarDists(x)),
-                               .distGower_mixedType(x[1,,drop=F], centers[1,,drop=F], .ChooseVarDists(x)))
-#single type is a *bit* slower in most cases
-microbenchmark::microbenchmark(.distGower_singleType(x, centers[1,,drop=F], .ChooseVarDists(x)),
-                               .distGower_mixedType(x, centers[1,,drop=F], .ChooseVarDists(x)))
-#single type is a third slower in most cases
-#well, let's write a singletype+noNAs version, to see if it's any faster
-}
+
 #helper function to Gower's distance on a _single vartype_ with no NAs
 #checks need to happen outside of it
 #     (i.e. x needs to be scaled previously, distance function is
@@ -263,162 +258,55 @@ microbenchmark::microbenchmark(.distGower_singleType(x, centers[1,,drop=F], .Cho
 #               (Weighting with delta, and summing up happens at the end of the distGower function)
 #' @param distances expects genDist object, f.i. as derived from .ChooseVarDists(x)
 .distGower_singleTypeNoNAs <- function(x, centers, distances) {
-#meine Vermutung ist, dass distJaccard ohne /ncol(x) passt
-  #hi
+
   dists <- unique(distances)
-  z <- array(0, dim=c(dim(x), nrow(centers)),
-             dimnames=c(dimnames(x), list(NULL)))
+  p <- ncol(x)
   
   if(dists=='distEuclidean') {
-    for(k in 1:nrow(centers)){
-      d <- t(sqrt((t(x) - centers[k,])^2))
-      z[,,k] <- ifelse(is.na(d), 1, d) #just a placeholder, NA cases are removed by weights==0
-    }
+    dstfnc <- flexclust::distEuclidean
   } else if(dists=='distManhattan') {
-    for(k in 1:nrow(centers)){
-      d <- t(abs(t(x)-centers[k,]))
-      z[,,k] <- ifelse(is.na(d), 1, d)
-    }
-  } else if(dists %in% c('distSimMatch', 'distJaccard')) {
-    for(k in 1:nrow(centers)){
-      d <- t(t(x) != centers[k,])
-      z[,,k] <- ifelse(is.na(d), 1, d)
-    }
-    if(dists=='distJaccard') {
-      for(k in 1:nrow(centers)){
-        z[,,k][x==0] <- 1 #auch nur ein placeholder, das wird auch mit dem delta=0 rausgenommen
-      }
-    }
-    
+    dstfnc <- flexclust::distManhattan
+  } else if(dists=='distSimMatch') {
+    dstfnc <- distSimMatch
+    p <- 1 #da ist colMeans schon drin
+  } else if(dists=='distJaccard') {
+    dstfnc <- flexclust::distJaccard
+    p <- 1 #meine Vermutung ist, dass distJaccard ohne /ncol(x) für singletype noNA passt? Schließlich hat das schon einen Nenner? Und dass nur 1==1 bedacht wird, sollte da auch drin schon behandelt sein
   } else {stop('Specified distance not implemented in flexord::distGower')}
-  #ifelse part could ofc also go here, but the dimensions are retained easier for z[,,k]
-  z
+
+  dstfnc(x, centers)/p
 }
-#hi, testing, (on nrowx=1, nrowcent=1, NA, onevartype...)
-#then compare with mixedtype+NAs
+
 
 #' @param genDist i.e. genDist expects char.vector with dist to be used
 #'                 for each variable, as for example created by .ChooseVarDists
 #' @param x, centers: dist expects these to be already scaled 'gowerly'
 distGower <- function(x, centers, genDist) {
   
-  #would it be sufficient here to just call flexclust::distEuclidean etc.
-  #on the relevant columns, replace NAs, and sum up the different parts?
-  #no: too many NAs in the end (after all, not only 1 spot NA, but the
-  #whole row xdistEuclidean)
-  
   if (ncol(x) != ncol(centers))
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   
-  k <- nrow(centers)
-  dists <- unique(genDist)
-  delta <- .delta(x, centers, distances=genDist)
-  
-  if(length(dists)==1) { #the single vartype case
+  #if single vartype, and no NAs --> z=simpledistancemethod/ncol(x)
+  #for distEuclidean, distManhattan (as in our study), this still follows
+  #Gower, as the variables have been scaled previously, and are didided by
+  #the number of parameters (i.e. dist will always range between 0 and 1).
+  #For distJaccard and distSimMatch it is redundant, but I still included
+  #them for now
+  if(length(unique(genDist))==1 && !any(is.na(x))) {
     
-    #hi
+    .distGower_singleTypeNoNAs(x, centers, distances=genDist)
+  
   } else {
     
-    xsep <- sapply(dists, \(y) {
-      x[,which(genDist==y), drop=F]
-    }, simplify = F)
-    centsep <- sapply(dists, \(y) {
-      centers[,which(genDist==y), drop=F]
-    }, simplify = F)
+    delta <- .delta(x, centers, distances=genDist)
     
-    hlp <- xsep
+    z <- .distGower_mixedType(x, centers, distances=genDist)
     
-    for(dist_type in dists) {
-      
-      dist_cols <- sum(genDist==dist_type)
-      
-      if(dist_type == 'distEuclidean') {
-        hlp[[dist_type]] <- sapply(1:k, \(i) { 
-          d <- sqrt((xsep[[dist_type]] - matrix(centsep[[dist_type]][i,],
-                                                nrow=nrow(x),
-                                                ncol=dist_cols,
-                                                byrow=T))^2)
-          ifelse(is.na(d), 1, d) #using 1 (=max.dist for the scaled vars) as placeholder
-        }, simplify = 'array')
-      }
-      
-      if(dist_type == 'distManhattan') {
-        hlp[[dist_type]] <- sapply(1:k, \(i) {
-          d <- abs(xsep[[dist_type]] - matrix(centsep[[dist_type]][i,],
-                                              nrow=nrow(x),
-                                              ncol=dist_cols,
-                                              byrow=T))
-          ifelse(is.na(d), 1, d) #s.o.
-        }, simplify = 'array')
-      }
-      
-      if(dist_type == 'distSimMatch') {
-        hlp[[dist_type]] <- sapply(1:k, \(i) {
-          d <- xsep[[dist_type]] != matrix(centsep[[dist_type]][i,],
-                                           nrow=nrow(x),
-                                           ncol=dist_cols,
-                                           byrow=T)
-          ifelse(is.na(d), 1, d)
-        }, simplify = 'array')
-      }
-      
-      if(dist_type == 'distJaccard') {
-        
-        centrep <- sapply(1:k, \(i) {
-          matrix(centsep[[dist_type]][i,],
-                 nrow=nrow(x),
-                 ncol=dist_cols,
-                 byrow=T)
-        }, simplify = 'array')
-        
-        hlp[[dist_type]] <- sapply(1:k, \(i) {
-          d <- xsep[[dist_type]] != centrep[,,i]
-          d <- ifelse(is.na(d), 1, d) #das sollte im nächsten Schritt eh auch
-          #mitgehandelt werden, aber zur Sicherheit explizit
-          d[xsep[[dist_type]]==0] <- 1 #außerdem könnte ich mir den Schritt eh
-          #sparen, die Info muss ja sowieso ins delta
-          d
-        }, simplify = 'array')
-
-        delta <- sapply(1:k, \(i) {
-          dlt <- xsep[[dist_type]]+centrep[,,i]
-          dlt <- ifelse(is.na(dlt), 0, dlt)
-          tmp_dlt <- array(delta[,,i,drop=F],
-                           dim=dim(x), dimnames=dimnames(x))
-          tmp_dlt[,genDist==dist_type][dlt==0] <- 0
-          tmp_dlt
-        }, simplify = 'array')
-      }
-      
-      if(nrow(x) == 1) {
-        hlp[[dist_type]] <- array(hlp[[dist_type]],
-                                  dim=c(nrow(x), dist_cols, k),
-                                  dimnames=list(NULL,
-                                                names(which(dist_type==genDist)), NULL))
-      }
-      
-    }
+    z <- sapply(1:nrow(centers),
+                \(k) rowSums(z[,,k,drop=F]*delta[,,k,drop=F])/rowSums(delta[,,k,drop=F]))
+    z[which(is.nan(z))] <- 0 #aus distJaccard, dort setzt Fritz diesen Fall auch 0
     
-    hlp <- sapply(1:k, \(i) {
-      # arr <- lapply(hlp, \(y) y[,,i, drop=F])
-      # dims <- sapply(lapply(arr, dim), `[`, 2) #equivalent to sapply(hlp, ncol)
-      # 
-      # arr[dims==1] <- lapply(arr[dims==1],
-      #                        \(y) matrix(y, dimnames=dimnames(y)[1:2]))
-      # arr[dims>1] <- lapply(arr[dims>1], \(y) y[,,1])
-      
-      arr <- sapply(hlp, \(y) {
-        arr <- y[,,i, drop=F]
-        array(arr, dim=dim(arr)[1:2], dimnames=dimnames(arr)[1:2])
-      })
-      
-      do.call(cbind, arr)
-    }, simplify = 'array')
-    hlp <- hlp[,colnames(x),,drop=F] #ordering by original column order
-    
-    z <- sapply(1:k,
-                \(i) rowSums(hlp[,,i,drop=F]*delta[,,i,drop=F])/rowSums(delta[,,i,drop=F]))
-    return(z)
+    z
   }
 }
 
@@ -487,7 +375,68 @@ kccaFamilyGower <- function(cent=NULL,
                         trim=trim, groupFun=groupFun)
 }
 
-if(FALSE){
+kccaFamilyGowerTestDataRange <- function(cent=NULL,
+                            xrange=NULL, xmethods=NULL,
+                            trim=0, groupFun='minSumClusters') {
+  
+  rng <- .rangeMatrix(xrange)
+  
+#  preproc <- function(x) .ScaleGower(x, rangeMatrix=rng)
+  #archived, simpler version, as in the case of xrange='data range' or xrange=c(min,max)
+  #the scaling destroys binary variables
+  
+  
+  if(is.null(xmethods)) {
+    warning('No column-wise distance measures specified, default measures
+            will be used. Make sure that the data object x for your clustering
+            procedure is a correctly coded dataframe.') #in fact, it won't work if is.null(xmethods) && is.matrix(x)
+    distGen <- function(x, ...) { #TODO: remove ... when GDM2's genDist is fixed
+      #I apologize for the use of parent.frame(), but didn't know how else to fix it.
+      #however I do think it's ok here because 1) 'xclass' is not a generic method
+      #and 2) because I only use them once in the beginning (unlike the dists),
+      #so I can't really get lost in the frames
+      xcls <- get('xclass', parent.frame())
+      .ChooseVarDists(xcls)
+    }
+    preproc <- function(x) {
+      xcls <- get('xclass', parent.frame())
+      .ScaleVarSpecific(x, rangeMatrix=rng,
+                        xclass=xcls)
+    }
+  } else {
+    distGen <- function(x, ...) { #TODO: dots necessary right now, remove when distGDM2 is updated
+      #      if('xmethods' %in% names(xmethods)) xmethods <- xmethods$xmethods #s.o.
+      if(!all(xmethods %in% c('distEuclidean', 'distManhattan',
+                              'distSimMatch', 'distJaccard')))
+        stop('Specified columnwise xmethod not implemented!')
+      return(xmethods)
+    }
+    preproc <- function(x) .ScaleVarSpecific(x, rangeMatrix=rng,
+                                             xclass=xmethods)
+  }
+  
+  #the default combo in the paper for distGower was centMin.
+  #now that x is scaled in the beginning, I think centOptim is
+  #sufficient
+  if(is.null(cent)) {
+    cent <- function(x){
+      centOptimNA(x, dist = \(y, centers) {
+        distGower(y, centers, genDist=genDist)
+      }) #filler cent, will be recreated in the function
+    }
+  }
+  
+  flexclust::kccaFamily(name='kGower',
+                        dist=distGower,
+                        genDist=distGen,
+                        cent=cent,
+                        preproc=preproc,
+                        xrange=rng, xmethods=xmethods,
+                        trim=trim, groupFun=groupFun)
+}
+
+if(FALSE){ #Example zone
+  #mixed data case
   (dat <- data.frame(cont = sample(1:100, 10, replace=T)/10,
                      bin_sym = as.logical(sample(0:1, 10, replace=T)),
                      bin_asym = as.logical(sample(0:1, 10, replace=T)),                     
@@ -497,66 +446,37 @@ if(FALSE){
                                           levels=1:4, ordered=T),
                      nom = factor(sample(letters[1:4], 10, replace=T),
                                   levels=letters[1:4])))
-  datmatrix <- data.matrix(dat)
   
-  # .ScaleVarSpecific(datmatrix,
-  #                   'variable specific',
-  #                   xmethods=sapply(dat, \(y) paste(class(y), collapse=' ')))
-  # #trying out overriding colwise distances
-  # .ScaleVarSpecific(datmatrix,
-  #                   'variable specific',
-  #                   xmethods=rep('distManhattan', ncol(datmatrix)))
-  # #only column 'nom' looks different now. However, this should not
-  # #matter for the analysis because, as stated identical(1,1) gives
-  # #the same as identical(1/x,1/x).
-  # #let's see if there are runtime differences:
-  # microbenchmark::microbenchmark(
-  #   colwise=.ScaleVarSpecific(datmatrix,
-  #                     'variable specific',
-  #                     xmethods=sapply(dat, \(y) paste(class(y), collapse=' '))),
-  #   overall=.ScaleVarSpecific(datmatrix,
-  #                     'variable specific',
-  #                     xmethods=rep('distManhattan', ncol(datmatrix)))
-  # ) #overall clearly faster, but what about bigger objects?
-  # 
-  # xmethods <- sapply(dat, \(y) paste(class(y), collapse = ' '))
-  # system.time(
-  #   .ScaleVarSpecific(datmatrix[rep(1:nrow(dat), 10000),],
-  #                     'variable specific',
-  #                     xmethods=xmethods)
-  # )
-  # system.time(
-  #   .ScaleGower(datmatrix[rep(1:nrow(dat), 10000),],
-  #               'variable specific')
-  # ) #there .ScaleGower is slower...
-  # #what is critical value?
-  # system.time(
-  #   .ScaleVarSpecific(datmatrix[rep(1:nrow(dat), 1000),],
-  #                     'variable specific',
-  #                     xmethods=xmethods)
-  # ); system.time(
-  #   .ScaleGower(datmatrix[rep(1:nrow(dat), 1000),],
-  #               'variable specific')
-  # ) #there is a *tiny* difference already...
-  # #I don't know...
-  # 
-  # #I guess I'll leave the helper .ScaleVarSpecific in, and use
-  # #.ScaleGower for now, cause it's *considerably* easier
+  datrng <- apply(datmat, 2, range) |> data.frame() |> 
+    as.list()
+  datmat <- data.matrix(dat) |> 
+    .ScaleGower(xrange='variable specific')
+  datcent <- datmat[sample(1:nrow(dat), 3, replace=F),]
+  
+  #mixed data with NAs
+  datNA <- dat
+  nas <- sample(c(T,F), prod(dim(dat)),
+                replace=T, prob=c(0.1,0.9))
+  datNA[nas] <- NA
+  datNAmat <- data.matrix(datNA) |> 
+    .ScaleGower(xrange=datrng)
+  datcentNA <- datmatNA[sample(1:nrow(dat), 3, replace=F),]
+
+  #hi
+  #(hopefully) correct .ScaleVarSpecific exists now,
+  #test it, and test clustering with kccaFamilyGowerTestDataRange
   
   genDist <- .ChooseVarDists(dat)
   
-  #add some NAs to dat
-  d <- prod(dim(dat))
-  na <- vector('logical', length=d) |> 
-    matrix(nrow=nrow(dat))
-  na[sample(1:d, d/10, replace=F)] <- T
-  datNA <- dat
-  datNA[na] <- NA
-  datNAmatrix <- data.matrix(datNA)
-  centNA <- datNAmatrix[sample(1:nrow(dat), 3, replace=F),]
+  datmatNAscld <- .ScaleGower(datmatNAscld, xrange=datrng)
+  datcentNAscld <- .ScaleGower(datcentNA, xrange=datrng)
   
-  datNAmatrixscaled <- .ScaleGower(datNAmatrix, xrange='variable specific')
-  centNAscaled <- datNAmatrixscaled[sample(1:nrow(dat), 3, replace=F),]
+  #single variable type case
+  data('risk', package='MSA')
+  riskcent <- risk[sample(1:nrow(risk), 3, replace=F),]
+  
+  
+  datmatscld |> distGower(datcent)
 
   datmatrixscaled |> distGower(centnoNAscaled, .ChooseVarDists(dat))
   datmatrixscaled |> distGower(datmatrix, .ChooseVarDists(dat)) |> as.dist()
