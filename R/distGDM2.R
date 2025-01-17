@@ -57,7 +57,7 @@
 #' - `distGDM2`: A distance matrix for each row in `x` from each row in `centers`
 #'    with dimensions `c(nrow(x), nrow(centers)`.
 #' - `.projectIntofx`: A function with parameter `new_x`that will project the
-#'    new data object `new_x` into the space of `x`'s epdf, ecdf, and \( \tilde{F} \).
+#'    new data object `new_x` into the space of `x`'s epdf, ecdf, and \eqn{\tilde{F}}.
 #' - `kccaFamilyGDM2`: A custom `kccaFamily` object using `distGDM2` as the 
 #'    distance function, and `.projectIntofx` as the belonging distance generating
 #'    function. To be used within `flexclust::kcca` or functions that build upon it.

@@ -9,6 +9,7 @@
 #'                kappa_p observations according to the population mean to the
 #'                data
 #' @param nu_p Regularization parameter.
+#' @export
 FLXMCregnorm <- function(formula=.~., G, kappa_p=0.01, nu_p=3)
 {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
