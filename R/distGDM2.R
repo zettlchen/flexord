@@ -1,97 +1,10 @@
 # 06.12.24
 
-#' Helper functions for K-centroids clustering using GDM2 distance
-#'
-#'@usage
-#' distGDM2(x, centers, genDist=NULL, xrange=NULL)
-#' .projectIntofx(x, xrange=NULL)
-#' kccaFamilyGDM2(cent=NULL, preproc=NULL,
-#'                xrange=NULL, xmethods=NULL,
-#'                trim=0, groupFun='minSumClusters')
-#'
-#'@description
-#' `distGDM2` implements the GDM2 distance first presented by Walesiak (1993)
-#' and extended to usage in K-centroids clustering in Ernst et.~al (2025).
-#' 
-#' `kccafamilyGDM2` is a wrapper for `flexclust::kccaFamily` to conduct
-#' K-centroids clustering with GDM2 distance. It is intended for use in
-#' `flexclust::kcca` functions built upon it.
-#' 
-#' @details
-#' `.projectIntofx` is a helper function factory that creates a function that
-#' will project an arbitrary object into the space of the empirical PDF and CDF
-#' of a matrix x.
-#' 
-#' If `distGDM2` is used within `flexclust:kcca`, the `genDist` function
-#' (such as `.projectIntofx`) will be automatically primed on `x` within
-#' `kcca` previously to applying the distance function.
-#' If `distGDM2` is to be used on its own outside of kcca, priming will
-#' occur within `distGDM2`.
-#'
-#' @param x A matrix of numerically coded ordinal data points. The ordinal
-#' variables need to be coded as `1:length(levels(x[,i]))`.
-#' @param centers A numeric matrix with the same coding scheme as in `x`,
-#' `ncol(centers)==ncol(x)`, and `nrow(centers)<=nrow(x)`.
-#' Within `kcca`, this is filled with the cluster centers.
-#' @param genDist Function for creating a distance function that will be
-#'    primed on `x`, such as f.i. `.projectIntofx`. For more information, see
-#'    the 'Details' section.
-#' @param xrange Range specification for the variables. Possible values are:
-#'   - `NULL` (default): defaults to `'data range'`.
-#'   - `'data range'`: Uses the range of the entire dataset.
-#'   - `'variable specific'`: Uses column-specific ranges.
-#'   - A numeric vector: Applies the same range to all columns.
-#'   - A list of numeric vectors: Specifies column-specific ranges.
-#' @param cent See [flexclust::kccaFamily()]: Function for determining cluster
-#'   centroids. `NULL` (default) defaults to `flexclust::centOptim`, a general
-#'   purpose optimizer.
-#' @param preproc See [flexclust::kccaFamily()]: Preprocessing function to be
-#' applied to the data before clustering.
-#' @param trim See [flexclust::kccaFamily()]: Proportion of points trimmed in
-#' robust clustering.
-#' @param groupFun See [flexclust::kccaFamily()]: A character string specifying
-#' the function for clustering.
-#'   Default is `'minSumClusters'`.
-#'
-#' @return
-#' - `distGDM2`: A distance matrix for each row in `x` from each row in `centers`
-#'    with dimensions `c(nrow(x), nrow(centers)`.
-#' - `.projectIntofx`: A function with parameter `new_x`that will project the
-#'    new data object `new_x` into the space of `x`'s epdf, ecdf, and \eqn{\tilde{F}}.
-#' - `kccaFamilyGDM2`: A custom `kccaFamily` object using `distGDM2` as the 
-#'    distance function, and `.projectIntofx` as the belonging distance generating
-#'    function. To be used within `flexclust::kcca` or functions that build upon it.
-#'
-#' @importFrom stats ecdf
-#' 
-#' @examples
-#' ## Example usage
-#' #creating a distance matrix between two matrices based on GDM2 distance
-#' dat <- matrix(sample(1:5, 50, replace = TRUE),
-#'               nrow = 10)
-#' initcenters <- dat[sample(1:10, 3),]
-#' distGDM2(dat, initcenters, genDist=flexord:::.projectIntofx)
-#' 
-#' #a classical distance matrix for a single matrix can be obtained via:
-#' as.dist(distGDM2(dat, dat, genDist=flexord:::.projectIntofx))
-#' 
-#' #K-centroids clustering using GDM2 distance
-#' flexclust::kcca(dat, k=3, family=kccaFamilyGDM2())
-#' 
-#' @seealso - [flexclust::kcca()](https://cran.r-project.org/package=flexclust)
-#'
-#' @references
-#' - Leisch, F (2006). *A Toolbox for K-Centroids Cluster Analysis.*
-#'   Computational Statistics and Data Analysis, 17(3), 526-544.
-#'   [doi:10.1016/j.csda.2005.10.006](https://doi.org/10.1016/j.csda.2005.10.006)
-#' - Walesiak, M (1993). *Statystyczna Analiza Wielowymiarowa w Badaniach Marketingowych.*
-#'   Wydawnictwo Akademii Ekonomicznej, 44-46.
-#' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-#'   *Ordinal clustering with the flex-Scheme.*
-#'   Austrian Statistics Journal. _Submitted manuscript_.
-#'
-#' @export
+#script for GDM2 distance and its helper, main documentation block in distSimMatch.R
 
+#' @rdname distance_functions
+#' @importFrom stats ecdf
+#' @export
 distGDM2 <- function(x, centers, genDist, xrange=NULL) {
   if (ncol(x) != ncol(centers))
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
@@ -120,12 +33,12 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
   z 
 }
 
-#' @param x a numerically coded matrix.
-#' @param rangeMatrix expects a function that has been previously created
-#'                    with `.rangeMatrix(xrange)`. If it is NULL, it is created on x.
-#' @param xrange is a compatibility parameter so the helper runs outside
-#'               of the `kccaFamilyGDM2` concept, but within `kccaFamilyGDM2`,
-#'               `.rangeMatrix(xrange)` is run previously
+# @param x a numerically coded matrix.
+# @param rangeMatrix expects a function that has been previously created
+#                    with `.rangeMatrix(xrange)`. If it is NULL, it is created on x.
+# @param xrange is a compatibility parameter so the helper runs outside
+#               of the `kccaFamilyGDM2` concept, but within `kccaFamilyGDM2`,
+#               `.rangeMatrix(xrange)` is run previously
 .projectIntofx <- function(x, rangeMatrix=NULL,
                            xrange=NULL){
   
@@ -176,27 +89,3 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
   return(projectNew)
 }
 
-#' @import flexclust
-#' @export
-kccaFamilyGDM2 <- function(cent=NULL, preproc=NULL,
-                           xrange='all', xmethods=NULL, #currently not used but if GDM2 were to be extended for mixed data, it could be used just like in kGower
-                           trim=0, groupFun='minSumClusters') {
-  
-  rng <- .rangeMatrix(xrange)
-  
-  distGen <- function(x) .projectIntofx(x, rangeMatrix=rng)
-  
-  if(is.null(cent)) {
-    cent <- function(x){
-    #genDist <- .projectIntofx(x, xrange=xrange)
-    flexclust::centOptim(x, dist = \(y, centers) {
-      distGDM2(y, centers, genDist=genDist)
-      }) #filler cent, will be recreated in the function
-    }
-  }
-  flexclust::kccaFamily(name='kGDM2',
-                        dist=distGDM2,
-                        genDist=distGen,
-                        cent=cent, preproc=preproc,
-                        trim=trim, groupFun=groupFun)
-}

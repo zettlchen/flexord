@@ -7,7 +7,7 @@
 #just prepares the function that will be used on x, the resulting
 #function is applied within kcca
 #used in: centMin (centroidFunctions.R); kccaFamilyGower (distGower.R)
-#' @param xrange: response level range of the variables. Implemented options:
+# @param xrange: response level range of the variables. Implemented options:
 #        'all': range of all x, over all variables
 #        'columnwise': columnwise range of x
 #        c(lower, upper): range vector specified by user, upper and lower
@@ -43,12 +43,12 @@
 #Easier to code (cause I don't need to extract xclass from the parent frame),
 #and works in cases where xrange is variable specific ('columnwise', or list of range vectors).
 #However, in the case of data wide ranges, it destroys the binary variables.
-#' @param x a numerically coded matrix.
-#' @param rangeMatrix expects a function that has been previously created
-#'                    with `.rangeMatrix(xrange)`. If it is NULL, it is created on x.
-#' @param xrange is a compatibility parameter so the helper runs outside
-#'               of the `kccaFamilyGower` concept, but within `kccaFamilyGower`,
-#'               `.rangeMatrix(xrange)` is run previously
+# @param x a numerically coded matrix.
+# @param rangeMatrix expects a function that has been previously created
+#                    with `.rangeMatrix(xrange)`. If it is NULL, it is created on x.
+# @param xrange is a compatibility parameter so the helper runs outside
+#               of the `kccaFamilyGower` concept, but within `kccaFamilyGower`,
+#               `.rangeMatrix(xrange)` is run previously
 .ScaleGower <- function(x, rangeMatrix=NULL,
                         xrange=NULL) {
   

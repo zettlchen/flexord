@@ -134,6 +134,42 @@ only implemented for \code{kGower}. Within \code{kModes}, the omission of NA res
 can be avoided by coding missings as valid factor levels. For \code{kGDM2}, currently
 the only option is to omit missing values completely.
 }
+\examples{
+# Example 1: kModes
+set.seed(123)
+dat <- data.frame(cont = sample(1:100, 10, replace=T)/10,
+                  bin_sym = as.logical(sample(0:1, 10, replace=T)),
+                  bin_asym = as.logical(sample(0:1, 10, replace=T)),                     
+                  ord_levmis = factor(sample(1:5, 10, replace=T),
+                                      levels=1:6, ordered=T),
+                  ord_levfull = factor(sample(1:4, 10, replace=T),
+                                       levels=1:4, ordered=T),
+                  nom = factor(sample(letters[1:4], 10, replace=T),
+                               levels=letters[1:4]))
+flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kModes'))
+
+# Example 2: kGDM2
+flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kGDM2'))
+flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kGDM2',
+                                                    xrange='columnwise'))
+# Example 3: kGower
+flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
+nas <- sample(c(T,F), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
+   matrix(nrow=nrow(dat))
+dat[nas] <- NA
+flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
+flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
+                                           xrange='all'))
+flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
+                                           xmethods=c('distEuclidean',
+                                                      'distEuclidean',
+                                                      'distJaccard',
+                                                       'distManhattan',
+                                                       'distManhattan',
+                                                       'distSimMatch')))
+#the case where column 2 is a binary variable, but is symmetric
+
+}
 \references{
 \itemize{
 \item Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).

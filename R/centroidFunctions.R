@@ -4,19 +4,20 @@
 # TODO: adapt examples when distGower and the wrapper are done. should prolly be
 #       in the wrapper anyways
 
-#' Additional Centroid Functions for K-centroids clustering of (ordinal) categorical data
+#' New Centroid Functions for K-centroids clustering of (ordinal) categorical/mixed data
 #'
 #'
 #' @description
-#' Functions to calculate cluster centroids that extend the options available
-#' in `flexclust`.
+#' Functions to calculate cluster centroids for K-centroids clustering that extend the
+#' options available in package `flexclust`.
 #' 
 #' `centMode` calculates centroids based on the mode of each variable.
 #' `centMin` minimizes the applied distance metric to find centroids within a specified range.
 #' `centOptimNA` replicates the exact behaviour of `flexclust::centOptim`, just with NA removal.
 #' 
 #' These functions are designed for use within `flexclust::kcca` or functions that are built
-#' upon it.
+#' upon it. Their use is easiest via the wrapper `kccaExtendedFamily`, for more information
+#' see `?kccaExtendedFamily`.
 #'
 #' @details
 #' - **`centMode`**: Column-wise modes are used as centroids, and ties are
@@ -33,7 +34,8 @@
 #' @param x A numeric matrix or data frame. Categorical/ordinal variables
 #'    need to be coded as `1:length(levels(x[,i]))` in steps of one.
 #' @param dist The distance measure function to be minimized in `centMin`.
-#' @param xrange Range specification for the variables. Possible values are:
+#' @param xrange Range specification for the variables. Currently only used for `centMin`.
+#'   Possible values are:
 #'   - `NULL` (default): defaults to `'all'`.
 #'   - `'all'`: Uses the range of the entire data set.
 #'   - `'columnwise'`: Uses column-specific ranges.
@@ -42,9 +44,11 @@
 #'       ranges, the length of the list must be equal to the number of columns to be scaled.
 #'
 #' @return 
-#' A named numeric vector containing the centroid values for each variable.
+#' A named numeric vector containing the centroid values for each column of `x`.
 #' 
-#' @seealso - [flexclust::kcca()](https://cran.r-project.org/package=flexclust)
+#' @seealso
+#' - [kccaExtendedFamily()](https://github.com/dernst/flexord/blob/main/man/kccaExtendedFamily.Rd)
+#' - [flexclust::kcca()](https://cran.r-project.org/package=flexclust)
 #'
 #' @importFrom stats setNames optim
 #'
@@ -55,17 +59,24 @@
 #'                   C = rep(c(1, 2, 4, 5), 2))
 #' centMode(dat)
 #' ## within kcca
-#' flexclust::kcca(dat, 3, family=kccaExtendedFamily('kModes'))
+#' flexclust::kcca(dat, 3, family=kccaExtendedFamily('kModes')) #default centroid
 #' 
 #' # Example: Centroid is level for which distance is minimal
 #' centMin(dat, flexclust::distManhattan, xrange = 'all')
+#' ## within kcca
+#' flexclust::kcca(dat, 3,
+#'                 family=kccaFamily(dist=flexclust::distManhattan,
+#'                                   cent=\(y) centMin(y, flexclust::distManhattan
+#'                                                      xrange='all')))
 #'                              
-#' # Example: General purpose optimizer with NA removal
+#' # Example: Centroid calculated by general purpose optimizer with NA removal
 #' nas <- sample(c(TRUE, FALSE), prod(dim(dat)),
 #'               replace=TRUE, prob=c(0.1,0.9)) |> 
 #'        matrix(nrow=nrow(dat))
 #' dat[nas] <- NA
 #' centOptimNA(dat, flexclust::distManhattan)
+#' ## within kcca
+#' flexclust::kcca(dat, 3, family=kccaExtendedFamily('kGower')) #default centroid
 #' @name centroid_functions
  
 #' @rdname centroid_functions

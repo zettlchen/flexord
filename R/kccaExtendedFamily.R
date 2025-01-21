@@ -142,12 +142,48 @@
 #'   *klaR Analyzing German Business Cycles.* In: Data Analysis an
 #'   Decision Support, Springer: Berlin. 335-343.
 #'   [doi:10.1007/3-540-28397-8_36](https://doi.org/10.1007/3-540-28397-8_36)
-#'   
+#' 
+#' @examples
+#' # Example 1: kModes
+#' set.seed(123)
+#' dat <- data.frame(cont = sample(1:100, 10, replace=T)/10,
+#'                   bin_sym = as.logical(sample(0:1, 10, replace=T)),
+#'                   bin_asym = as.logical(sample(0:1, 10, replace=T)),                     
+#'                   ord_levmis = factor(sample(1:5, 10, replace=T),
+#'                                       levels=1:6, ordered=T),
+#'                   ord_levfull = factor(sample(1:4, 10, replace=T),
+#'                                        levels=1:4, ordered=T),
+#'                   nom = factor(sample(letters[1:4], 10, replace=T),
+#'                                levels=letters[1:4]))
+#' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kModes'))
+#' 
+#' # Example 2: kGDM2
+#' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kGDM2'))
+#' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kGDM2',
+#'                                                     xrange='columnwise'))
+#' # Example 3: kGower
+#' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
+#' nas <- sample(c(T,F), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
+#'    matrix(nrow=nrow(dat))
+#' dat[nas] <- NA
+#' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
+#' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
+#'                                            xrange='all'))
+#' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
+#'                                            xmethods=c('distEuclidean',
+#'                                                       'distEuclidean',
+#'                                                       'distJaccard',
+#'                                                        'distManhattan',
+#'                                                        'distManhattan',
+#'                                                        'distSimMatch')))
+#' #the case where column 2 is a binary variable, but is symmetric
+#' 
 #' @seealso
 #' [flexclust::kcca()](https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html)
 #' [flexclust::stepFlexclust()](https://search.r-project.org/CRAN/refmans/flexclust/html/stepFlexclust.html)
 #' [flexclust::bootFlexclust()](https://search.r-project.org/CRAN/refmans/flexclust/html/bootFlexclust.html)
-
+#'
+#' @import flexclust
 
 #' @export
 kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
@@ -237,4 +273,5 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
                         preproc=preproc,
                         trim=trim, groupFun=groupFun)
                               
-  }
+}
+
