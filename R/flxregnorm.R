@@ -9,11 +9,16 @@
 #'                kappa_p observations according to the population mean to the
 #'                data
 #' @param nu_p Regularization parameter.
+#' 
+#' @importFrom methods new
+#' @importFrom stats cov.wt
+#' @importFrom mvtnorm dmvnorm
+#' 
 #' @export
 FLXMCregnorm <- function(formula=.~., G, kappa_p=0.01, nu_p=3)
 {
-    z <- new("FLXMC", weighted=TRUE, formula=formula,
-             name="FLXMCregnorm")
+    z <- methods::new("FLXMC", weighted=TRUE, formula=formula,
+                      name="FLXMCregnorm")
 
     force(G)
 
@@ -26,10 +31,10 @@ FLXMCregnorm <- function(formula=.~., G, kappa_p=0.01, nu_p=3)
             mvtnorm::dmvnorm(y, mean=para$center, sigma=diag(para$s2), log=TRUE)
         }
 
-        new("FLXcomponent",
-            parameters=list(center=para$center, s2=para$s2),
-            logLik=logLik, df=para$df, 
-            predict=predict)
+        methods::new("FLXcomponent",
+                     parameters=list(center=para$center, s2=para$s2),
+                     logLik=logLik, df=para$df, 
+                     predict=predict)
     }
 
     z@fit <- function(x, y, w, ...) {
@@ -37,7 +42,7 @@ FLXMCregnorm <- function(formula=.~., G, kappa_p=0.01, nu_p=3)
         n = nrow(y)
         mu_p = colMeans(y)
 
-        var_data = cov.wt(y, method="unbiased")$cov %>% diag
+        var_data = stats::cov.wt(y, method="unbiased")$cov |> diag()
         xi_p2 = var_data / G^2
 
 

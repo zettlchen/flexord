@@ -62,16 +62,18 @@
 #'    distance function, and `.projectIntofx` as the belonging distance generating
 #'    function. To be used within `flexclust::kcca` or functions that build upon it.
 #'
+#' @importFrom stats ecdf
+#' 
 #' @examples
 #' ## Example usage
 #' #creating a distance matrix between two matrices based on GDM2 distance
 #' dat <- matrix(sample(1:5, 50, replace = TRUE),
 #'               nrow = 10)
 #' initcenters <- dat[sample(1:10, 3),]
-#' distGDM2(dat, initcenters, genDist=.projectIntofx)
+#' distGDM2(dat, initcenters, genDist=flexord:::.projectIntofx)
 #' 
 #' #a classical distance matrix for a single matrix can be obtained via:
-#' as.dist(distGDM2(dat, dat, genDist=.projectIntofx))
+#' as.dist(distGDM2(dat, dat, genDist=flexord:::.projectIntofx))
 #' 
 #' #K-centroids clustering using GDM2 distance
 #' flexclust::kcca(dat, k=3, family=kccaFamilyGDM2())
@@ -149,7 +151,7 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
         return(pdf$Freq[ind[length(ind)]])
       }
     }
-    list(epdf=epdf, ecdf=ecdf(x[,y]))
+    list(epdf=epdf, ecdf=stats::ecdf(x[,y]))
   })
   
   names(hats) <- colnames(x)

@@ -45,7 +45,7 @@
 #'   Default is `'minSumClusters'`.
 #'
 #' @return
-#' - `distGDM2`: A distance matrix for each row in `x` from each row in `centers`
+#' - `distSimMatch`: A distance matrix for each row in `x` from each row in `centers`
 #'    with dimensions `c(nrow(x), nrow(centers)`.
 #' - `kccaFamilyKmodes`: A custom `kccaFamily` for `kmodes` clustering, i.e.
 #'    K-centroids clustering using Simple Matching Distance and modes for centroids.
@@ -56,17 +56,16 @@
 #' #creating a distance matrix between two matrices based on GDM2 distance
 #' dat <- data.frame(option1 = sample(LETTERS[1:4], 10, replace=TRUE),
 #'                   option2 = sample(letters[1:6], 10, replace=TRUE),
-#'                   state = sample(state.name[1:10], 10, replace=TRUE)) |>
-#'        as.matrix()
-#' initcenters <- dat[sample(1:10, 3),]
-#' distSimMatch(dat, initcenters, genDist=.projectIntofx)
+#'                   state = sample(state.name[1:10], 10, replace=TRUE))
+#' datmat <- data.matrix(dat)
+#' initcenters <- datmat[sample(1:10, 3),]
+#' distSimMatch(datmat, initcenters)
 #' 
 #' #a classical distance matrix for a single matrix can be obtained via:
-#' as.dist(distSimMatch(dat, dat))
+#' as.dist(distSimMatch(datmat, datmat))
 #' 
 #' #K-centroids clustering via kmodes
-#' dat <- data.matrix(dat) #recommended for maximal control, but not required
-#' flexclust::kcca(dat, k=3, family=kccaFamilyGDM2())
+#' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kModes'))
 #' 
 #' @seealso
 #' - [klaR::kmodes()](https://cran.r-project.org/package=klaR)

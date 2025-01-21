@@ -6,10 +6,6 @@
 
 #' Additional Centroid Functions for K-centroids clustering of (ordinal) categorical data
 #'
-#' @usage
-#' centMode(x)
-#' centMin(x, dist, xrange=NULL)
-#' centOptimNA(x, dist)
 #'
 #' @description
 #' Functions to calculate cluster centroids that extend the options available
@@ -50,6 +46,8 @@
 #' 
 #' @seealso - [flexclust::kcca()](https://cran.r-project.org/package=flexclust)
 #'
+#' @importFrom stats setNames optim
+#'
 #' @examples
 #' # Example: Mode as centroid
 #' dat <- data.frame(A = rep(2:5, 2),
@@ -57,21 +55,20 @@
 #'                   C = rep(c(1, 2, 4, 5), 2))
 #' centMode(dat)
 #' ## within kcca
-#' kcca(x, 3, family=kccaFamily(dist=distSimMatch,
-#'                              cent=centMode))
+#' flexclust::kcca(dat, 3, family=kccaExtendedFamily('kModes'))
 #' 
 #' # Example: Centroid is level for which distance is minimal
-#' centMin(y, distGower, xrange = 'data range')
-#' ## within kcca
-#' kcca(x, 3, family=kccaFamily(dist= distGower,
-#'                              cent=\(y) centMin(y, distGower))
+#' centMin(dat, flexclust::distManhattan, xrange = 'all')
 #'                              
 #' # Example: General purpose optimizer with NA removal
-#' nas <- sample(c(T, F), prod(dim(dat)),
-#'               replace=T, prob=c(0.1,0.9)) |> 
+#' nas <- sample(c(TRUE, FALSE), prod(dim(dat)),
+#'               replace=TRUE, prob=c(0.1,0.9)) |> 
 #'        matrix(nrow=nrow(dat))
 #' dat[nas] <- NA
-#' centOptimNA(dat, distManhattan)
+#' centOptimNA(dat, flexclust::distManhattan)
+#' @name centroid_functions
+ 
+#' @rdname centroid_functions
 #' @export
 centMode <- function(x) {
   apply(x, 2, \(cat) {
@@ -80,30 +77,30 @@ centMode <- function(x) {
   })
 }
 
+#' @rdname centroid_functions
 #' @export
 centMin <- function(x, dist, xrange=NULL) {
-  if(is.null(xrange)) xrange <- 'data range'
+  if(is.null(xrange)) xrange <- 'all'
   
   rng <- .rangeMatrix(xrange=xrange)(x)
   
   lvls <- apply(rng, 2, \(y) matrix(seq(y[1], y[2])),
                 simplify = F)
   cntrs <- vector(length = ncol(x)) |> 
-    setNames(colnames(x))
+    stats::setNames(colnames(x))
   for (i in 1:ncol(x)) {
-    cntrs[i] <- dist(x[, i, drop = FALSE], lvls[[i]][, 1, drop = FALSE],
-                     xrange = rng[, i]) |>
-      colSums() |> setNames(lvls[[i]]) |> 
-      which.min() |> #automatically picks first
-      names() |> as.numeric()
+    d <- dist(x[, i, drop=F], lvls[[i]]) |> 
+      colSums() |> matrix(nrow=1)
+    cntrs[i] <- max.col(-d, ties.method='random')
   }
   return(cntrs)
 }
 
+#' @rdname centroid_functions
 #' @export
 centOptimNA <- function(x, dist) {
   foo <- function(p)
     sum(dist(x, matrix(p, nrow=1)), na.rm=TRUE)
   
-  optim(colMeans(x, na.rm=TRUE), foo)$par
+  stats::optim(colMeans(x, na.rm=TRUE), foo)$par
 }

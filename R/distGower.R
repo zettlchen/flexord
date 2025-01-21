@@ -43,7 +43,7 @@
                        )
                 )
          )
-  ) |> setNames(names(xclass))
+  ) |> stats::setNames(names(xclass))
 }
 
 
