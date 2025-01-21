@@ -9,7 +9,7 @@ Author: Lena Ortega Menjivar [aut, cre] (<lena.ortega-menjivar@boku.ac.at>)
 Maintainer: Lena Ortega Menjivar <lena.ortega-menjivar@boku.ac.at>
 Description: We extend the capabilities for flexible partitioning and model-based clustering
        available in the packages 'flexclust' and 'flexmix' to handle ordinal and mixed-wtih
-       ordinal data types via new distance, centroid and distribution functions that
+       ordinal data types via new distance, centroid and driver functions that
        make various assumptions regarding ordinality. Using them within the flex-scheme
        allows for easy comparisons across methods.
 Imports:
