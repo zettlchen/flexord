@@ -146,14 +146,14 @@
 #' @examples
 #' # Example 1: kModes
 #' set.seed(123)
-#' dat <- data.frame(cont = sample(1:100, 10, replace=T)/10,
-#'                   bin_sym = as.logical(sample(0:1, 10, replace=T)),
-#'                   bin_asym = as.logical(sample(0:1, 10, replace=T)),                     
-#'                   ord_levmis = factor(sample(1:5, 10, replace=T),
-#'                                       levels=1:6, ordered=T),
-#'                   ord_levfull = factor(sample(1:4, 10, replace=T),
-#'                                        levels=1:4, ordered=T),
-#'                   nom = factor(sample(letters[1:4], 10, replace=T),
+#' dat <- data.frame(cont = sample(1:100, 10, replace=TRUE)/10,
+#'                   bin_sym = as.logical(sample(0:1, 10, replace=TRUE)),
+#'                   bin_asym = as.logical(sample(0:1, 10, replace=TRUE)),                     
+#'                   ord_levmis = factor(sample(1:5, 10, replace=TRUE),
+#'                                       levels=1:6, ordered=TRUE),
+#'                   ord_levfull = factor(sample(1:4, 10, replace=TRUE),
+#'                                        levels=1:4, ordered=TRUE),
+#'                   nom = factor(sample(letters[1:4], 10, replace=TRUE),
 #'                                levels=letters[1:4]))
 #' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kModes'))
 #' 
@@ -163,7 +163,7 @@
 #'                                                     xrange='columnwise'))
 #' # Example 3: kGower
 #' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
-#' nas <- sample(c(T,F), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
+#' nas <- sample(c(TRUE,FALSE), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
 #'    matrix(nrow=nrow(dat))
 #' dat[nas] <- NA
 #' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
@@ -205,7 +205,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     
     rng <- .rangeMatrix(xrange)
     
-    distGen <- function(x) .projectIntofx(x, rangeMatrix=rng)
+    distGen <- function(x) flexord:::.projectIntofx(x, rangeMatrix=rng)
     dstfnc <- distGDM2
     
     if(is.null(cent)) {
@@ -235,12 +235,12 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
         #and 2) because I only use them once in the beginning (unlike the dists),
         #so I can't really get lost in the frames
         xcls <- get('xclass', parent.frame())
-        .ChooseVarDists(xcls)
+        flexord:::.ChooseVarDists(xcls)
       }
       preproc <- function(x) {
         xcls <- get('xclass', parent.frame())
-        .ScaleVarSpecific(x, rangeMatrix=rng,
-                          xclass=xcls)
+        flexord:::.ScaleVarSpecific(x, rangeMatrix=rng,
+                                    xclass=xcls)
       }
     } else {
       distGen <- function(x, ...) {
@@ -249,8 +249,8 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
           stop('Specified columnwise xmethod not implemented!')
         return(xmethods)
       }
-      preproc <- function(x) .ScaleVarSpecific(x, rangeMatrix=rng,
-                                               xclass=xmethods)
+      preproc <- function(x) flexord:::.ScaleVarSpecific(x, rangeMatrix=rng,
+                                                         xclass=xmethods)
     }
     
     dstfnc <- distGower

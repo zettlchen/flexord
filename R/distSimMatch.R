@@ -122,40 +122,40 @@
 #' 
 #' # Example 3: Gower's distance
 #' # Ex. 3.1: single variable type case with no missings:
-#' xcls <- .ChooseVarDists(datmat) #all Euclidean (on dat, it would default to all Simple Matching)
-#' datscld <- .ScaleVarSpecific(datmat, xclass=xcls,
-#'                              xrange=list(c(1,4), c(1,6), c(1,4),
-#'                                          c(1,5), c(1,10), c(1,3)))
+#' xcls <- flexord:::.ChooseVarDists(datmat) #all Euclidean (on dat, it would default to all Simple Matching)
+#' datscld <- flexord:::.ScaleVarSpecific(datmat, xclass=xcls,
+#'                                        xrange=list(c(1,4), c(1,6), c(1,4),
+#'                                                    c(1,5), c(1,10), c(1,3)))
 #' initcentscld <- datscld[sample(1:10, 3),]
 #' distGower(datscld, initcentscld, genDist=xcls)
 #' ## within kcca
-#' kcca(datmat, 3, kccaExtendedFamily('kGower')) #turns into kmeans with scaling
+#' flexclust::kcca(datmat, 3, kccaExtendedFamily('kGower')) #turns into kmeans with scaling
 #' 
 #' # Ex. 3.2: single variable type case with missing values:
-#' nas <- sample(c(T,F), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
+#' nas <- sample(c(TRUE,FALSE), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
 #'    matrix(nrow=nrow(dat))
 #' dat[nas] <- NA
 #' #repeat the steps from above...or just do:
-#' kcca(dat, 3, kccaExtendedFamily('kGower', cent=centMode)) #turns into kModes with upweighting of present values
+#' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower', cent=centMode)) #turns into kModes with upweighting of present values
 #' 
 #' #Ex. 3.3: mixed variable types (with or without missings): 
-#' dat <- data.frame(cont = sample(1:100, 10, replace=T)/10,
-#'                   bin_sym = as.logical(sample(0:1, 10, replace=T)),
-#'                   bin_asym = as.logical(sample(0:1, 10, replace=T)),                     
-#'                   ord_levmis = factor(sample(1:5, 10, replace=T),
-#'                                       levels=1:6, ordered=T),
-#'                   ord_levfull = factor(sample(1:4, 10, replace=T),
-#'                                        levels=1:4, ordered=T),
-#'                   nom = factor(sample(letters[1:4], 10, replace=T),
+#' dat <- data.frame(cont = sample(1:100, 10, replace=TRUE)/10,
+#'                   bin_sym = as.logical(sample(0:1, 10, replace=TRUE)),
+#'                   bin_asym = as.logical(sample(0:1, 10, replace=TRUE)),                     
+#'                   ord_levmis = factor(sample(1:5, 10, replace=TRUE),
+#'                                       levels=1:6, ordered=TRUE),
+#'                   ord_levfull = factor(sample(1:4, 10, replace=TRUE),
+#'                                        levels=1:4, ordered=TRUE),
+#'                   nom = factor(sample(letters[1:4], 10, replace=TRUE),
 #'                                levels=letters[1:4]))
 #' dat[nas] <- NA
-#' xcls <- .ChooseVarDists(dat)
-#' datmat <- .ScaleVarSpecific(data.matrix(dat), xclass=xcls,
-#'                             xrange='columnwise')
+#' xcls <- flexord:::.ChooseVarDists(dat)
+#' datmat <- flexord:::.ScaleVarSpecific(data.matrix(dat), xclass=xcls,
+#'                                       xrange='columnwise')
 #' initcenters <- datmat[sample(1:10, 3),]
 #' distGower(datmat, initcenters, genDist=xcls)                  
 #' ## within kcca
-#' kcca(dat, 3, kccaExtendedFamily('kGower'))
+#' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
 #' ## as a distance matrix
 #' distGower(datmat, datmat, genDist=xcls) |> as.dist()
 #' ## as a distance matrix

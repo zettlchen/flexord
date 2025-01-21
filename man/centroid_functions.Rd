@@ -70,9 +70,9 @@ flexclust::kcca(dat, 3, family=kccaExtendedFamily('kModes')) #default centroid
 centMin(dat, flexclust::distManhattan, xrange = 'all')
 ## within kcca
 flexclust::kcca(dat, 3,
-                family=kccaFamily(dist=flexclust::distManhattan,
-                                  cent=\(y) centMin(y, flexclust::distManhattan
-                                                     xrange='all')))
+                family=flexclust::kccaFamily(dist=flexclust::distManhattan,
+                                             cent=\(y) centMin(y, flexclust::distManhattan,
+                                                               xrange='all')))
                              
 # Example: Centroid calculated by general purpose optimizer with NA removal
 nas <- sample(c(TRUE, FALSE), prod(dim(dat)),
