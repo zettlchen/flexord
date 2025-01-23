@@ -4,7 +4,7 @@
 #' Fraley & Raftery (...) for multivariate normal mixtures.
 #' The covariance matrix for each component is assumed to be diagonal.
 #' @param formula A formula describing the normal components
-#' @param G Number of components in the mixture model
+#' @param G Number of components in the mixture model (not used if xi_p is given)
 #' @param kappa_p Regularization parameter. Functions as if you added
 #'                kappa_p observations according to the population mean to the
 #'                data
@@ -13,13 +13,11 @@
 #' @importFrom methods new
 #' @importFrom stats cov.wt
 #' @importFrom mvtnorm dmvnorm
-#' 
+#' @import flexmix
 #' @export
-FLXMCregnorm <- function(formula=.~., xi_p, kappa_p=0.01, nu_p=3) {
+FLXMCregnorm <- function(formula=.~., xi_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregnorm")
-
-    force(G)
 
     z@defineComponent <- function(para) {
         predict <- function(x, ...){
@@ -30,35 +28,45 @@ FLXMCregnorm <- function(formula=.~., xi_p, kappa_p=0.01, nu_p=3) {
             mvtnorm::dmvnorm(y, mean=para$center, sigma=diag(para$s2), log=TRUE)
         }
 
-        methods::new("FLXcomponent",
-                     parameters=list(center=para$center, s2=para$s2),
-                     logLik=logLik, df=para$df, 
-                     predict=predict)
+        new("FLXcomponent",
+            parameters=list(center=para$center, s2=para$s2,
+                            mu_p = para$mu_p, var_data = para$var_data),
+            logLik=logLik, df=para$df, 
+            predict=predict)
     }
 
-    z@fit <- function(x, y, w, ...) {
+    z@fit <- function(x, y, w, component=NULL) {
         # From Fraley/Raftery
         n = nrow(y)
-        mu_p = colMeans(y)
 
-        var_data = stats::cov.wt(y, method="unbiased")$cov |> diag()
-        xi_p2 = var_data / G^2
+        if(length(component) == 0L) {
+            component$mu_p = colMeans(y)
+            #component$var_data = diag(cov.wt(y, method="unbiased")$cov)
+            component$var_data = 1/(n-1) * vapply(seq_len(ncol(y)), \(i) {
+                sum((y[,i] - component$mu_p[i])^2)
+            }, double(1))
+        }
+
+        if(is.null(xi_p) && !is.null(G)) {
+            xi_p2 = component$var_data / G^2
+        } else {
+            xi_p2 = xi_p
+        }
 
 
         nk = sum(w)
         ykbar = colSums(w*y)/nk
 
-        muhat1 = (nk*ykbar + kappa_p*mu_p)/(kappa_p + nk)
+        muhat1 = (nk*ykbar + kappa_p*component$mu_p)/(kappa_p + nk)
 
-
-        s2hat_numer1 = xi_p2 + (kappa_p*nk)/(kappa_p+nk)*(ykbar - mu_p)^2
+        s2hat_numer1 = xi_p2 + (kappa_p*nk)/(kappa_p+nk)*(ykbar - component$mu_p)^2
         s2hat_numer2 = rowSums(w * (t(y) - ykbar)^2)
         s2hat_denom = nu_p + nk + 3
         s2hat = (s2hat_numer1+s2hat_numer2) / s2hat_denom
 
 
         para = list(center = muhat1, s2 = s2hat, df = 2*ncol(y))
-        z@defineComponent(para)
+        z@defineComponent(c(para, component))
     }
 
     z
