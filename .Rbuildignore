@@ -1,3 +1,8 @@
 ^LICENSE\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+\.gitignore
+\.git
+\.\.Rcheck
+\.swp$
+R/\.scratch\.R$
