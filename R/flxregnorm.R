@@ -15,6 +15,15 @@
 #' @importFrom mvtnorm dmvnorm
 #' @import flexmix
 #' @export
+#' @return an object of class FLXC
+#' @export
+#' @references
+#' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
+#'   *Ordinal clustering with the flex-Scheme.*
+#'   Austrian Statistics Journal. _Submitted manuscript_.
+#' - Fraley, C, Raftery AE (2007)
+#'   *Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering.*
+#'   Journal of Classification, 24(2), 155-181
 FLXMCregnorm <- function(formula=.~., xi_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregnorm")
