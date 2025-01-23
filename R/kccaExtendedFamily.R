@@ -128,7 +128,7 @@
 #' - Gower, JC (1971).
 #'   *A General Coefficient for Similarity and Some of Its Properties.*
 #'   Biometrics, 27(4), 857-871.
-#'   [doi:10.2307/2528823](https://doi.org/10.2307/2528823)
+#'   \doi{doi:10.2307/2528823}
 #' - Kaufman, L, Rousseeuw, P (1990).
 #'   *Finding Groups in Data: An Introduction to Cluster Analysis.*
 #'   Wiley Series in Probability and Statistics.
