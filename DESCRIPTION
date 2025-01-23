@@ -15,9 +15,10 @@ Description: We extend the capabilities for flexible partitioning and model-base
 Imports:
        flexclust (>= 1.5.0),
        methods,
-       mvtnorm
+       mvtnorm,
+       flexmix
 License: GPL-2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Depends: R (>= 4.3)
+Depends: R (>= 4.1)
