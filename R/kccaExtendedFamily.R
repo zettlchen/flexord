@@ -132,16 +132,16 @@
 #' - Kaufman, L, Rousseeuw, P (1990).
 #'   *Finding Groups in Data: An Introduction to Cluster Analysis.*
 #'   Wiley Series in Probability and Statistics.
-#'   [doi:10.1002/9780470316801](https://doi.org/10.1002/9780470316801)
+#'   \doi{doi:10.1002/9780470316801}
 #' - Leisch, F (2006). *A Toolbox for K-Centroids Cluster Analysis.*
 #'   Computational Statistics and Data Analysis, 17(3), 526-544.
-#'   [doi:10.1016/j.csda.2005.10.006](https://doi.org/10.1016/j.csda.2005.10.006)
+#'   \doi{doi:10.1016/j.csda.2005.10.006}
 #' - Walesiak, M (1993). *Statystyczna Analiza Wielowymiarowa w Badaniach Marketingowych.*
 #'   Wydawnictwo Akademii Ekonomicznej, 44-46.
 #' - Weihs, C, Ligges, U, Luebke, K, Raabe, N (2005).
 #'   *klaR Analyzing German Business Cycles.* In: Data Analysis an
 #'   Decision Support, Springer: Berlin. 335-343.
-#'   [doi:10.1007/3-540-28397-8_36](https://doi.org/10.1007/3-540-28397-8_36)
+#'   \doi{doi:10.1007/3-540-28397-8_36}
 #' 
 #' @examples
 #' # Example 1: kModes
