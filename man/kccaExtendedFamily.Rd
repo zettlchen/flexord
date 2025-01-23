@@ -47,10 +47,10 @@ the distance measure for each column of \code{x}. Currently only used for
 default methods for each column of \code{x}. For more information on
 allowed input values, and default measures, see the Details section.}
 
-\item{trim}{See \code{\link[flexclust:kccaFamily]{flexclust::kccaFamily()}}: Proportion of points trimmed in
+\item{trim}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: Proportion of points trimmed in
 robust clustering.}
 
-\item{groupFun}{See \code{\link[flexclust:kccaFamily]{flexclust::kccaFamily()}}: A character string specifying
+\item{groupFun}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: A character string specifying
 the function for clustering. Default is \code{'minSumClusters'}.}
 }
 \value{
@@ -178,20 +178,20 @@ Austrian Statistics Journal. \emph{Submitted manuscript}.
 \item Gower, JC (1971).
 \emph{A General Coefficient for Similarity and Some of Its Properties.}
 Biometrics, 27(4), 857-871.
-\href{https://doi.org/10.2307/2528823}{doi:10.2307/2528823}
+\doi{doi:10.2307/2528823}
 \item Kaufman, L, Rousseeuw, P (1990).
 \emph{Finding Groups in Data: An Introduction to Cluster Analysis.}
 Wiley Series in Probability and Statistics.
-\href{https://doi.org/10.1002/9780470316801}{doi:10.1002/9780470316801}
+\doi{doi:10.1002/9780470316801}
 \item Leisch, F (2006). \emph{A Toolbox for K-Centroids Cluster Analysis.}
 Computational Statistics and Data Analysis, 17(3), 526-544.
-\href{https://doi.org/10.1016/j.csda.2005.10.006}{doi:10.1016/j.csda.2005.10.006}
+\doi{doi:10.1016/j.csda.2005.10.006}
 \item Walesiak, M (1993). \emph{Statystyczna Analiza Wielowymiarowa w Badaniach Marketingowych.}
 Wydawnictwo Akademii Ekonomicznej, 44-46.
 \item Weihs, C, Ligges, U, Luebke, K, Raabe, N (2005).
 \emph{klaR Analyzing German Business Cycles.} In: Data Analysis an
 Decision Support, Springer: Berlin. 335-343.
-\href{https://doi.org/10.1007/3-540-28397-8_36}{doi:10.1007/3-540-28397-8_36}
+\doi{doi:10.1007/3-540-28397-8_36}
 }
 }
 \seealso{
