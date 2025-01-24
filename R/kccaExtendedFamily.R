@@ -190,7 +190,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
                                cent=NULL, preproc=NULL,
                                xrange=NULL, xmethods=NULL,
                                trim=0, groupFun='minSumClusters') { #the last two are unused leftovers from kcca, should probably not provide them
-                                 
+  which <- match.arg(which)
   if(which=='kModes') {
     
     distGen <- NULL
