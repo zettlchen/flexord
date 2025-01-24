@@ -29,7 +29,7 @@ In their 2011 study, Smart et.\~al collected information on 464 Irish and
 British patients suffering from lower back pain regarding:
 \itemize{
 \item the type of lower back pain (classified into 'nociceptive', 'peripheral
-neuropathic', and 'central')
+neuropathic', and 'central neuropathic')
 \item the presence/absence of 38 clinical criteria and symptoms relating to lower
 back pain.
 }

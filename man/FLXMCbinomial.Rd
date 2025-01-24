@@ -33,7 +33,7 @@ Parameter estimation is achieved using the MAP estimator for each cluster
 and variable using a Beta prior.
 }
 \examples{
-\dontrun{
+\donttest{
 library("flexmix")
 library("flexord")
 library("flexclust")

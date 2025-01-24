@@ -49,7 +49,7 @@ components is used as per Fraley and Raftery (2007). In which case the
 number of components (parameter \code{G}) needs to be specified.
 }
 \examples{
-\dontrun{
+\donttest{
 library("flexmix")
 library("flexord")
 library("flexclust")

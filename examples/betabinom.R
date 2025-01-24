@@ -1,4 +1,4 @@
-\dontrun{
+\donttest{
 library("flexmix")
 library("flexord")
 library("flexclust")

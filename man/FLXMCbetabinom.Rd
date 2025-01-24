@@ -36,7 +36,7 @@ that clusters become more similar to each other the larger
 \code{alpha2} is chosen. For small values it is mostly negligible however.
 }
 \examples{
-\dontrun{
+\donttest{
 library("flexmix")
 library("flexord")
 library("flexclust")
