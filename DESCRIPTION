@@ -4,11 +4,14 @@ Version: 1.0.0
 Authors@R: 
     c(person('Lena', 'Ortega Menjivar', role=c('aut', 'cre'),
              email='lena.ortega-menjivar@boku.ac.at',
-             comment=c(ORCID='0000-0001-5785-4021', 'please add')))
+             comment=c(ORCID='0000-0001-5785-4021', 'please add')),
+      person('Dominik', 'Ernst', role=c('aut'),
+             email='dominik.ernst@boku.ac.at',
+             comment=c(ORCID='0009-0005-5579-2636')))
 Author: Lena Ortega Menjivar [aut, cre] (<lena.ortega-menjivar@boku.ac.at>)
 Maintainer: Lena Ortega Menjivar <lena.ortega-menjivar@boku.ac.at>
 Description: We extend the capabilities for flexible partitioning and model-based clustering
-       available in the packages 'flexclust' and 'flexmix' to handle ordinal and mixed-wtih
+       available in the packages 'flexclust' and 'flexmix' to handle ordinal and mixed-with
        ordinal data types via new distance, centroid and driver functions that
        make various assumptions regarding ordinality. Using them within the flex-scheme
        allows for easy comparisons across methods.
@@ -21,4 +24,4 @@ License: GPL-2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Depends: R (>= 4.1)
+Depends: R (>= 4.3)
