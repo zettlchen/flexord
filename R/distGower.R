@@ -92,40 +92,9 @@
   return(x)
 }
 
-#.delta: helper function to calculate weights for Gower's distance
-# @param x a numerically coded matrix.
-# @param centers a numerically coded matrix that is compatible with,
-#                or a subset of, `x`. `ncol(x)==ncol(centers)`, and
-#                `nrow(x)>=nrow(centers)`.
-# @param distances character vector of variable specific distances,
-#                  f.i. as derived from `.ChooseVarDists(x)`. Length
-#                  needs to be equal to `ncol(x)`.
-# @return a logical array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`.
-#         `TRUE` in `ijk` if `x[i,j]` and `centers[k,j]` are both non-
-#         missing, and, in the case of logical variables calculated with
-#         `distJaccard`, not more than one variables is equal to 0; `FALSE`
-#         otherwise. 
-.delta <- function(x, centers, distances) {
-  K <- nrow(centers)
-  delta <- sapply(1:K,
-                  \(k) t(!(is.na(t(x)) | is.na(centers[k,]))),
-                  simplify='array')
-  distJ <- distances=='distJaccard'
-  
-  if(any(distJ)) {
-    xJ <- x[, distJ, drop=F]
-    cJ <- centers[, distJ, drop=F]
-    for(k in 1:K){
-      delta[, distJ, k] <- t((t(xJ) + cJ[k,])>0)
-    }
-    delta[which(is.na(delta))] <- FALSE
-  }
-  
-  delta
-  
-}
-
-
+#' @rdname distance_functions
+#' @export
+distGower <- function(x, centers, genDist) {
 #.distGower_mixedType: helper function to calculate Gower's distance on _mixed variable types_, and/or
 #in the presence of missing values
 # @param x a numerically coded matrix. If `distEuclidean` or
@@ -224,7 +193,7 @@
 # or `distSimMatch` directly.
 # 
 # The checks for this helper to run (`length(unique(distances))==1` and
-# `!any(is.na(x))` happen outside of it.
+# `!anyNA(x)` happen outside of it.
 .distGower_singleTypeNoNAs <- function(x, centers, distances) {
 
   dists <- unique(distances)
@@ -245,19 +214,48 @@
   dstfnc(x, centers)/p
 }
 
-#' @rdname distance_functions
-#' @export
-distGower <- function(x, centers, genDist) {
+#.delta: helper function to calculate weights for Gower's distance
+# @param x a numerically coded matrix.
+# @param centers a numerically coded matrix that is compatible with,
+#                or a subset of, `x`. `ncol(x)==ncol(centers)`, and
+#                `nrow(x)>=nrow(centers)`.
+# @param distances character vector of variable specific distances,
+#                  f.i. as derived from `.ChooseVarDists(x)`. Length
+#                  needs to be equal to `ncol(x)`.
+# @return a logical array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`.
+#         `TRUE` in `ijk` if `x[i,j]` and `centers[k,j]` are both non-
+#         missing, and, in the case of logical variables calculated with
+#         `distJaccard`, not more than one variables is equal to 0; `FALSE`
+#         otherwise. 
+.delta <- function(x, centers, distances) {
+  K <- nrow(centers)
+  delta <- sapply(1:K,
+                  \(k) t(!(is.na(t(x)) | is.na(centers[k,]))),
+                  simplify='array')
+  distJ <- distances=='distJaccard'
   
+  if(any(distJ)) {
+    xJ <- x[, distJ, drop=F]
+    cJ <- centers[, distJ, drop=F]
+    for(k in 1:K){
+      delta[, distJ, k] <- t((t(xJ) + cJ[k,])>0)
+    }
+    delta[which(is.na(delta))] <- FALSE
+  }
+  
+  delta
+  
+}
+
   if (ncol(x) != ncol(centers))
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   
-  if(length(unique(genDist))==1 && !any(is.na(x))) {
+  if(length(unique(genDist))==1 && !anyNA(x)) {
     
     .distGower_singleTypeNoNAs(x, centers, distances=genDist)
   
   } else {
-    
+
     delta <- .delta(x, centers, distances=genDist)
     
     z <- .distGower_mixedType(x, centers, distances=genDist)
