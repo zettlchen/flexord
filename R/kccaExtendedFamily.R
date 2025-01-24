@@ -205,7 +205,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     
     rng <- .rangeMatrix(xrange)
     
-    distGen <- function(x) flexord:::.projectIntofx(x, rangeMatrix=rng)
+    distGen <- function(x) .projectIntofx(x, rangeMatrix=rng)
     dstfnc <- distGDM2
     
     if(is.null(cent)) {
@@ -235,11 +235,11 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
         #and 2) because I only use them once in the beginning (unlike the dists),
         #so I can't really get lost in the frames
         xcls <- get('xclass', parent.frame())
-        flexord:::.ChooseVarDists(xcls)
+        .ChooseVarDists(xcls)
       }
       preproc <- function(x) {
         xcls <- get('xclass', parent.frame())
-        flexord:::.ScaleVarSpecific(x, rangeMatrix=rng,
+        .ScaleVarSpecific(x, rangeMatrix=rng,
                                     xclass=xcls)
       }
     } else {
@@ -249,8 +249,8 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
           stop('Specified columnwise xmethod not implemented!')
         return(xmethods)
       }
-      preproc <- function(x) flexord:::.ScaleVarSpecific(x, rangeMatrix=rng,
-                                                         xclass=xmethods)
+      preproc <- function(x) .ScaleVarSpecific(x, rangeMatrix=rng,
+                                               xclass=xmethods)
     }
     
     dstfnc <- distGower

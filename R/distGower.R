@@ -254,13 +254,13 @@ distGower <- function(x, centers, genDist) {
   
   if(length(unique(genDist))==1 && !any(is.na(x))) {
     
-    flexord:::.distGower_singleTypeNoNAs(x, centers, distances=genDist)
+    .distGower_singleTypeNoNAs(x, centers, distances=genDist)
   
   } else {
     
-    delta <- flexord:::.delta(x, centers, distances=genDist)
+    delta <- .delta(x, centers, distances=genDist)
     
-    z <- flexord:::.distGower_mixedType(x, centers, distances=genDist)
+    z <- .distGower_mixedType(x, centers, distances=genDist)
     
     z <- sapply(1:nrow(centers),
                 \(k) rowSums(z[,,k,drop=F]*delta[,,k,drop=F])/rowSums(delta[,,k,drop=F]))
