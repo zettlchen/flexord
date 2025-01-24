@@ -33,6 +33,7 @@ Parameter estimation is achieved using the MAP estimator for each cluster
 and variable using a Beta prior.
 }
 \examples{
+\dontrun{
 library("flexmix")
 library("flexord")
 library("flexclust")
@@ -68,7 +69,7 @@ m2 = stepFlexmix(dat~1, model=FLXMCbinomial(size=size, alpha2=1), k=k)
 # Small values for the regularization don't seem to affect the ARI (much)
 randIndex(clusters(m1), true_clusters)
 randIndex(clusters(m2), true_clusters)
-
+}
 }
 \references{
 \itemize{

@@ -1,3 +1,4 @@
+\dontrun{
 library("flexmix")
 library("flexord")
 library("flexclust")
@@ -38,4 +39,4 @@ m2 = stepFlexmix((dat+1L)~1, model=FLXMCregmultinom(size=size+1L, alpha2=1), k=k
 # Small values for the regularization don't seem to affect the ARI (much)
 randIndex(clusters(m1), true_clusters)
 randIndex(clusters(m2), true_clusters)
-
+}
