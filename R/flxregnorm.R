@@ -1,22 +1,41 @@
 #' FlexMix driver for regularized multivariate normal mixtures
 #'
-#' This model implements the regularization method as introduced in
-#' Fraley & Raftery (...) for multivariate normal mixtures.
-#' The covariance matrix for each component is assumed to be diagonal.
+#' This model driver implements the regularization method as introduced by
+#' Fraley and Raftery (2007) for multivariate normal mixtures. Default
+#' parameters for the regularization are taken from that paper.
+#' However we only implement the special case where the covariance matrix
+#' is diagonal and different variance per variable. For more general applications
+#' of normal mixtures see package \pkg{Mclust}.
+#'
+#' For the regularization the conjugate prior distributions for the normal
+#' distirbution are used, which are:
+#' * Normal prior with parameter `mu_p` and `sigma^2/kappa_p` for the mean
+#' * Inverse Gamma prior with parameters `nu_p/2` and `xi_p^2/2` tor the
+#'   variance
+#'
+#'  `mu_p` is computed from the data as the overall means across all components.
+#'
+#' A value for the scale hyperparameter `xi_p` may be specified directly.
+#' Otherwise the empirical variance divided by the square of the number of
+#' components is used as per Fraley and Raftery (2007). In which case the
+#' number of components (parameter `G`) needs to be specified.
+#' 
+#'
 #' @param formula A formula describing the normal components
 #' @param G Number of components in the mixture model (not used if xi_p is given)
-#' @param kappa_p Regularization parameter. Functions as if you added
-#'                kappa_p observations according to the population mean to the
-#'                data
-#' @param nu_p Regularization parameter.
-#' 
+#' @param kappa_p Shrinkage parameter. Functions as if you added
+#'                `kappa_p` observations according to the population mean to
+#'                each component (hyperparameter for IG prior)
+#' @param nu_p Degress of freedom (hyperparameter for IG prior)
+#' @param xi_p Scale (hyperparameter for IG prior). If not given the empirical
+#'             variance divided by the square of the number of components
+#'             is used as per Fraley and Raftery (2007).
 #' @importFrom methods new
 #' @importFrom stats cov.wt
 #' @importFrom mvtnorm dmvnorm
 #' @import flexmix
 #' @export
 #' @return an object of class FLXC
-#' @export
 #' @references
 #' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
 #'   *Ordinal clustering with the flex-Scheme.*
@@ -24,9 +43,15 @@
 #' - Fraley, C, Raftery AE (2007)
 #'   *Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering.*
 #'   Journal of Classification, 24(2), 155-181
+#' @example examples/regnorm.R
 FLXMCregnorm <- function(formula=.~., xi_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregnorm")
+
+
+    if(is.null(xi_p) && is.null(G)) {
+        stop("either parameter xi_p or G is needed")
+    }
 
     z@defineComponent <- function(para) {
         predict <- function(x, ...){

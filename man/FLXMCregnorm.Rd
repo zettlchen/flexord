@@ -9,11 +9,15 @@ FLXMCregnorm(formula = . ~ ., xi_p = NULL, kappa_p = 0.01, nu_p = 3, G = NULL)
 \arguments{
 \item{formula}{A formula describing the normal components}
 
-\item{kappa_p}{Regularization parameter. Functions as if you added
-kappa_p observations according to the population mean to the
-data}
+\item{xi_p}{Scale (hyperparameter for IG prior). If not given the empirical
+variance divided by the square of the number of components
+is used as per Fraley and Raftery (2007).}
 
-\item{nu_p}{Regularization parameter.}
+\item{kappa_p}{Shrinkage parameter. Functions as if you added
+\code{kappa_p} observations according to the population mean to
+each component (hyperparameter for IG prior)}
+
+\item{nu_p}{Degress of freedom (hyperparameter for IG prior)}
 
 \item{G}{Number of components in the mixture model (not used if xi_p is given)}
 }
@@ -21,9 +25,63 @@ data}
 an object of class FLXC
 }
 \description{
-This model implements the regularization method as introduced in
-Fraley & Raftery (...) for multivariate normal mixtures.
-The covariance matrix for each component is assumed to be diagonal.
+This model driver implements the regularization method as introduced by
+Fraley and Raftery (2007) for multivariate normal mixtures. Default
+parameters for the regularization are taken from that paper.
+However we only implement the special case where the covariance matrix
+is diagonal and different variance per variable. For more general applications
+of normal mixtures see package \pkg{Mclust}.
+}
+\details{
+For the regularization the conjugate prior distributions for the normal
+distirbution are used, which are:
+\itemize{
+\item Normal prior with parameter \code{mu_p} and \code{sigma^2/kappa_p} for the mean
+\item Inverse Gamma prior with parameters \code{nu_p/2} and \code{xi_p^2/2} tor the
+variance
+}
+
+\code{mu_p} is computed from the data as the overall means across all components.
+
+A value for the scale hyperparameter \code{xi_p} may be specified directly.
+Otherwise the empirical variance divided by the square of the number of
+components is used as per Fraley and Raftery (2007). In which case the
+number of components (parameter \code{G}) needs to be specified.
+}
+\examples{
+
+library("flexmix")
+library("flexord")
+library("flexclust")
+
+# example data
+data("iris")
+my_iris = subset(iris, select=setdiff(colnames(iris), "Species")) |>
+    as.matrix()
+
+# cluster one model with a scale parameter similar to the default for 3 components
+m1 = flexmix(my_iris~1,
+             model=FLXMCregnorm(xi_p=c(0.23, 0.06, 1.04, 0.19)),
+             k=3)
+
+summary(m1)
+
+# rand index of clusters vs species
+randIndex(clusters(m1), iris$Species)
+
+# cluster one model with default scale parameter
+m2 = flexmix(my_iris~1,
+             model=FLXMCregnorm(G=3),
+             k=3)
+
+summary(m2)
+
+# rand index of clusters vs species
+randIndex(clusters(m2), iris$Species)
+
+
+# rand index between both models (should be around 0.8)
+randIndex(clusters(m1), clusters(m2))
 }
 \references{
 \itemize{

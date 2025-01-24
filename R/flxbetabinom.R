@@ -143,16 +143,6 @@ FLXMCbetabinom = function(formula=.~., size, alpha2=0, eps=sqrt(.Machine$double.
     size <- as.integer(size)
     
 
-    if(FALSE) {
-    z@preproc.y = \(y) {
-        xuni <<- lapply(seq(ncol(y)), \(col) {
-            sort(unique(y[,col]))
-        })
-        y
-    }
-    }
-
-
     z@defineComponent <- expression({
         logLik <- function(x,y) {
             z <- y

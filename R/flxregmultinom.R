@@ -1,3 +1,34 @@
+#' FlexMix driver for regularized multinomial mixtures
+#'
+#' This model driver can be used to cluster data using a multinomial
+#' distribution.
+#' 
+#' Using a regularization parameter `alpha2` greater than zero
+#' acts as adding `alpha2` observations conforming to the population
+#' mean to each component. This can be used to avoid degenerate
+#' solutions. It also has the effect
+#' that clusters become more similar to each other the larger
+#' `alpha2` is chosen. For small values it is mostly negligible however.
+#'
+#' For regularization we compute the MAP estimates for the multinomial
+#' distribution using the Dirichlet distribution as prior, which is 
+#' the conjugate prior. The parameters of this prior are selected to 
+#' correspond to the marginal distribution of the variable across all
+#' observations.
+#'
+#' @param size values are assumed to be integers in `1:size`
+#' @param alpha2 Regularization parameter. Can be regarded the same as
+#'  adding `alpha2` observations conforming to the population mean to each
+#'  component.
+#' @return an object of class FLXC
+#' @export
+#' @references
+#' - Galindo Garre, F, Vermunt, JK (2006).
+#'   *Avoiding Boundary Estimates in Latent Class Analysis by Bayesian Posterior Mode Estimation*
+#'   Behaviormetrika, 33, 43-59.
+#' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
+#'   *Ordinal clustering with the flex-Scheme.*
+#'   Austrian Statistics Journal. _Submitted manuscript_.
 #' @export
 FLXMCregmultinom = function(formula=.~., size, alpha2=0) {
     stopifnot(length(size) == 1)
