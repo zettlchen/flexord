@@ -30,6 +30,7 @@
 #'   *Ordinal clustering with the flex-Scheme.*
 #'   Austrian Statistics Journal. _Submitted manuscript_.
 #' @export
+#' @example examples/multinom.R
 FLXMCregmultinom = function(formula=.~., size, alpha2=0) {
     stopifnot(length(size) == 1)
     stopifnot(length(alpha2) == 1)

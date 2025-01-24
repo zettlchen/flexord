@@ -135,6 +135,7 @@ BBmle <- function(x, size=NULL, w=1, alpha2=0, eps=sqrt(.Machine$double.eps))
 #'   *Modellbasiertes Clustern mit der Beta-Binomialverteilung.*
 #'   Bachelor's thesis, Ludwig-Maximilians-Universität München
 #' @export
+#' @example examples/betabinom.R
 FLXMCbetabinom = function(formula=.~., size, alpha2=0, eps=sqrt(.Machine$double.eps)) {
 
     z <- new("FLXMC", weighted=TRUE, formula=formula, dist="mvbetabinom",
