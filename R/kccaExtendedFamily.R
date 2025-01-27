@@ -205,6 +205,8 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     
     rng <- .rangeMatrix(xrange)
     
+    if(is.null(preproc)) preproc <- function(x) x #added here because xclass also runs for kGDM2, and thus this preproc also needs its own function environment
+    
     distGen <- function(x) .projectIntofx(x, rangeMatrix=rng)
     dstfnc <- distGDM2
     

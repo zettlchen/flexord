@@ -53,7 +53,7 @@
 #the minimum value, and divide by range). Only performed on numeric
 #or ordinal variables. In the latter case, the function expects the
 #variables to be coded numerically ranging from `1:max(level)` in steps of 1.
-# @param x a numerically coded matrix.
+# @param x a numerically coded matrix. (or, within stepFlexclust: a dataframe without character columns)
 # @param xclass character vector of either:
 #               - variable classes as obtained by `data.class`; or:
 #               - proposed variable-specific default distances, f.i.
@@ -72,6 +72,10 @@
     rng <- .rangeMatrix(xrange)
   } else {
     rng <- rangeMatrix
+  }
+  
+  if(is.data.frame(x)) { #this happens only within stepFlexclust, within kcca, data.matrix(x) has already been run
+    x <- data.matrix(x)
   }
   
   if(is.null(colnames(x))) colnames(x) <- 1:ncol(x) #don't need this here but later in the dist #I think it's actually obsolete now
