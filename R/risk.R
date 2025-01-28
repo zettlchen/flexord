@@ -1,0 +1,55 @@
+#27.01.25
+
+#docu for the risk data set
+
+#' Risk aversion
+#' 
+#' Survey data from 563 respondents on frequency of risk taking on six different types.
+#' Taken from the companion package to 'Market Segmentation Analysis:
+#' Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018).
+#' 
+#' @format
+#' `risk` is a matrix with 563 respondents (rows) and 6 variables (columns) named
+#' `Recreational`, `Health`, `Career`, `Financial`, `Safety` and `Social`.
+#' 
+#' @details
+#' The data was collected by academic researchers using a permission based
+#' online panel.
+#'
+#' The sample was taken from adult Australian residents who have undertaken
+#' at least one holiday in the last year which involved staying away from
+#' home for at least four nights.
+#'
+#' The respondents were asked: “Which risks have you taken in the past?”
+#' and answered on a 5-point scale with options:
+#' - Never (1)
+#' - Rarely (2)
+#' - Quite often (3)
+#' - Often (4)
+#' - Very often (5)
+#' 
+#' The six types of risk were:
+#' - Recreational risks (e.g. rock-climbing, scuba diving)
+#' - Health risks (e.g., smoking, poor diet, high alcohol consumption)
+#' - Career risks (e.g., quitting a job without another to go to)
+#' - Financial risks (e.g., gambling, risky investments)
+#' - Safety risks (e.g., speeding)
+#' - Social risks (e.g., standing for election, publicly challenging a rule or decision)
+#' 
+#' @references
+#' - Hajibaba H, Dolnicar S (2017).
+#'   *Helping when disaster hits*. In: Dolnicar S (ed) Peer-to-Peer Accomodation
+#'   Networks: Pushing the Boundaries, Goodfellow Publishers, Oxford, chap.21,
+#'   235-243.
+#'   \doi{doi:10.23912/9781911396512-3619}
+#' - Hajibaba H, Karlsson L, Dolnicar S (2017)
+#'   *Residents open their homes to tourists when disaster strikes.*
+#'   Journal of Travel Research. 58(8), 1065-1078.
+#'   \doi{doi:10.1177/0047287516677167}
+#'   
+#'   @source
+#'   Sara Dolnicar
+#'   Data and help page are taken from the companion package to 'Market Segmentation
+#'   Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018)
+#'   #url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
+"risk"
