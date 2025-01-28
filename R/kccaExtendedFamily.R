@@ -6,10 +6,10 @@
 #' This wrapper creates objects of class `flexclust::kccaFamily`,
 #' which can be used within `flexclust::kcca` to conduct K-centroids
 #' clustering using the following methods:
-#'  - **kModes** (after Weihs et\~al., 2005)
-#'  - **kGower** (Gower's distance after Kaufman \& Rousseeuw, 1990,
+#'  - **kModes** (after Weihs et~al., 2005)
+#'  - **kGower** (Gower's distance after Kaufman & Rousseeuw, 1990,
 #'                and a user specified centroid)
-#'  - **kGDM2** (GDM2 distance after Walesiak et\~al., 1993, and a
+#'  - **kGDM2** (GDM2 distance after Walesiak et~al., 1993, and a
 #'              user specified centroid)
 #'              
 #' @usage
@@ -30,7 +30,7 @@
 #' this method.
 #' 
 #' An object created with `which='kGower` will use Gower's method as described
-#' in Kaufman\&Rousseeuw (1990) for clustering:
+#' in Kaufman & Rousseeuw (1990) for clustering:
 #' - Numeric and/or ordinal variables are scaled by \eqn{\frac{\mathbf{x}-\min{\mathbf{x}}}{\max{\mathbf{x}-\min{\mathbf{x}}}}}
 #'   (please note that ordinal variables have to be coded so that they represent their ranks
 #'   in the way that they start with 1 and go in steps of one up to their maximum level \eqn{m}.)
@@ -55,14 +55,14 @@
 #'   will be applied for centroid calculation.
 #'   
 #' An object created with `which=kGDM2` will use the GDM2 distance for ordinal variables,
-#' which was first introduced by Walesiak et\~al. (1993), and adapted in Ernst et\~al. (2025),
+#' which was first introduced by Walesiak et~al. (1993), and adapted in Ernst et~al. (2025),
 #' as the distance measure within `flexclust::kcca`.
 #' 
 #' The principle behind it is that the ordinality of a variable will be
 #' respected by conducting only relational operations on them, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}.
 #' By translating \eqn{x} to its relative frequencies and empirical cumulative
 #' distributions, we are able to extend this principle to compare two arbitrary
-#' values, and thus conduct K-Centroids clustering. For more details, see Ernst et\~al. (2025).
+#' values, and thus conduct K-Centroids clustering. For more details, see Ernst et~al. (2025).
 #' 
 #' Also for this method, if `cent=NULL`, a general purpose optimizer with `NA` omission
 #' will be applied for centroid calculation.
@@ -90,7 +90,7 @@
 #' @param preproc Preprocessing function to be applied to the data before clustering
 #'                (See: [flexclust::kccaFamily()](https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html)).
 #'                This parameter is ignored for `which='kGower'`, instead, the default
-#'                preprocessing proposed by Gower (1971) and Kaufman\&Rousseeuw (1990)
+#'                preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw (1990)
 #'                is conducted. For `kGDM2` and `kModes`, users can specify preprocessing
 #'                steps here, though this is not recommended.
 #' @param xrange The range of the data in `x`. Options are:

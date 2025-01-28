@@ -64,12 +64,12 @@ used for categorical, or symmetric binary data) into K-centroids
 clustering.
 
 \code{distGower} implements Gower's Distance after Gower (1971) and
-Kaufman\&Rousseeuw (1990) for mixed-type data with missings into K-centroids
+Kaufman & Rousseeuw (1990) for mixed-type data with missings into K-centroids
 clustering.
 
 \code{distGDM2} implements GDM2 distance for ordinal data introduced by
-Walesiak et\~al. (1993) and adapted to K-centroids clustering by
-Ernst et\~al. (2025).
+Walesiak et~al. (1993) and adapted to K-centroids clustering by
+Ernst et~al. (2025).
 
 These functions are designed for use within \code{flexclust::kcca} or functions that are built
 upon it. Their use is easiest via the wrapper \code{kccaExtendedFamily}, for more information
@@ -100,7 +100,7 @@ optimized centroid is found in \code{kccaExtendedFamily(which='kGower')}.
 on the variables, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}. By translating \eqn{x}
 to its relative frequencies and empirical cumulative distributions, we are able to
 extend this principle to compare two arbitrary values, and thus use it within K-Centroids
-clustering. For more details, see Ernst et\~al. (2025).
+clustering. For more details, see Ernst et~al. (2025).
 A wrapper for this algorithm in combination with a numerically optimized centroid
 is found in \code{kccaExtendedFamily(which='kGDM2')}.
 }
@@ -136,21 +136,24 @@ as.dist(distGDM2(datmat, datmat, genDist=flexord:::.projectIntofx))
 
 # Example 3: Gower's distance
 # Ex. 3.1: single variable type case with no missings:
-xcls <- flexord:::.ChooseVarDists(datmat) #all Euclidean (on dat, it would default to all Simple Matching)
+xcls <- flexord:::.ChooseVarDists(datmat)
+##all Euclidean (on dat, it would default to all Simple Matching)
 datscld <- flexord:::.ScaleVarSpecific(datmat, xclass=xcls,
                                        xrange=list(c(1,4), c(1,6), c(1,4),
                                                    c(1,5), c(1,10), c(1,3)))
 initcentscld <- datscld[sample(1:10, 3),]
 distGower(datscld, initcentscld, genDist=xcls)
 ## within kcca
-flexclust::kcca(datmat, 3, kccaExtendedFamily('kGower')) #turns into kmeans with scaling
+flexclust::kcca(datmat, 3, kccaExtendedFamily('kGower'))
+##turns into kmeans with scaling
 
 # Ex. 3.2: single variable type case with missing values:
 nas <- sample(c(TRUE,FALSE), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
    matrix(nrow=nrow(dat))
 dat[nas] <- NA
 #repeat the steps from above...or just do:
-flexclust::kcca(dat, 3, kccaExtendedFamily('kGower', cent=centMode)) #turns into kModes with upweighting of present values
+flexclust::kcca(dat, 3, kccaExtendedFamily('kGower', cent=centMode))
+##turns into kModes with upweighting of present values
 
 #Ex. 3.3: mixed variable types (with or without missings): 
 dat <- data.frame(cont = sample(1:100, 10, replace=TRUE)/10,
@@ -183,23 +186,23 @@ Austrian Statistics Journal. \emph{Submitted manuscript}.
 \item Gower, JC (1971).
 \emph{A General Coefficient for Similarity and Some of Its Properties.}
 Biometrics, 27(4), 857-871.
-\href{https://doi.org/10.2307/2528823}{doi:10.2307/2528823}
+\doi{doi:10.2307/2528823}
 \item Kaufman, L, Rousseeuw, P (1990).
 \emph{Finding Groups in Data: An Introduction to Cluster Analysis.}
 Wiley Series in Probability and Statistics.
-\href{https://doi.org/10.1002/9780470316801}{doi:10.1002/9780470316801}
+\doi{doi:10.1002/9780470316801}
 \item Leisch, F (2006). \emph{A Toolbox for K-Centroids Cluster Analysis.}
 Computational Statistics and Data Analysis, 17(3), 526-544.
-\href{https://doi.org/10.1016/j.csda.2005.10.006}{doi:10.1016/j.csda.2005.10.006}
+\doi{doi:10.1016/j.csda.2005.10.006}
 \item Kaufman L, Rousseeuw, P (1990.) \emph{Finding Groups in Data: An Introduction to Cluster Analysis.}
-Wiley Series in Probability and Statistics, New York: John Wiley \& Sons.
-\href{https://doi.org/10.1002/9780470316801}{doi:10.1002/9780470316801}
+Wiley Series in Probability and Statistics, New York: John Wiley & Sons.
+\doi{doi:10.1002/9780470316801}
 \item Walesiak, M (1993). \emph{Statystyczna Analiza Wielowymiarowa w Badaniach Marketingowych.}
 Wydawnictwo Akademii Ekonomicznej, 44-46.
 \item Weihs, C, Ligges, U, Luebke, K, Raabe, N (2005). \emph{klaR Analyzing German Business Cycles}.
 In Baier D, Decker, R, Schmidt-Thieme, L (eds.). Data Analysis and Decision Support,
 335-343.Berlin: Springer-Verlag.
-\href{https://doi.org/10.1007/3-540-28397-8_36}{doi:10.1007/3-540-28397-8_36}
+\doi{doi:10.1007/3-540-28397-8_36}
 }
 }
 \seealso{

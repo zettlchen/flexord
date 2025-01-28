@@ -26,7 +26,7 @@ For \code{kGDM2} and \code{kGower}, \code{cent=NULL} defaults to a general purpo
 \item{preproc}{Preprocessing function to be applied to the data before clustering
 (See: \href{https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html}{flexclust::kccaFamily()}).
 This parameter is ignored for \code{which='kGower'}, instead, the default
-preprocessing proposed by Gower (1971) and Kaufman\&Rousseeuw (1990)
+preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw (1990)
 is conducted. For \code{kGDM2} and \code{kModes}, users can specify preprocessing
 steps here, though this is not recommended.}
 
@@ -47,10 +47,10 @@ the distance measure for each column of \code{x}. Currently only used for
 default methods for each column of \code{x}. For more information on
 allowed input values, and default measures, see the Details section.}
 
-\item{trim}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: Proportion of points trimmed in
+\item{trim}{See \code{\link[flexclust:kccaFamily]{flexclust::kccaFamily()}}: Proportion of points trimmed in
 robust clustering.}
 
-\item{groupFun}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: A character string specifying
+\item{groupFun}{See \code{\link[flexclust:kccaFamily]{flexclust::kccaFamily()}}: A character string specifying
 the function for clustering. Default is \code{'minSumClusters'}.}
 }
 \value{
@@ -67,10 +67,10 @@ This wrapper creates objects of class \code{flexclust::kccaFamily},
 which can be used within \code{flexclust::kcca} to conduct K-centroids
 clustering using the following methods:
 \itemize{
-\item \strong{kModes} (after Weihs et\~al., 2005)
-\item \strong{kGower} (Gower's distance after Kaufman \& Rousseeuw, 1990,
+\item \strong{kModes} (after Weihs et~al., 2005)
+\item \strong{kGower} (Gower's distance after Kaufman & Rousseeuw, 1990,
 and a user specified centroid)
-\item \strong{kGDM2} (GDM2 distance after Walesiak et\~al., 1993, and a
+\item \strong{kGDM2} (GDM2 distance after Walesiak et~al., 1993, and a
 user specified centroid)
 }
 }
@@ -82,7 +82,7 @@ User-specified alternative centroids in parameter \code{cent} are ignored for
 this method.
 
 An object created with \verb{which='kGower} will use Gower's method as described
-in Kaufman\&Rousseeuw (1990) for clustering:
+in Kaufman & Rousseeuw (1990) for clustering:
 \itemize{
 \item Numeric and/or ordinal variables are scaled by \eqn{\frac{\mathbf{x}-\min{\mathbf{x}}}{\max{\mathbf{x}-\min{\mathbf{x}}}}}
 (please note that ordinal variables have to be coded so that they represent their ranks
@@ -109,14 +109,14 @@ will be applied for centroid calculation.
 }
 
 An object created with \code{which=kGDM2} will use the GDM2 distance for ordinal variables,
-which was first introduced by Walesiak et\~al. (1993), and adapted in Ernst et\~al. (2025),
+which was first introduced by Walesiak et~al. (1993), and adapted in Ernst et~al. (2025),
 as the distance measure within \code{flexclust::kcca}.
 
 The principle behind it is that the ordinality of a variable will be
 respected by conducting only relational operations on them, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}.
 By translating \eqn{x} to its relative frequencies and empirical cumulative
 distributions, we are able to extend this principle to compare two arbitrary
-values, and thus conduct K-Centroids clustering. For more details, see Ernst et\~al. (2025).
+values, and thus conduct K-Centroids clustering. For more details, see Ernst et~al. (2025).
 
 Also for this method, if \code{cent=NULL}, a general purpose optimizer with \code{NA} omission
 will be applied for centroid calculation.

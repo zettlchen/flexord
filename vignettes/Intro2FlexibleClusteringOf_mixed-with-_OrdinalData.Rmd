@@ -1,0 +1,194 @@
+---
+title: "Introduction to Flexible Clustering of (mixed-with-)ordinal Data"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+bibliography: vignettes.bib
+vignette: >
+  %\VignetteIndexEntry{Intro2FlexibleClusteringOf_mixed-with-_OrdinalData}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Package description and contents
+
+The package `flexord` is an add on-package to the `flexclust` and `flexmix` packages
+that provide suites for partitioning and model-based clustering with flexible
+method switching and comparison.
+
+We provide additional distance and centroid calculation functions, and additional drivers of
+distributions that are tailored towards ordinal, or mixed-with-ordinal data. These
+new methods can easily be plugged into the capabilities for clustering provided by `flexclust` and `flexmix`.
+
+By plugging them into the *flex-scheme*, they can be used for:
+
+  - one-off K-centroids and model-based clustering (via `flexclust::kcca` and `flexmix::flexmix`)
+  - repeated clustering runs with various cluster numbers `k` (via `flexclust::stepFlexclust` and `flexmix::stepFlexmix`)
+  - bootstrapping repeated clustering runs with various `k`s (via `flexclust::bootFlexclust` and `flexmix::boot`)
+  - using the various generic methods for the resulting objects, such as `predict` `plot`, `barchart`,...
+
+The new methods provided are:
+```{r table, echo=FALSE, results='asis'}
+knitr::kable(
+  data.frame(
+    clusType = c("Partitioning (K-centroids)", "", "", "", "", "", "", "Model-based", "", "", ""),
+    Funtype = c("distance", "", "", "centroid", "", "", "wrapper", "driver", "", "", ""),
+    Fun = c(
+      "`distSimMatch`",
+      "`distGDM2`",
+      "`distGower`",
+      "`centMode`",
+      "`centMin`",
+      "`centOptimNA`",
+      "`kccaExtendedFamily`",
+      "`FLXMCregnorm`",
+      "`FLXMCregmultinom`",
+      "`FLXMCbinomial`",
+      "`FLXMCbetabinomial`"
+    ),    
+    Method = c(
+      "Simple Matching Distance", 
+      "GDM2 distance for ordinal data",
+      "Gower's distance",
+      "Mode as centroid",
+      "Factor level with minimal distance as centroid",
+      "Centroid calculation by general purpose optimizer",
+      "Creates a `kccaFamily` object pre-configured for kModes-, kGDM2- or kGower clustering",
+      "Regularized multivariate normal distribution",
+      "Regularized multivariate multinomial distribution",
+      "Regularized multivariate binomial distribution",
+      "Regularized multivariate beta-binomial distribution"
+    ),
+    Scale = c(
+      "nominal", 
+      "ordinal",
+      "mixed-with-ordinal",
+      "nominal", 
+      "nominal/ordinal",
+      "numeric",
+      "",
+      "numeric", 
+      "nominal",
+      "ordinal",
+      "ordinal"
+    ),
+    NAs = c(
+      "not implemented", 
+      "not implemented",
+      "upweighing of present variables",
+      "not implemented", 
+      "not implemented",
+      "complete-case analysis",
+      "",
+      "not implemented", 
+      "not implemented",
+      "not implemented", 
+      "not implemented"
+    ),
+    Source = c(
+      "@kaufman_finding_1990, p.19",
+      "@walesiak_finding_2010; @ernst_ordinal_2025",
+      "@kaufman_finding_1990, p.32-37", 
+      "@weihs_klaR_2005; @leisch_toolbox_2006",
+      "@ernst_ordinal_2025",
+      "@leisch_toolbox_2006",
+      "",
+      "@fraley2007bayesian; @ernst_ordinal_2025",
+      "@galindo2006avoiding; @ernst_ordinal_2025",
+      "@ernst_ordinal_2025",
+      "@kondofersky2008; @ernst_ordinal_2025"
+    )
+  ), 
+  format = "html", 
+  escape = FALSE, 
+  col.names = c(
+    "Clustering Type", "Function Type", "Function Name", 
+    "Method", "Scale Assumptions", "NA handling", "Source"
+  )
+)
+```
+
+## Example 1: Clustering purely nominal data
+```{r setup, message=FALSE}
+library(flexord)
+library(flexclust)
+library(flexmix)
+```
+
+As an example for purely nominal data, we will use the classic `Titanic` data set:
+```{r nominal_1}
+titanic_df <- data.frame(Titanic)
+titanic_df <- titanic_df[rep(1:nrow(titanic_df),
+                             titanic_df$Freq), -5]
+str(titanic_df)
+```
+
+We can conduct K-centroids clustering with the kModes algorithm directly on the
+data frame^[Internally, it will be converted to a `data.matrix`. However, as only
+equality operations and frequency counts are used, this is of no consequence.]:
+
+```{r nominal_2}
+kcca(titanic_df, k=3, family=kccaExtendedFamily('kModes'))
+```
+Let us assume that for some reason we are unhappy with the mode as a centroid,
+and rather want to use an optimized centroid value, by choosing the factor level
+for which Simple Matching distance^[i.e. mean disagreement count] is minimal:
+```{r nominal_3}
+kcca(titanic_df, k=4, family=kccaFamily(dist=distSimMatch, #Simple Matching Distance, from the kModes algorithm
+                                        cent=\(y) centMin(y, dist=distSimMatch,
+                                                          xrange='columnwise')))
+```
+
+This already showcases one of the advantages of `flexclust`: As the name
+suggests, we are quickly able to mix and match our distance and centroid functions,
+and quickly create our own K-centroids algorithms.
+
+Furthermore `flexclust` allows us to decrease the influence of randomness via
+running the algorithm several times, and keeping only the solution with the
+minimum within cluster distance. This can be done for one `k` (i.e. the number of
+clusters), or several:
+```{r nominal_4}
+stepFlexclust(data.matrix(titanic_df),
+              k=2:4, nrep=3, #choosing a small number of repetitions for each k just for the example
+              family=kccaExtendedFamily('kModes')) #or alternatively chosen distances and centroids
+```
+The output above suggests that choosing 4 clusters brings the best solution,
+as it has the smallest within cluster distance.
+However, none of the algorithms converged - you will just have to forgive me
+that our example data does not seem to be ideal for clustering.
+
+#hi: bootstrapping + stability plots. Only mention, possibly store one result
+as a system.file
+
+## Example 2: Clustering on ordinal data with no missing values
+```{r ordinal_1}
+data('risk')
+str(risk)
+```
+
+Our example data set is a survey to 563 Australians in 2015(?) where they indicated on a scale from 1-5 how inclined they are to take 5 types of risks. It consists of purely
+ordinal variables without missing values.
+
+### Treating the data as purely nominal
+
+### Treating the data as equidistant, i.e. integer
+
+## Example 3: Clustering mixed-type data with missing values
+```{r mixed_1}
+data('vacmot')
+vacmot2 <- cbind(vacmotdesc,
+                 apply(vacmot, 2, as.logical))
+vacmot2 <- vacmot2[,c('Gender', 'Age', 'Income2', 'Relationship.Status', 'Vacation.Behaviour',
+           sample(colnames(vacmot), 3, replace = F))]
+vacmot2$Income2 <- as.ordered(vacmot2$Income2) #alternatively dplyr --> Suggests
+str(vacmot2)
+colMeans(is.na(vacmot2))*100 #NA percentage
+```
