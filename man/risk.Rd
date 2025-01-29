@@ -8,6 +8,14 @@
 \code{risk} is a matrix with 563 respondents (rows) and 6 variables (columns) named
 \code{Recreational}, \code{Health}, \code{Career}, \code{Financial}, \code{Safety} and \code{Social}.
 }
+\source{
+Sara Dolnicar.
+
+Data and help page are taken from the companion package to 'Market Segmentation
+Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018).
+
+#url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
+}
 \usage{
 risk
 }
@@ -55,12 +63,6 @@ Networks: Pushing the Boundaries, Goodfellow Publishers, Oxford, chap.21,
 \emph{Residents open their homes to tourists when disaster strikes.}
 Journal of Travel Research. 58(8), 1065-1078.
 \doi{doi:10.1177/0047287516677167}
-
-@source
-Sara Dolnicar
-Data and help page are taken from the companion package to 'Market Segmentation
-Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018)
-#url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
 }
 }
 \keyword{datasets}

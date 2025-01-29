@@ -47,9 +47,11 @@
 #'   Journal of Travel Research. 58(8), 1065-1078.
 #'   \doi{doi:10.1177/0047287516677167}
 #'   
-#'   @source
-#'   Sara Dolnicar
+#' @source
+#'   Sara Dolnicar.
+#'   
 #'   Data and help page are taken from the companion package to 'Market Segmentation
-#'   Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018)
+#'   Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018).
+#'   
 #'   #url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
 "risk"
