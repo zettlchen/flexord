@@ -121,6 +121,7 @@ knitr::kable(
 library(flexord)
 library(flexclust)
 library(flexmix)
+set.seed(123)
 ```
 
 As an example for purely nominal data, we will use the classic `Titanic` data set:
@@ -131,6 +132,7 @@ titanic_df <- titanic_df[rep(1:nrow(titanic_df),
 str(titanic_df)
 ```
 
+### Partitioning approach
 We can conduct K-centroids clustering with the kModes algorithm directly on the
 data frame^[Internally, it will be converted to a `data.matrix`. However, as only
 equality operations and frequency counts are used, this is of no consequence.]:
@@ -151,7 +153,7 @@ This already showcases one of the advantages of `flexclust`: As the name
 suggests, we are quickly able to mix and match our distance and centroid functions,
 and quickly create our own K-centroids algorithms.
 
-Furthermore `flexclust` allows us to decrease the influence of randomness via
+Furthermore, `flexclust` allows us to decrease the influence of randomness via
 running the algorithm several times, and keeping only the solution with the
 minimum within cluster distance. This can be done for one `k` (i.e. the number of
 clusters), or several:
@@ -160,13 +162,42 @@ stepFlexclust(data.matrix(titanic_df),
               k=2:4, nrep=3, #choosing a small number of repetitions for each k just for the example
               family=kccaExtendedFamily('kModes')) #or alternatively chosen distances and centroids
 ```
-The output above suggests that choosing 4 clusters brings the best solution,
-as it has the smallest within cluster distance.
+The output above shows the solutions with lowest within cluster distance out of 
+3 runs for 2:4 clusters, in comparison to 1 big cluster.
 However, none of the algorithms converged - you will just have to forgive me
 that our example data does not seem to be ideal for clustering.
 
-#hi: bootstrapping + stability plots. Only mention, possibly store one result
-as a system.file
+`stepFlexclust` still doesn't give us a definitive recommendation on which `k`
+to pick. This is where `bootFlexclust` comes in. In `bootFlexclust`, `nboot`
+bootstrap samples of the original data are drawn, on which `stepFlexclust` is
+performed for each `k`. Thus it results in `k`$\times$`nboot` best out of `nrep`
+partitions of bootstrapped data sets. The predicted cluster memberships are then
+predicted back onto the original data set, and the stability of these partitions
+is tested via the Adjusted Rand Index [@hubert_arabie_1985]:
+```{r nominal_5}
+(nom <- bootFlexclust(data.matrix(titanic_df),
+                     k=2:4, nrep=3, nboot=5, #again, ridiculously few repetitions for the sake of example runtimes
+                     family=kccaExtendedFamily('kModes')))
+```
+The resulting ARIs can be quickly visualized via a predefined plotting method:
+```{r nominal_6}
+plot(nom)
+```
+
+Our plot indicates that out of 2:4 clusters, a two cluster solution has the highest
+median ARI (i.e. highest median stability), but for our five runs, a four cluster
+solution will be the safest choice.
+
+Now that we have decided on cluster number in our toy example, we could go back
+to the chosen partitions from `kcca` or `stepFlexclust`, and make use of the 
+further visualization, prediction, and other methods. For this, we refer to the
+documentation available in @leisch_toolbox_2006 and @dolnicar_market_2018.
+
+### Model-based approach
+We also offer an algorithm specifically designed for model-based clustering of
+unordered categorical data via a regularized multinomial distribution. For this,
+we plug the driver we offer into `flexmix`:
+
 
 ## Example 2: Clustering on ordinal data with no missing values
 ```{r ordinal_1}

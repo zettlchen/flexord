@@ -47,10 +47,10 @@ the distance measure for each column of \code{x}. Currently only used for
 default methods for each column of \code{x}. For more information on
 allowed input values, and default measures, see the Details section.}
 
-\item{trim}{See \code{\link[flexclust:kccaFamily]{flexclust::kccaFamily()}}: Proportion of points trimmed in
+\item{trim}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: Proportion of points trimmed in
 robust clustering.}
 
-\item{groupFun}{See \code{\link[flexclust:kccaFamily]{flexclust::kccaFamily()}}: A character string specifying
+\item{groupFun}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: A character string specifying
 the function for clustering. Default is \code{'minSumClusters'}.}
 }
 \value{
