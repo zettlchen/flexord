@@ -121,7 +121,7 @@ knitr::kable(
 library(flexord)
 library(flexclust)
 library(flexmix)
-set.seed(123)
+set.seed(1111)
 ```
 
 As an example for purely nominal data, we will use the classic `Titanic` data set:
@@ -185,9 +185,8 @@ The resulting ARIs can be quickly visualized via a predefined plotting method:
 plot(nom)
 ```
 
-Our plot indicates that out of 2:4 clusters, a two cluster solution has the highest
-median ARI (i.e. highest median stability), but for our five runs, a four cluster
-solution will be the safest choice.
+Our plot indicates that out of 2:4 clusters, a three cluster solution has the highest
+median ARI out of 5 runs.
 
 Now that we have decided on cluster number in our toy example, we could go back
 to the chosen partitions from `kcca` or `stepFlexclust`, and make use of the 
@@ -200,16 +199,16 @@ unordered categorical data via a regularized multinomial distribution. For this,
 we plug the driver we offer into `flexmix`:
 
 ```{r nominal_m2}
-flexmix(formula=data.matrix(titanic_df) ~ 1, k=4,
+flexmix(formula=data.matrix(titanic_df) ~ 1, k=3,
         model=FLXMCregmultinom(size=4)) #size is the numeric maximum of the factor ranges. In our case 4, as 'Class' has 4 levels
 ```
 
 If in our application we are likely to obtain degenerate solutions, we can mitigate
-this risk by setting the $\alpha2$ parameter greater 0. With this, we add
-$\alpha2$ observations which are equal to the population mean to each component (=cluster):
+this risk by setting the $\alpha_2$ parameter greater 0. With this, we add
+$\alpha_2$ observations which are equal to the population mean to each component (=cluster):
 ```{r nominal_m3}
-flexmix(data.matrix(titanic_df) ~ 1, k=4,
-        model=FLXMCregmultinom(size=4, alpha2=(nrow(titanic_df)/4)*0.1)) #a moderate amount of noise
+flexmix(data.matrix(titanic_df) ~ 1, k=3,
+        model=FLXMCregmultinom(size=4, alpha2=(nrow(titanic_df)/3)*0.1)) #a moderate amount of noise
 
 ```
 
@@ -248,9 +247,57 @@ is equal for all variables.
 
 ### Partitioning approach
 In our package, we offer two partitioning methods designed for ordinal data:
-First, 
+Firstly, we can apply Gower's distance from `distGower` to purely ordinal data, which results in using Manhattan
+distance (as provided also in `flexclust::distManhattan`) with previous scaling as described by
+@kaufman_finding_1990 and Gower's upweighing of non-missing values:
+```{r ordinal_p2}
+kcca(risk, k=4, family=kccaExtendedFamily('kGower'))
+```
+The default centroid for this family is the general purpose optimizer `centOptimNA`, which is the
+general purpose optimizer `flexclust::centOptim`, just with NA removal. In our case of purely ordinal data, we could also choose the Median as a centroid:
+```{r ordinal_p3}
+kcca(risk, k=4, family=kccaExtendedFamily('kGower',
+                                          cent=centMedian))
+```
+This results in kMedians with previous scaling, and non-missing value upweighing. In our `risk` example with
+no NAs and equal level lengths for all variables, `flexclust::kccaFamily('kmedians')` would suffice, but there are still many data situations where the `kGower` approach will be preferable.
+
+As a second alternative designed specifically for ordinal data, we implement the GDM2 distance for ordinal
+data by @walesiak_finding_2010, which conduct only relational operations on ordinal variables.
+We have reformulated it for use in K-centroids analysis in @ernst_ordinal_2025, and implemented it in the
+package:
+```{r ordindal_p4}
+kcca(risk, k=3, family=kccaExtendedFamily('kGDM2'))
+```
+
+Same as in `kGower`, a default general optimizer centroid is applied, which we could replace as desired.
+
+Another parameter used in both `kGower` and `kGDM2` is `xrange`. Both algorithms require information on the
+range of the data object for data preprocessing, one for scaling, the other for transforming the data to
+empirical distributions. The range calculation can be influenced in the following ways: We can use the range
+of the whole `x` (argument `all`, the default for `kGDM2`), columnwise ranges (`xrange=columnwise`), a vector
+specifying the range of the data set, or a list of length `ncol(x)` with range vectors for each column.
+Let us assume that the highest possible response to the `risk` questions was `Extremely often (6)`, but
+it was never chosen by any of the respondents. We can take the new assumed full range of the data into account:
+```{r ordinal_p5}
+kcca(risk, k=3, family=kccaExtendedFamily('kGDM2',
+                                          xrange=c(1,6)))
+```
+
+Again, the distances, centroids, and wrapper alternatives presented can be used also in the further capabilities
+of `flexclust`.
 
 ### Model-based approach
+We also offer drivers for two distributions for ordinal data:
+```{r ordinal_m2}
+flexmix(risk~1,  k=3,
+        model=FLXMCbinomial(size=5))
+flexmix(risk~1, k=3,
+        model=FLXMCbetabinom(size=6)) #the hypothetical example where response level 6 was never picked
+```
+@Dominik, bitte bring du hier was sinnvolles zum herzeigen ein, falls was fehlt.
+Also here, we can of course use the capabilities of `stepFlexmix`, and plotting and booting functions
+that are built upon it. For example usage see **Example 1**.
 
 ### Treating the data as purely nominal
 
@@ -277,7 +324,7 @@ distributions while allowing for regularization (same as is the case for `FLXMCr
 regularization can help avoid degenerate solutions):
 ```{r numerical}
 flexmix(risk ~ 1, k=3,
-        model = FLXMCregnorm(kappa_p=(nrow(risk)/4)*0.1, #regularization parameter
+        model = FLXMCregnorm(kappa_p=(nrow(risk)/3)*0.1, #regularization parameter
                              G=3)) #number of clusters, used for scale calculation
 ```
 @Dominik, please help me out here. I have no idea what to do with all of these
@@ -319,7 +366,7 @@ limit, we have successfully ran the algorithm on purely ordinal data with MCAR
 missingness percentages of up to 30%. However, common sense dictates that solutions
 obtained for such high missingness percentage need to be treated with caution.].
 
-## Partitioning approach
+### Partitioning approach
 Currently, we only offer one method for mixed-type data with missing values, which
 is `kGower` (scaling and distances as proposed by @gower_1971 and @kaufman_finding_1990,
 and a general purpose optimizer centroid as provided in `flexclust`, but with NA omission):
@@ -332,4 +379,24 @@ for the numerically/integer coded variables, Manhattan distance for ordinal vari
 and Jaccard distance for logically coded variables).
 
 We could instead provide a vector of length `ncol(vacmot2)` where each distance
-measure to be used is specified. We could also #xrange #possibly earlier
+measure to be used is specified. Let us assume that we have many outliers in the Age variable, that we
+consider `Vacation.Behaviour` an ordered factor as well, and that the three binary responses to vacation motives
+are symmetric instead of asymmetric^[meaning that 2 disagreements are just as important as 2 agreements],
+and for this reason want to evaluate the first with Manhattan distance, and the latter with squared
+Euclidean distance^[we could achieve symmetric treatment also via Simple Matching Distance]:
+```{r}
+colnames(vacmot2)
+xmthds <- c('distSimMatch', rep('distManhattan', 3),
+            'distSimMatch', rep('distEuclidean', 3))
+kcca(vacmot2, k=3,
+     family=kccaExtendedFamily('kGower', xmethods = xmthds))
+```
+
+For `kGower`, all numeric/integer and ordered variables are scaled as proposed by @kaufman_finding_1990,
+by centering around their minimum and dividing by the range. This means that also for `kGower`, the range of the variables will influence the clustering results. Same as for `kGDM2`
+(**Example 2**), we can specify the range to be used in parameter `xrange`. In the case of `kGower`,
+the default value is `columnwise`, where the range for each column is calculated separately.
+
+Again, the distance, centroid and wrapper functions can be used in the further
+tools provided by `flexclust`,
+for examples on that see **Example 1**.
