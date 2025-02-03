@@ -195,7 +195,12 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     
     distGen <- NULL
     dstfnc <- distSimMatch
-    cent <- centMode
+    # was this:
+    #cent <- centMode
+    # changed to this, so R CMD check doesn't complain.
+    cent <- function(x, genDist) {
+        centMode(x)
+    }
 
   }
   
@@ -207,11 +212,11 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     
     if(is.null(preproc)) preproc <- function(x) x #added here because xclass also runs for kGDM2, and thus this preproc also needs its own function environment
     
-    distGen <- function(x) .projectIntofx(x, rangeMatrix=rng)
+    distGen <- function(x, ...) .projectIntofx(x, rangeMatrix=rng)
     dstfnc <- distGDM2
     
     if(is.null(cent)) {
-      cent <- function(x){
+      cent <- function(x, genDist){
         flexclust::centOptim(x, dist = \(y, centers) {
           distGDM2(y, centers, genDist=genDist)
         }) #filler cent, will be recreated in the function
@@ -231,7 +236,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     if(is.null(xmethods)) {
       warning('No column-wise distance measures specified, default measures
             for each column will be used.')
-      distGen <- function(x) {
+      distGen <- function(x, ...) {
         #I apologize for the use of parent.frame(), but didn't know how else to fix it.
         #however I do think it's ok here because 1) 'xclass' is not a generic method
         #and 2) because I only use them once in the beginning (unlike the dists),
@@ -259,7 +264,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     
     #the default combo in the paper for distGower was centMin. now that x is scaled in the beginning, I think centOptim is sufficient
     if(is.null(cent)) {
-      cent <- function(x){
+      cent <- function(x, genDist){
         centOptimNA(x, dist = \(y, centers) {
           distGower(y, centers, genDist=genDist)
         }) #filler cent, will be recreated in the function
