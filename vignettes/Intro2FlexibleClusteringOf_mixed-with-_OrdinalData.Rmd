@@ -293,7 +293,7 @@ We also offer drivers for two distributions for ordinal data:
 flexmix(risk~1,  k=3,
         model=FLXMCbinomial(size=5))
 flexmix(risk~1, k=3,
-        model=FLXMCbetabinom(size=6)) #the hypothetical example where response level 6 was never picked
+        model=FLXMCbetabinom(size=6, alpha2=1)) #the hypothetical example where response level 6 was never picked
 ```
 @Dominik, bitte bring du hier was sinnvolles zum herzeigen ein, falls was fehlt.
 Also here, we can of course use the capabilities of `stepFlexmix`, and plotting and booting functions
