@@ -10,7 +10,7 @@ The dataset \code{lowbackpain} provided with this package is a list containing:
 \item{data:}{A 464x11 binary matrix indicating the presence/absence of the
 11 selected criteria for each of the 464 patients. Rownames are
 study IDs.}
-\item{group:}{A vector of length 464 indicating with diagnosis each patient
+\item{group:}{A vector of length 464 indicating the diagnosis each patient
 received, numerically coded (order has no meaning). The names of
 the vector give the diagnosis in words.}
 \item{index:}{The index to the criteria explaining which symptom they refer to.}
@@ -20,7 +20,7 @@ the vector give the diagnosis in words.}
 \url{https://projecteuclid.org/journals/annals-of-applied-statistics/volume-11/issue-4/Variable-selection-for-latent-class-analysis-with-application-to-low/10.1214/17-AOAS1061.full?tab=ArticleLinkSupplemental}
 }
 \usage{
-lowbackpain
+data('lowbackpain')
 }
 \description{
 In a 2011 study, Smart et~al. collected information on 464 Irish and

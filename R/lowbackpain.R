@@ -16,13 +16,15 @@
 #' were able to select 11 out of 38 criteria which contain the most of the
 #' relevant grouping information while avoiding redundancy.
 #' 
+#' @usage data('lowbackpain')
+#' 
 #' @format
 #' The dataset `lowbackpain` provided with this package is a list containing:
 #' \describe{
 #'  \item{data:}{A 464x11 binary matrix indicating the presence/absence of the
 #'              11 selected criteria for each of the 464 patients. Rownames are
 #'              study IDs.}
-#'  \item{group:}{A vector of length 464 indicating with diagnosis each patient
+#'  \item{group:}{A vector of length 464 indicating the diagnosis each patient
 #'           received, numerically coded (order has no meaning). The names of
 #'           the vector give the diagnosis in words.}
 #'  \item{index:}{The index to the criteria explaining which symptom they refer to.}
@@ -40,4 +42,3 @@
 #'   
 #' @source <https://projecteuclid.org/journals/annals-of-applied-statistics/volume-11/issue-4/Variable-selection-for-latent-class-analysis-with-application-to-low/10.1214/17-AOAS1061.full?tab=ArticleLinkSupplemental>
 "lowbackpain"
-lowbackpain

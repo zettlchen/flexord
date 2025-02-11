@@ -10,8 +10,8 @@ kccaExtendedFamily(which=c('kModes', 'kGDM2', 'kGower'),
                    xrange=NULL,
                    xmethods=NULL,
                    trim=0, groupFun='minSumClusters')
-flexclust::kcca(x, k,
-                family=kccaExtendedFamily(which=c('kModes', 'kGDM2', 'kGower'), ...))
+#flexclust::kcca(x, k,
+#                 family=kccaExtendedFamily(which=c('kModes', 'kGDM2', 'kGower'), ...))
 }
 \arguments{
 \item{which}{One of either \code{kModes}, \code{kGDM2} or \code{kGower}, the three predefined
