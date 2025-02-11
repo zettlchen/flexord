@@ -6,7 +6,7 @@ output:
     toc_depth: 2
 bibliography: vignettes.bib
 vignette: >
-  %\VignetteIndexEntry{Intro2FlexibleClusteringOf_mixed-with-_OrdinalData}
+  %\VignetteIndexEntry{Intro2Flexord}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -233,7 +233,7 @@ plot(nom)
 For more information on the further plotting methods, bootstrapping methods, and
 other utilities offered, check out the documentation for `flexmix` (`browseVignettes('flexmix')`).
 
-## Example 2: Clustering on ordinal data with no missing values
+## Example 2: Clustering purely ordinal data
 ```{r ordinal_1}
 data('risk')
 str(risk)
@@ -254,15 +254,19 @@ distance (as provided also in `flexclust::distManhattan`) with previous scaling 
 kcca(risk, k=4, family=kccaExtendedFamily('kGower'))
 ```
 The default centroid for this family is the general purpose optimizer `centOptimNA`, which is the
-general purpose optimizer `flexclust::centOptim`, just with NA removal. In our case of purely ordinal data, we could also choose the Median as a centroid:
+general purpose optimizer `flexclust::centOptim`, just with NA removal. In our case of purely ordinal data
+with no missing values, we could also choose the Median as a centroid:
 ```{r ordinal_p3}
 kcca(risk, k=4, family=kccaExtendedFamily('kGower',
                                           cent=centMedian))
 ```
-This results in kMedians with previous scaling, and non-missing value upweighing. In our `risk` example with
-no NAs and equal level lengths for all variables, `flexclust::kccaFamily('kmedians')` would suffice, but there are still many data situations where the `kGower` approach will be preferable.
+This results in kMedians with previous scaling, and non-missing value upweighing^[Note to selves:
+Strictly, it doesn't, as Fritz never made his centMedianNA public]. In our `risk` example with
+no NAs and equal level lengths for all variables, `flexclust::kccaFamily('kmedians')` would suffice, but there
+are still many data situations where the `kGower` approach will be preferable.
 
-As a second alternative designed specifically for ordinal data, we implement the GDM2 distance for ordinal
+As a second alternative designed specifically for ordinal data without missing 
+values, we implement the GDM2 distance for ordinal
 data by @walesiak_finding_2010, which conduct only relational operations on ordinal variables.
 We have reformulated it for use in K-centroids analysis in @ernst_ordinal_2025, and implemented it in the
 package:
@@ -362,9 +366,9 @@ a respondent). Missing values are present, but the percentage is low^[This is by
 choice. While Gower's distance is designed to handle missingness via variable
 weights, and the general optimizer used here is written to omit NAs, both methods
 will degenerate with high NA percentages. While we have not yet determined the critical
-limit, we have successfully ran the algorithm on purely ordinal data with MCAR
+limit, we have successfully run the algorithm on purely ordinal data with MCAR
 missingness percentages of up to 30%. However, common sense dictates that solutions
-obtained for such high missingness percentage need to be treated with caution.].
+obtained for such high missingness percentages need to be treated with caution.].
 
 ### Partitioning approach
 Currently, we only offer one method for mixed-type data with missing values, which
@@ -384,7 +388,7 @@ consider `Vacation.Behaviour` an ordered factor as well, and that the three bina
 are symmetric instead of asymmetric^[meaning that 2 disagreements are just as important as 2 agreements],
 and for this reason want to evaluate the first with Manhattan distance, and the latter with squared
 Euclidean distance^[we could achieve symmetric treatment also via Simple Matching Distance]:
-```{r}
+```{r mixed_3}
 colnames(vacmot2)
 xmthds <- c('distSimMatch', rep('distManhattan', 3),
             'distSimMatch', rep('distEuclidean', 3))
@@ -393,7 +397,8 @@ kcca(vacmot2, k=3,
 ```
 
 For `kGower`, all numeric/integer and ordered variables are scaled as proposed by @kaufman_finding_1990,
-by centering around their minimum and dividing by the range. This means that also for `kGower`, the range of the variables will influence the clustering results. Same as for `kGDM2`
+by centering around their minimum and dividing by the range. This means that also for `kGower`,
+the range of the variables will influence the clustering results. Same as for `kGDM2`
 (**Example 2**), we can specify the range to be used in parameter `xrange`. In the case of `kGower`,
 the default value is `columnwise`, where the range for each column is calculated separately.
 

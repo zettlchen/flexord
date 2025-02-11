@@ -40,3 +40,4 @@
 #'   
 #' @source <https://projecteuclid.org/journals/annals-of-applied-statistics/volume-11/issue-4/Variable-selection-for-latent-class-analysis-with-application-to-low/10.1214/17-AOAS1061.full?tab=ArticleLinkSupplemental>
 "lowbackpain"
+lowbackpain
