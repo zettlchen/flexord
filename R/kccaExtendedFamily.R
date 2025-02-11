@@ -244,10 +244,10 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
         xcls <- get('xclass', parent.frame())
         .ChooseVarDists(xcls)
       }
-      preproc <- function(x) {
-        xcls <- get('xclass', parent.frame())
+      preproc <- function(x, xclass) {
+        #xcls <- get('xclass', parent.frame())
         .ScaleVarSpecific(x, rangeMatrix=rng,
-                                    xclass=xcls)
+                                    xclass=xclass)
       }
     } else {
       distGen <- function(x, ...) {
