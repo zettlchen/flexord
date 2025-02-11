@@ -6,3 +6,5 @@
 \.\.Rcheck
 \.swp$
 R/\.scratch\.R$
+figure-html/.+\.png$
+^vignettes/.+/*_files$
