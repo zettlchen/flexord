@@ -7,6 +7,11 @@
 FLXMCbinomial(formula = . ~ ., size = NULL, alpha2 = 0, eps = 0)
 }
 \arguments{
+\item{formula}{A formula which is interpreted relative to the formula
+specified in the call to \code{flexmix} using \code{update.formula}. Only the
+left-hand side (response) of the formula is used. Default is to
+use the original \code{flexmix} model formula.}
+
 \item{size}{number of trials (zero or more)}
 
 \item{alpha2}{Regularization parameter. Can be regarded the same as

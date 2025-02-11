@@ -125,6 +125,10 @@ BBmle <- function(x, size=NULL, w=1, alpha2=0, eps=sqrt(.Machine$double.eps))
 #'  adding `alpha2` observations conforming to the population mean to each
 #'  component.
 #' @param eps Lower threshold for the shape parameters a and b
+#' @param formula A formula which is interpreted relative to the formula
+#'        specified in the call to `flexmix` using `update.formula`. Only the
+#'        left-hand side (response) of the formula is used. Default is to
+#'        use the original `flexmix` model formula.
 #' @return an object of class FLXC
 #' @export
 #' @references
