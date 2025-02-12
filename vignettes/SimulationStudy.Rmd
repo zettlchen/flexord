@@ -259,7 +259,7 @@ sim_backpain_apply2params <- function(mod, #sim_backpain_sample_size_ncat
 
     grid = expand.grid(size=sizes, N=sample_size,
                        n_vars=n_vars, iter = seq(Niter))  |> 
-        as.data.table() |> 
+        as.data.table() %>%
         .[, seed := .get_seeds(.N)] %>%
         .[sample(nrow(.), size=nrow(.), replace=FALSE),] %>%
         .[, index := seq(.N)]
