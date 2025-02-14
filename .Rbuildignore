@@ -5,4 +5,7 @@
 \.git
 \.\.Rcheck
 \.swp$
-R/\.scratch\.R$
+^R/\.scratch\.R$
+^vignettes/.+_files$
+^docs/
+^flexord\.Rcheck
