@@ -17,7 +17,7 @@ Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 20
 #url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
 }
 \usage{
-risk
+data('risk')
 }
 \description{
 Survey data from 563 respondents on frequency of risk taking on six different types.

@@ -20,6 +20,10 @@
 #' @param alpha2 Regularization parameter. Can be regarded the same as
 #'  adding `alpha2` observations conforming to the population mean to each
 #'  component.
+#' @param formula A formula which is interpreted relative to the formula
+#'        specified in the call to `flexmix` using `update.formula`. Only the
+#'        left-hand side (response) of the formula is used. Default is to
+#'        use the original `flexmix` model formula.
 #' @return an object of class FLXC
 #' @export
 #' @references

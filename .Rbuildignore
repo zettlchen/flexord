@@ -5,4 +5,9 @@
 \.git
 \.\.Rcheck
 \.swp$
-R/\.scratch\.R$
+^R/\.scratch\.R$
+figure-html/.+\.png$
+^examples/
+^vignettes/.+_files$
+^docs/
+^flexord\.Rcheck

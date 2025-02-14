@@ -36,6 +36,8 @@
 #' - Safety risks (e.g., speeding)
 #' - Social risks (e.g., standing for election, publicly challenging a rule or decision)
 #' 
+#' @usage data('risk')
+#' 
 #' @references
 #' - Hajibaba H, Dolnicar S (2017).
 #'   *Helping when disaster hits*. In: Dolnicar S (ed) Peer-to-Peer Accomodation

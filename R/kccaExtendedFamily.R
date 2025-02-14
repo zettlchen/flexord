@@ -19,8 +19,8 @@
 #'                    xrange=NULL,
 #'                    xmethods=NULL,
 #'                    trim=0, groupFun='minSumClusters')
-#' flexclust::kcca(x, k,
-#'                 family=kccaExtendedFamily(which=c('kModes', 'kGDM2', 'kGower'), ...))
+#' #flexclust::kcca(x, k,
+#' #                 family=kccaExtendedFamily(which=c('kModes', 'kGDM2', 'kGower'), ...))
 #'              
 #' @details
 #' `kccaExtendedFamily(which='kModes')` creates an object that will perform
