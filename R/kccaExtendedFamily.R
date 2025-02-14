@@ -236,13 +236,13 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     if(is.null(xmethods)) {
       warning('No column-wise distance measures specified, default measures
             for each column will be used.')
-      distGen <- function(x, ...) {
+      distGen <- function(x, xclass) {
         #I apologize for the use of parent.frame(), but didn't know how else to fix it.
         #however I do think it's ok here because 1) 'xclass' is not a generic method
         #and 2) because I only use them once in the beginning (unlike the dists),
         #so I can't really get lost in the frames
-        xcls <- get('xclass', parent.frame())
-        .ChooseVarDists(xcls)
+        #xcls <- get('xclass', parent.frame())
+        .ChooseVarDists(xclass)
       }
       preproc <- function(x, xclass) {
         #xcls <- get('xclass', parent.frame())
