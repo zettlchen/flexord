@@ -99,7 +99,7 @@
 #' # Example 1: Simple Matching Distance
 #' set.seed(123)
 #' dat <- data.frame(question1 = factor(sample(LETTERS[1:4], 10, replace=TRUE)),
-#'                   question2 = factor(sample(letters[1:6], 10, replace=TRUE)),
+#'                   question2 = factor(sample(LETTERS[1:6], 10, replace=TRUE)),
 #'                   question3 = factor(sample(LETTERS[1:4], 10, replace=TRUE)),
 #'                   question4 = factor(sample(LETTERS[1:5], 10, replace=TRUE)),
 #'                   state = factor(sample(state.name[1:10], 10, replace=TRUE)),
