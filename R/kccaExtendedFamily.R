@@ -210,9 +210,9 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     
     rng <- .rangeMatrix(xrange)
     
-    if(is.null(preproc)) preproc <- function(x) x #added here because xclass also runs for kGDM2, and thus this preproc also needs its own function environment
+    if(is.null(preproc)) preproc <- function(x, xclass) x #added here because xclass also runs for kGDM2, and thus this preproc also needs its own function environment
     
-    distGen <- function(x, ...) .projectIntofx(x, rangeMatrix=rng)
+    distGen <- function(x, xclass) .projectIntofx(x, rangeMatrix=rng)
     dstfnc <- distGDM2
     
     if(is.null(cent)) {
@@ -234,8 +234,9 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     #old, archived preproc: preproc <- function(x) .ScaleGower(x, rangeMatrix=rng)
     
     if(is.null(xmethods)) {
-      warning('No column-wise distance measures specified, default measures
-            for each column will be used.')
+      # sorry I dont think we should have a warning for the default case
+      #warning('No column-wise distance measures specified, default measures
+      #      for each column will be used.')
       distGen <- function(x, xclass) {
         #I apologize for the use of parent.frame(), but didn't know how else to fix it.
         #however I do think it's ok here because 1) 'xclass' is not a generic method
@@ -250,13 +251,13 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
                                     xclass=xclass)
       }
     } else {
-      distGen <- function(x, ...) {
+      distGen <- function(x, xclass) {
         if(!all(xmethods %in% c('distEuclidean', 'distManhattan',
                                 'distSimMatch', 'distJaccard')))
           stop('Specified columnwise xmethod not implemented!')
         return(xmethods)
       }
-      preproc <- function(x) .ScaleVarSpecific(x, rangeMatrix=rng,
+      preproc <- function(x, xclass) .ScaleVarSpecific(x, rangeMatrix=rng,
                                                xclass=xmethods)
     }
     
@@ -272,13 +273,88 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
     }
     
   }
-  
+ 
+
+  newgendist <- function(x, family) {
+    kccaExtendedFamilyGenDist(x, family, genDist = distGen)
+  }
+
+
+
   flexclust::kccaFamily(name=which,
                         dist=dstfnc,
                         cent=cent,
-                        genDist=distGen,
+                        genDist=newgendist,
                         preproc=preproc,
                         trim=trim, groupFun=groupFun)
                               
 }
+
+
+
+
+kccaExtendedFamilyGenDist = function(x, family, genDist) {
+  if(is.data.frame(x)) {
+    xclass <- sapply(x, data.class)
+  } else {
+    xclass <- rep('numeric', ncol(x))
+  }
+
+  origDist <- family@dist
+  origCent <- family@cent
+  origPreproc <- family@preproc
+  #origGenDist <- family@genDist
+
+  newpreproc <- if("xclass" %in% names(formals(origPreproc))) {
+    function(x) origPreproc(x, xclass = xclass)
+  } else {
+    origPreproc
+  }
+
+  newdist <- if("genDist" %in% names(formals(origDist))) {
+    function(x, centers) origDist(x, centers, genDist = generated_dist)
+  } else {
+    origDist
+  }
+
+  newcent <- if("genDist" %in% names(formals(origCent))) {
+    function(x) origCent(x, genDist = generated_dist)
+  } else {
+    origCent
+  }
+
+  newgendist <- if("xclass" %in% names(formals(genDist))) {
+    function(x) genDist(x, xclass = xclass)
+  } else {
+    origGenDist
+  }
+
+
+  family_new <- kccaFamily(
+    name     = family@name,
+    dist     = newdist,
+    cent     = newcent,
+    #genDist  = newgendist,
+    genDist = family@genDist,
+    preproc  = newpreproc,
+    trim     = family@trim,
+    groupFun = family@groupFun)
+
+  family_orig <- family
+  family <- family_new
+
+  x <- data.matrix(x) #previously: x <- as(x, "matrix")  
+  x <- family@preproc(x)
+
+  # except what do we do here..
+  generated_dist = if("xclass" %in% names(formals(genDist))) {
+    genDist(x, xclass = xclass)
+  } else {
+    genDist(x)
+  }
+  #generated_dist <- genDist(x)
+
+  family
+}
+
 
