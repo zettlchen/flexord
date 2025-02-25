@@ -292,7 +292,10 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
 
 
 
-
+#' Recreate the family object with updated distance, centroid, ... functions 
+#' @param x the data set that kcca was called with
+#' @param family the original family
+#' @param genDist a function that generates a vector of distance functions
 kccaExtendedFamilyGenDist = function(x, family, genDist) {
   if(is.data.frame(x)) {
     xclass <- sapply(x, data.class)
@@ -303,7 +306,6 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
   origDist <- family@dist
   origCent <- family@cent
   origPreproc <- family@preproc
-  #origGenDist <- family@genDist
 
   newpreproc <- if("xclass" %in% names(formals(origPreproc))) {
     function(x) origPreproc(x, xclass = xclass)
@@ -334,7 +336,6 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
     name     = family@name,
     dist     = newdist,
     cent     = newcent,
-    #genDist  = newgendist,
     genDist = family@genDist,
     preproc  = newpreproc,
     trim     = family@trim,
@@ -346,13 +347,11 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
   x <- data.matrix(x) #previously: x <- as(x, "matrix")  
   x <- family@preproc(x)
 
-  # except what do we do here..
   generated_dist = if("xclass" %in% names(formals(genDist))) {
     genDist(x, xclass = xclass)
   } else {
     genDist(x)
   }
-  #generated_dist <- genDist(x)
 
   family
 }
