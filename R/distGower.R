@@ -2,9 +2,6 @@
 
 #script for Gower's distance and its helpers, main documentation block in distSimMatch.R
 
-#old distGower_ordinal that was used in paper (written just for ordinal, not mixed)
-#can be found in the AJS paper folder, is now replaced here as the other options work properly
-
 # .ChooseVarDists: helper that maps default distances to 4 different variable types.
 #                  A different option is to specifically provide a character vector
 #                  of length ncol(x) to kccaFamilyGower(xmethods) that specifies the
