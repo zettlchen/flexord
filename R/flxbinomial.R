@@ -17,10 +17,11 @@
 #' @param eps When greater than zero, probabilities are truncated to fit
 #'     in \[eps, 1-eps\]
 #' @param formula A formula which is interpreted relative to the formula
-#'        specified in the call to `flexmix` using `update.formula`. Only the
-#'        left-hand side (response) of the formula is used. Default is to
-#'        use the original `flexmix` model formula.
-#' @return an object of class FLXC
+#'        specified in the call to [flexmix::flexmix()] using
+#'        [stats::update.formula()]. Only the left-hand side (response)
+#'        of the formula is used. Default is to
+#'        use the original [flexmix::flexmix()] model formula.
+#' @return an object of class `"FLXC"`
 #' @export
 #' @references
 #' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).

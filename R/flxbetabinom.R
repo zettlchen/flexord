@@ -129,7 +129,7 @@ BBmle <- function(x, size=NULL, w=1, alpha2=0, eps=sqrt(.Machine$double.eps))
 #'        specified in the call to `flexmix` using `update.formula`. Only the
 #'        left-hand side (response) of the formula is used. Default is to
 #'        use the original `flexmix` model formula.
-#' @return an object of class FLXC
+#' @return an object of class `"FLXC"`
 #' @export
 #' @references
 #' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).

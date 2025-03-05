@@ -39,11 +39,11 @@ options available in package \pkg{flexclust}.
 
 \code{centMode} calculates centroids based on the mode of each variable.
 \code{centMin} minimizes the applied distance metric to find centroids within a specified range.
-\code{centOptimNA} replicates the exact behaviour of \code{flexclust::centOptim}, just with NA removal.
+\code{centOptimNA} replicates the exact behaviour of \code{\link[flexclust:distances]{flexclust::centOptim()}}, just with NA removal.
 
-These functions are designed for use within \code{flexclust::kcca} or functions that are built
+These functions are designed for use within \code{\link[flexclust:kcca]{flexclust::kcca()}} or functions that are built
 upon it. Their use is easiest via the wrapper \code{kccaExtendedFamily}, for more information
-see \code{?kccaExtendedFamily}.
+see \code{\link[=kccaExtendedFamily]{kccaExtendedFamily()}}.
 }
 \details{
 \itemize{
@@ -53,7 +53,7 @@ this results in the \code{kmodes} algorithm.
 \item \strong{\code{centMin}}: Column-wise centroids are calculated by minimizing the
 specified distance measure between a value of \code{x}, and all possible levels of \code{x}.
 \item \strong{centOptimNA}: Column-wise centroids are calculated by minimizing the
-specified distance measure via a general purpose optimizer. Unlike in \code{flexclust::centOptim},
+specified distance measure via a general purpose optimizer. Unlike in \code{\link[flexclust:distances]{flexclust::centOptim()}},
 NAs are removed from the starting search values.
 }
 }
@@ -84,8 +84,6 @@ centOptimNA(dat, flexclust::distManhattan)
 flexclust::kcca(dat, 3, family=kccaExtendedFamily('kGower')) #default centroid
 }
 \seealso{
-\itemize{
-\item \href{https://github.com/dernst/flexord/blob/main/man/kccaExtendedFamily.Rd}{kccaExtendedFamily()}
-\item \href{https://cran.r-project.org/package=flexclust}{flexclust::kcca()}
-}
+\code{\link[=kccaExtendedFamily]{kccaExtendedFamily()}},
+\code{\link[flexclust:kcca]{flexclust::kcca()}}
 }

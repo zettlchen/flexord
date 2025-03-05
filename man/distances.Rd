@@ -21,7 +21,7 @@ need to be coded as \code{1:length(levels(x[,i]))} in steps of one.}
 \code{ncol(centers)==ncol(x)}, and \code{nrow(centers)<=nrow(x)}.}
 
 \item{genDist}{Additional information on x required for distance calculation.
-Filled automatically if used within \code{flexclust::kcca}.
+Filled automatically if used within \code{\link[flexclust:kcca]{flexclust::kcca()}}.
 \itemize{
 \item For \code{distGower}: A character vector of variable specific distances to be used,
 f.i. as derived from \code{.ChooseVarDists(x)}. Length
@@ -57,7 +57,7 @@ between each row of \code{x} from each row of \code{centers}.
 }
 \description{
 Functions to calculate the distance between a matrix \code{x} and an arbitrary
-matrix \code{c}, which can be used for K-centroids clustering via \code{flexclust::kcca}.
+matrix \code{c}, which can be used for K-centroids clustering via \code{\link[flexclust:kcca]{flexclust::kcca()}}.
 
 \code{distSimMatch} implements Simple Matching Distance (most frequently
 used for categorical, or symmetric binary data) into K-centroids
@@ -71,9 +71,9 @@ clustering.
 Walesiak et al. (1993) and adapted to K-centroids clustering by
 Ernst et al. (2025).
 
-These functions are designed for use within \code{flexclust::kcca} or functions that are built
-upon it. Their use is easiest via the wrapper \code{kccaExtendedFamily}, for more information
-see \code{?kccaExtendedFamily}. However, they can easily be extended to result
+These functions are designed for use within \code{\link[flexclust:kcca]{flexclust::kcca()}} or functions that are built
+upon it. Their use is easiest via the wrapper \code{\link[=kccaExtendedFamily]{kccaExtendedFamily()}}.
+However, they can easily be extended to result
 in a distance matrix of \code{x}, see Examples.
 }
 \details{
@@ -206,10 +206,8 @@ In Baier D, Decker, R, Schmidt-Thieme, L (eds.). Data Analysis and Decision Supp
 }
 }
 \seealso{
-\itemize{
-\item \href{https://cran.r-project.org/package=flexclust}{flexclust::kcca()}
-\item \href{https://cran.r-project.org/package=klaR}{klaR::kmodes()}
-\item \href{https://search.r-project.org/CRAN/refmans/cluster/html/daisy.html}{cluster::daisy()}
-\item \href{https://search.r-project.org/CRAN/refmans/clusterSim/html/dist.GDM.html}{clusterSim::dist.GDM()}
-}
+\code{\link[flexclust:kcca]{flexclust::kcca()}},
+\code{\link[klaR:kmodes]{klaR::kmodes()}},
+\code{\link[cluster:daisy]{cluster::daisy()}},
+\code{\link[clusterSim:dist.GDM]{clusterSim::dist.GDM()}}
 }

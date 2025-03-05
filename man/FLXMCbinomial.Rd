@@ -8,9 +8,10 @@ FLXMCbinomial(formula = . ~ ., size = NULL, alpha2 = 0, eps = 0)
 }
 \arguments{
 \item{formula}{A formula which is interpreted relative to the formula
-specified in the call to \code{flexmix} using \code{update.formula}. Only the
-left-hand side (response) of the formula is used. Default is to
-use the original \code{flexmix} model formula.}
+specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
+\code{\link[stats:update.formula]{stats::update.formula()}}. Only the left-hand side (response)
+of the formula is used. Default is to
+use the original \code{\link[flexmix:flexmix]{flexmix::flexmix()}} model formula.}
 
 \item{size}{number of trials (zero or more)}
 
@@ -22,7 +23,7 @@ component.}
 in [eps, 1-eps]}
 }
 \value{
-an object of class FLXC
+an object of class \code{"FLXC"}
 }
 \description{
 This model driver can be used to cluster binomial data.

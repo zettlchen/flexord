@@ -17,12 +17,12 @@ methods for K-centroids clustering.
 For more information on each of them, see the Details section.}
 
 \item{cent}{Function for determining cluster
-centroids (See: \href{https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html}{flexclust::kccaFamily()}).
+centroids (See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}).
 This parameter is ignored for \code{which='kModes'}, and \code{centMode} is used.
 For \code{kGDM2} and \code{kGower}, \code{cent=NULL} defaults to a general purpose optimizer.}
 
 \item{preproc}{Preprocessing function to be applied to the data before clustering
-(See: \href{https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html}{flexclust::kccaFamily()}).
+(See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.
 This parameter is ignored for \code{which='kGower'}, instead, the default
 preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw (1990)
 is conducted. For \code{kGDM2} and \code{kModes}, users can specify preprocessing
@@ -52,17 +52,17 @@ robust clustering.}
 the function for clustering. Default is \code{'minSumClusters'}.}
 }
 \value{
-An object of class \code{flexclust::kccaFamily}. When using it within \code{flexclust::kcca},
+An object of class \code{"kccaFamily"}. When using it within \code{\link[flexclust:kcca]{flexclust::kcca()}},
 \code{kccaExtendedFamily(which='kModes')} will result in an object able to conduct
 kModes clustering, \code{which='kGDM2'} will result in an object for K-centroids clustering using
 GDM2 distance, and \code{which='kGower'} will result in an object for k-centroids clustering using
 Gower's distance.
-The output of \code{flexclust::kcca} will be an object of class \code{kcca}, and can thus
-be used in \code{flexclust}'s plotting, stepwise-clustering, and bootstrapping methods.
+The output of \code{\link[flexclust:kcca]{flexclust::kcca()}} will be an object of class \code{"kcca"}, and can thus
+be used in \pkg{flexclust}'s plotting, stepwise-clustering, and bootstrapping methods.
 }
 \description{
-This wrapper creates objects of class \code{flexclust::kccaFamily},
-which can be used within \code{flexclust::kcca} to conduct K-centroids
+This wrapper creates objects of class \code{"kccaFamily"},
+which can be used with \code{\link[flexclust:kcca]{flexclust::kcca()}} to conduct K-centroids
 clustering using the following methods:
 \itemize{
 \item \strong{kModes} (after Weihs et al., 2005)
@@ -108,7 +108,7 @@ will be applied for centroid calculation.
 
 An object created with \code{which=kGDM2} will use the GDM2 distance for ordinal variables,
 which was first introduced by Walesiak et al. (1993), and adapted in Ernst et al. (2025),
-as the distance measure within \code{flexclust::kcca}.
+as the distance measure within \code{\link[flexclust:kcca]{flexclust::kcca()}}.
 
 The principle behind it is that the ordinality of a variable will be
 respected by conducting only relational operations on them, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}.
@@ -193,7 +193,7 @@ Decision Support, Springer: Berlin. 335-343.
 }
 }
 \seealso{
-\href{https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html}{flexclust::kcca()}
-\href{https://search.r-project.org/CRAN/refmans/flexclust/html/stepFlexclust.html}{flexclust::stepFlexclust()}
-\href{https://search.r-project.org/CRAN/refmans/flexclust/html/bootFlexclust.html}{flexclust::bootFlexclust()}
+\code{\link[flexclust:kcca]{flexclust::kcca()}},
+\code{\link[flexclust:stepFlexclust]{flexclust::stepFlexclust()}},
+\code{\link[flexclust:bootFlexclust]{flexclust::bootFlexclust()}}
 }

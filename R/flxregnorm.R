@@ -35,7 +35,7 @@
 #' @importFrom mvtnorm dmvnorm
 #' @import flexmix
 #' @export
-#' @return an object of class FLXC
+#' @return an object of class `"FLXC"`
 #' @references
 #' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
 #'   *Ordinal clustering with the flex-Scheme.*

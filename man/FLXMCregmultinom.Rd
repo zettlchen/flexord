@@ -8,9 +8,10 @@ FLXMCregmultinom(formula = . ~ ., size, alpha2 = 0)
 }
 \arguments{
 \item{formula}{A formula which is interpreted relative to the formula
-specified in the call to \code{flexmix} using \code{update.formula}. Only the
+specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
+\code{\link[stats:update.formula]{stats::update.formula()}}. Only the
 left-hand side (response) of the formula is used. Default is to
-use the original \code{flexmix} model formula.}
+use the original \code{\link[flexmix:flexmix]{flexmix::flexmix()}} model formula.}
 
 \item{size}{values are assumed to be integers in \code{1:size}}
 
@@ -19,7 +20,7 @@ adding \code{alpha2} observations conforming to the population mean to each
 component.}
 }
 \value{
-an object of class FLXC
+an object of class \code{"FLXC"}
 }
 \description{
 This model driver can be used to cluster data using a multinomial

@@ -22,7 +22,7 @@ each component (hyperparameter for IG prior)}
 \item{G}{Number of components in the mixture model (not used if xi_p is given)}
 }
 \value{
-an object of class FLXC
+an object of class \code{"FLXC"}
 }
 \description{
 This model driver implements the regularization method as introduced by

@@ -43,11 +43,11 @@ centOptimNA <- function(x, dist) {
 #' 
 #' `centMode` calculates centroids based on the mode of each variable.
 #' `centMin` minimizes the applied distance metric to find centroids within a specified range.
-#' `centOptimNA` replicates the exact behaviour of `flexclust::centOptim`, just with NA removal.
+#' `centOptimNA` replicates the exact behaviour of [flexclust::centOptim()], just with NA removal.
 #' 
-#' These functions are designed for use within `flexclust::kcca` or functions that are built
+#' These functions are designed for use within [flexclust::kcca()] or functions that are built
 #' upon it. Their use is easiest via the wrapper `kccaExtendedFamily`, for more information
-#' see `?kccaExtendedFamily`.
+#' see [kccaExtendedFamily()].
 #'
 #' @details
 #' - **`centMode`**: Column-wise modes are used as centroids, and ties are
@@ -58,7 +58,7 @@ centOptimNA <- function(x, dist) {
 #'  specified distance measure between a value of `x`, and all possible levels of `x`.
 #'  
 #'  - **centOptimNA**: Column-wise centroids are calculated by minimizing the
-#'  specified distance measure via a general purpose optimizer. Unlike in `flexclust::centOptim`,
+#'  specified distance measure via a general purpose optimizer. Unlike in [flexclust::centOptim()],
 #'  NAs are removed from the starting search values.
 #'
 #' @param x A numeric matrix or data frame. Categorical/ordinal variables
@@ -77,8 +77,8 @@ centOptimNA <- function(x, dist) {
 #' A named numeric vector containing the centroid values for each column of `x`.
 #' 
 #' @seealso
-#' - [kccaExtendedFamily()](https://github.com/dernst/flexord/blob/main/man/kccaExtendedFamily.Rd)
-#' - [flexclust::kcca()](https://cran.r-project.org/package=flexclust)
+#' [kccaExtendedFamily()],
+#' [flexclust::kcca()]
 #'
 #' @importFrom stats setNames optim
 #'

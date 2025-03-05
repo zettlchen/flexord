@@ -26,7 +26,7 @@ component.}
 \item{eps}{Lower threshold for the shape parameters a and b}
 }
 \value{
-an object of class FLXC
+an object of class \code{"FLXC"}
 }
 \description{
 This model driver can be used to cluster data using the beta-binomial

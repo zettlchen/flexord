@@ -10,7 +10,7 @@
 #'
 #' @description
 #' Functions to calculate the distance between a matrix `x` and an arbitrary
-#' matrix `c`, which can be used for K-centroids clustering via `flexclust::kcca`.
+#' matrix `c`, which can be used for K-centroids clustering via [flexclust::kcca()].
 #' 
 #' `distSimMatch` implements Simple Matching Distance (most frequently
 #' used for categorical, or symmetric binary data) into K-centroids
@@ -24,9 +24,9 @@
 #' Walesiak et al. (1993) and adapted to K-centroids clustering by
 #' Ernst et al. (2025).
 #' 
-#' These functions are designed for use within `flexclust::kcca` or functions that are built
-#' upon it. Their use is easiest via the wrapper `kccaExtendedFamily`, for more information
-#' see `?kccaExtendedFamily`. However, they can easily be extended to result
+#' These functions are designed for use within [flexclust::kcca()] or functions that are built
+#' upon it. Their use is easiest via the wrapper [kccaExtendedFamily()].
+#' However, they can easily be extended to result
 #' in a distance matrix of `x`, see Examples.
 #' 
 #' @details
@@ -66,7 +66,7 @@
 #' @param centers A numeric matrix with the same coding scheme as in `x`,
 #' `ncol(centers)==ncol(x)`, and `nrow(centers)<=nrow(x)`.
 #' @param genDist Additional information on x required for distance calculation.
-#' Filled automatically if used within `flexclust::kcca`.
+#' Filled automatically if used within [flexclust::kcca()].
 #'    - For `distGower`: A character vector of variable specific distances to be used,
 #'                  f.i. as derived from `.ChooseVarDists(x)`. Length
 #'                  needs to be equal to `ncol(x)`. Can contain the options:
@@ -164,10 +164,10 @@
 #' ## as a distance matrix
 #' 
 #' @seealso
-#' - [flexclust::kcca()](https://cran.r-project.org/package=flexclust)
-#' - [klaR::kmodes()](https://cran.r-project.org/package=klaR)
-#' - [cluster::daisy()](https://search.r-project.org/CRAN/refmans/cluster/html/daisy.html)
-#' - [clusterSim::dist.GDM()](https://search.r-project.org/CRAN/refmans/clusterSim/html/dist.GDM.html)
+#' [flexclust::kcca()],
+#' [klaR::kmodes()],
+#' [cluster::daisy()],
+#' [clusterSim::dist.GDM()]
 #'
 #' @references
 #' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).

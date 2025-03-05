@@ -3,8 +3,8 @@
 #' Extending K-Centroids Clustering to (Mixed-with-)Ordinal Data
 #' 
 #' @description
-#' This wrapper creates objects of class `flexclust::kccaFamily`,
-#' which can be used within `flexclust::kcca` to conduct K-centroids
+#' This wrapper creates objects of class `"kccaFamily"`,
+#' which can be used with [flexclust::kcca()] to conduct K-centroids
 #' clustering using the following methods:
 #'  - **kModes** (after Weihs et al., 2005)
 #'  - **kGower** (Gower's distance after Kaufman & Rousseeuw, 1990,
@@ -54,7 +54,7 @@
 #'   
 #' An object created with `which=kGDM2` will use the GDM2 distance for ordinal variables,
 #' which was first introduced by Walesiak et al. (1993), and adapted in Ernst et al. (2025),
-#' as the distance measure within `flexclust::kcca`.
+#' as the distance measure within [flexclust::kcca()].
 #' 
 #' The principle behind it is that the ordinality of a variable will be
 #' respected by conducting only relational operations on them, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}.
@@ -82,11 +82,11 @@
 #'              methods for K-centroids clustering.
 #'              For more information on each of them, see the Details section.
 #' @param cent Function for determining cluster
-#'             centroids (See: [flexclust::kccaFamily()](https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html)).
+#'             centroids (See [flexclust::kccaFamily()]).
 #'             This parameter is ignored for `which='kModes'`, and `centMode` is used.
 #'             For `kGDM2` and `kGower`, `cent=NULL` defaults to a general purpose optimizer.
 #' @param preproc Preprocessing function to be applied to the data before clustering
-#'                (See: [flexclust::kccaFamily()](https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html)).
+#'                (See [flexclust::kccaFamily()].
 #'                This parameter is ignored for `which='kGower'`, instead, the default
 #'                preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw (1990)
 #'                is conducted. For `kGDM2` and `kModes`, users can specify preprocessing
@@ -111,13 +111,13 @@
 #' @param groupFun See [flexclust::kccaFamily()]: A character string specifying
 #'                 the function for clustering. Default is `'minSumClusters'`.
 #'   
-#' @return An object of class `flexclust::kccaFamily`. When using it within `flexclust::kcca`,
+#' @return An object of class `"kccaFamily"`. When using it within [flexclust::kcca()],
 #' `kccaExtendedFamily(which='kModes')` will result in an object able to conduct
 #' kModes clustering, `which='kGDM2'` will result in an object for K-centroids clustering using
 #' GDM2 distance, and `which='kGower'` will result in an object for k-centroids clustering using
 #' Gower's distance.
-#' The output of `flexclust::kcca` will be an object of class `kcca`, and can thus
-#' be used in `flexclust`'s plotting, stepwise-clustering, and bootstrapping methods.
+#' The output of [flexclust::kcca()] will be an object of class `"kcca"`, and can thus
+#' be used in \pkg{flexclust}'s plotting, stepwise-clustering, and bootstrapping methods.
 #'    
 #' @references
 #' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
@@ -177,9 +177,9 @@
 #' #the case where column 2 is a binary variable, but is symmetric
 #' 
 #' @seealso
-#' [flexclust::kcca()](https://search.r-project.org/CRAN/refmans/flexclust/html/kcca.html)
-#' [flexclust::stepFlexclust()](https://search.r-project.org/CRAN/refmans/flexclust/html/stepFlexclust.html)
-#' [flexclust::bootFlexclust()](https://search.r-project.org/CRAN/refmans/flexclust/html/bootFlexclust.html)
+#' [flexclust::kcca()],
+#' [flexclust::stepFlexclust()],
+#' [flexclust::bootFlexclust()]
 #'
 #' @import flexclust
 
