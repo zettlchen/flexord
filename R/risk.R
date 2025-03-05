@@ -1,11 +1,12 @@
 #' Risk Aversion
 #' 
 #' Survey data from 563 respondents on frequency of risk taking on six different types.
-#' Taken from the companion package to 'Market Segmentation Analysis:
-#' Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
+#' Taken from the companion package to _Market Segmentation Analysis:
+#' Understanding It, Doing It, and Making It Useful_ (Dolnicar et al., 2018,
+#' \doi{10.1007/978-981-10-8818-6}).
 #' 
 #' @format
-#' `risk` is a matrix with 563 respondents (rows) and 6 variables (columns) named
+#' A matrix with 563 respondents (rows) and 6 variables (columns) named
 #' `Recreational`, `Health`, `Career`, `Financial`, `Safety` and `Social`.
 #' 
 #' @details
@@ -16,7 +17,7 @@
 #' at least one holiday in the last year which involved staying away from
 #' home for at least four nights.
 #'
-#' The respondents were asked: “Which risks have you taken in the past?”
+#' The respondents were asked: "Which risks have you taken in the past?"
 #' and answered on a 5-point scale with options:
 #' - Never (1)
 #' - Rarely (2)
@@ -25,12 +26,12 @@
 #' - Very often (5)
 #' 
 #' The six types of risk were:
-#' - Recreational risks (e.g. rock-climbing, scuba diving)
-#' - Health risks (e.g., smoking, poor diet, high alcohol consumption)
-#' - Career risks (e.g., quitting a job without another to go to)
-#' - Financial risks (e.g., gambling, risky investments)
-#' - Safety risks (e.g., speeding)
-#' - Social risks (e.g., standing for election, publicly challenging a rule or decision)
+#' - Recreational: e.g. rock-climbing, scuba diving
+#' - Health: e.g., smoking, poor diet, high alcohol consumption
+#' - Career: e.g., quitting a job without another to go to
+#' - Financial: e.g., gambling, risky investments
+#' - Safety: e.g., speeding
+#' - Social: e.g., standing for election, publicly challenging a rule or decision
 #' 
 #' @usage data('risk')
 #' 
@@ -39,17 +40,18 @@
 #'   *Helping when disaster hits*. In: Dolnicar S (ed) Peer-to-Peer Accomodation
 #'   Networks: Pushing the Boundaries, Goodfellow Publishers, Oxford, chap.21,
 #'   235-243.
-#'   \doi{doi:10.23912/9781911396512-3619}
+#'   \doi{10.23912/9781911396512-3619}
 #' - Hajibaba H, Karlsson L, Dolnicar S (2017)
 #'   *Residents open their homes to tourists when disaster strikes.*
 #'   Journal of Travel Research. 58(8), 1065-1078.
-#'   \doi{doi:10.1177/0047287516677167}
+#'   \doi{10.1177/0047287516677167}
 #'   
 #' @source
 #'   Sara Dolnicar.
 #'   
-#'   Data and help page are taken from the companion package to 'Market Segmentation
-#'   Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
-#'   
-#'   #url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
+#'   Data and help page are taken from the companion package to _Market Segmentation
+#'   Analysis: Understanding It, Doing It, and Making It Useful_ (Dolnicar et al., 2018,
+#'   \doi{10.1007/978-981-10-8818-6}).
+#'
+#'   URL: \url{https://statistik.boku.ac.at/nachlass_leisch/MSA/}
 "risk"

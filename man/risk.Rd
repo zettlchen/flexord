@@ -5,24 +5,26 @@
 \alias{risk}
 \title{Risk Aversion}
 \format{
-\code{risk} is a matrix with 563 respondents (rows) and 6 variables (columns) named
+A matrix with 563 respondents (rows) and 6 variables (columns) named
 \code{Recreational}, \code{Health}, \code{Career}, \code{Financial}, \code{Safety} and \code{Social}.
 }
 \source{
 Sara Dolnicar.
 
-Data and help page are taken from the companion package to 'Market Segmentation
-Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
+Data and help page are taken from the companion package to \emph{Market Segmentation
+Analysis: Understanding It, Doing It, and Making It Useful} (Dolnicar et al., 2018,
+\doi{10.1007/978-981-10-8818-6}).
 
-#url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
+URL: \url{https://statistik.boku.ac.at/nachlass_leisch/MSA/}
 }
 \usage{
 data('risk')
 }
 \description{
 Survey data from 563 respondents on frequency of risk taking on six different types.
-Taken from the companion package to 'Market Segmentation Analysis:
-Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
+Taken from the companion package to \emph{Market Segmentation Analysis:
+Understanding It, Doing It, and Making It Useful} (Dolnicar et al., 2018,
+\doi{10.1007/978-981-10-8818-6}).
 }
 \details{
 The data was collected by academic researchers using a permission based
@@ -32,7 +34,7 @@ The sample was taken from adult Australian residents who have undertaken
 at least one holiday in the last year which involved staying away from
 home for at least four nights.
 
-The respondents were asked: “Which risks have you taken in the past?”
+The respondents were asked: "Which risks have you taken in the past?"
 and answered on a 5-point scale with options:
 \itemize{
 \item Never (1)
@@ -44,12 +46,12 @@ and answered on a 5-point scale with options:
 
 The six types of risk were:
 \itemize{
-\item Recreational risks (e.g. rock-climbing, scuba diving)
-\item Health risks (e.g., smoking, poor diet, high alcohol consumption)
-\item Career risks (e.g., quitting a job without another to go to)
-\item Financial risks (e.g., gambling, risky investments)
-\item Safety risks (e.g., speeding)
-\item Social risks (e.g., standing for election, publicly challenging a rule or decision)
+\item Recreational: e.g. rock-climbing, scuba diving
+\item Health: e.g., smoking, poor diet, high alcohol consumption
+\item Career: e.g., quitting a job without another to go to
+\item Financial: e.g., gambling, risky investments
+\item Safety: e.g., speeding
+\item Social: e.g., standing for election, publicly challenging a rule or decision
 }
 }
 \references{
@@ -58,11 +60,11 @@ The six types of risk were:
 \emph{Helping when disaster hits}. In: Dolnicar S (ed) Peer-to-Peer Accomodation
 Networks: Pushing the Boundaries, Goodfellow Publishers, Oxford, chap.21,
 235-243.
-\doi{doi:10.23912/9781911396512-3619}
+\doi{10.23912/9781911396512-3619}
 \item Hajibaba H, Karlsson L, Dolnicar S (2017)
 \emph{Residents open their homes to tourists when disaster strikes.}
 Journal of Travel Research. 58(8), 1065-1078.
-\doi{doi:10.1177/0047287516677167}
+\doi{10.1177/0047287516677167}
 }
 }
 \keyword{datasets}
