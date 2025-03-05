@@ -5,7 +5,7 @@
 \alias{lowbackpain}
 \title{Low Back Pain Diagnoses and Diagnosis Criteria}
 \format{
-The dataset \code{lowbackpain} provided with this package is a list containing:
+A list containing:
 \describe{
 \item{data:}{A 464x11 binary matrix indicating the presence/absence of the
 11 selected criteria for each of the 464 patients. Rownames are
@@ -17,13 +17,13 @@ the vector give the diagnosis in words.}
 }
 }
 \source{
-\url{https://projecteuclid.org/journals/annals-of-applied-statistics/volume-11/issue-4/Variable-selection-for-latent-class-analysis-with-application-to-low/10.1214/17-AOAS1061.full?tab=ArticleLinkSupplemental}
+Supplemental Content for Fop et al. (2017): \doi{10.1214/17-AOAS1061SUPP}
 }
 \usage{
 data('lowbackpain')
 }
 \description{
-In a 2011 study, Smart et al. collected information on 464 Irish and
+In a 2011 study, Smart et al. (2011) collected information on 464 Irish and
 British patients suffering from low back pain regarding:
 \itemize{
 \item the type of low back pain (classified into 'nociceptive', 'peripheral
@@ -42,11 +42,11 @@ relevant grouping information while avoiding redundancy.
 \item Fop, M, Smart, K, Murphy, TB (2017).
 \emph{Variable Selection for Latent Class Analysis with Application to Low Back Pain Diagnosis}.
 The Annals of Applied Statitics. 11(4), 2080-2110.
-\doi{doi:10.1214/17-aoas1061}
+\doi{10.1214/17-aoas1061}
 \item Smart, K, Blake, C, Staines, A, Doody, C (2011).
 \emph{The Discriminative Validity of "Nociceptive", "Peripheral Neuropathic", and "Central Sensitization" as Mechanisms-Based Classifications of Musculoskeletal Pain}.
 The Clinical Journal of Pain. 27, 655-663.
-\doi{doi:10.1097/AJP.0b013e318215f16a}
+\doi{10.1097/AJP.0b013e318215f16a}
 }
 }
 \keyword{datasets}
