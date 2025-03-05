@@ -1,4 +1,4 @@
-#' FlexMix driver for regularized multivariate normal mixtures
+#' FlexMix Driver for Regularized Multivariate Normal Mixtures
 #'
 #' This model driver implements the regularization method as introduced by
 #' Fraley and Raftery (2007) for multivariate normal mixtures. Default

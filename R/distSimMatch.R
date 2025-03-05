@@ -6,7 +6,7 @@
 #distGower.R contains code for distGower, .ChooseVarDists, .ScaleVarSpecific,
 # .delta, .distGower_mixedType and .distGower_SingleTypeNoNAs.
 
-#' New Distance Functions for K-centroids clustering of (ordinal) categorical/mixed data
+#' Distance Functions for K-Centroids Clustering of (Ordinal) Categorical/Mixed Data
 #'
 #' @description
 #' Functions to calculate the distance between a matrix `x` and an arbitrary
@@ -21,8 +21,8 @@
 #' clustering.
 #' 
 #' `distGDM2` implements GDM2 distance for ordinal data introduced by
-#' Walesiak et~al. (1993) and adapted to K-centroids clustering by
-#' Ernst et~al. (2025).
+#' Walesiak et al. (1993) and adapted to K-centroids clustering by
+#' Ernst et al. (2025).
 #' 
 #' These functions are designed for use within `flexclust::kcca` or functions that are built
 #' upon it. Their use is easiest via the wrapper `kccaExtendedFamily`, for more information
@@ -52,7 +52,7 @@
 #'    on the variables, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}. By translating \eqn{x}
 #'    to its relative frequencies and empirical cumulative distributions, we are able to
 #'    extend this principle to compare two arbitrary values, and thus use it within K-Centroids
-#'    clustering. For more details, see Ernst et~al. (2025).
+#'    clustering. For more details, see Ernst et al. (2025).
 #'    A wrapper for this algorithm in combination with a numerically optimized centroid
 #'    is found in `kccaExtendedFamily(which='kGDM2')`.
 #'    
@@ -193,10 +193,10 @@
 #'   In Baier D, Decker, R, Schmidt-Thieme, L (eds.). Data Analysis and Decision Support,
 #'   335-343.Berlin: Springer-Verlag.
 #'   \doi{doi:10.1007/3-540-28397-8_36}
-#' @name distance_functions
+#' @name distances
 NULL
 
-#' @rdname distance_functions
+#' @rdname distances
 #' @export
 distSimMatch <- function (x, centers) {
   if (ncol(x) != ncol(centers))

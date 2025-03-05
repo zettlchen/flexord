@@ -2,7 +2,7 @@
 % Please edit documentation in R/flxbetabinom.R
 \name{FLXMCbetabinom}
 \alias{FLXMCbetabinom}
-\title{FlexMix driver for regularized beta-binomial mixtures}
+\title{FlexMix Driver for Regularized Beta-Binomial Mixtures}
 \usage{
 FLXMCbetabinom(
   formula = . ~ .,

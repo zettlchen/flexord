@@ -1,4 +1,4 @@
-#' FlexMix driver for regularized binomial mixtures
+#' FlexMix Driver for Regularized Binomial Mixtures
 #'
 #' This model driver can be used to cluster binomial data.
 #' Using a regularization parameter `alpha2` greater than zero

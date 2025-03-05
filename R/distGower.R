@@ -96,7 +96,7 @@
   return(x)
 }
 
-#' @rdname distance_functions
+#' @rdname distances
 #' @export
 distGower <- function(x, centers, genDist) {
 #.distGower_mixedType: helper function to calculate Gower's distance on _mixed variable types_, and/or

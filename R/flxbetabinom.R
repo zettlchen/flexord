@@ -108,7 +108,7 @@ BBmle <- function(x, size=NULL, w=1, alpha2=0, eps=sqrt(.Machine$double.eps))
     res
 }
 
-#' FlexMix driver for regularized beta-binomial mixtures
+#' FlexMix Driver for Regularized Beta-Binomial Mixtures
 #'
 #' This model driver can be used to cluster data using the beta-binomial
 #' distribution.

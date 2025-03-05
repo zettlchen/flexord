@@ -3,7 +3,7 @@
 \docType{data}
 \name{risk}
 \alias{risk}
-\title{Risk aversion}
+\title{Risk Aversion}
 \format{
 \code{risk} is a matrix with 563 respondents (rows) and 6 variables (columns) named
 \code{Recreational}, \code{Health}, \code{Career}, \code{Financial}, \code{Safety} and \code{Social}.
@@ -12,7 +12,7 @@
 Sara Dolnicar.
 
 Data and help page are taken from the companion package to 'Market Segmentation
-Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018).
+Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
 
 #url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
 }
@@ -22,7 +22,7 @@ data('risk')
 \description{
 Survey data from 563 respondents on frequency of risk taking on six different types.
 Taken from the companion package to 'Market Segmentation Analysis:
-Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018).
+Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
 }
 \details{
 The data was collected by academic researchers using a permission based

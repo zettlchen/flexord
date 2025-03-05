@@ -68,8 +68,8 @@ Kaufman & Rousseeuw (1990) for mixed-type data with missings into K-centroids
 clustering.
 
 \code{distGDM2} implements GDM2 distance for ordinal data introduced by
-Walesiak et~al. (1993) and adapted to K-centroids clustering by
-Ernst et~al. (2025).
+Walesiak et al. (1993) and adapted to K-centroids clustering by
+Ernst et al. (2025).
 
 These functions are designed for use within \code{flexclust::kcca} or functions that are built
 upon it. Their use is easiest via the wrapper \code{kccaExtendedFamily}, for more information
@@ -100,7 +100,7 @@ optimized centroid is found in \code{kccaExtendedFamily(which='kGower')}.
 on the variables, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}. By translating \eqn{x}
 to its relative frequencies and empirical cumulative distributions, we are able to
 extend this principle to compare two arbitrary values, and thus use it within K-Centroids
-clustering. For more details, see Ernst et~al. (2025).
+clustering. For more details, see Ernst et al. (2025).
 A wrapper for this algorithm in combination with a numerically optimized centroid
 is found in \code{kccaExtendedFamily(which='kGDM2')}.
 }

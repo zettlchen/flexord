@@ -2,7 +2,7 @@
 % Please edit documentation in R/flxbinomial.R
 \name{FLXMCbinomial}
 \alias{FLXMCbinomial}
-\title{FlexMix driver for regularized binomial mixtures}
+\title{FlexMix Driver for Regularized Binomial Mixtures}
 \usage{
 FLXMCbinomial(formula = . ~ ., size = NULL, alpha2 = 0, eps = 0)
 }

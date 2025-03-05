@@ -1,12 +1,8 @@
-#27.01.25
-
-#docu for the risk data set
-
-#' Risk aversion
+#' Risk Aversion
 #' 
 #' Survey data from 563 respondents on frequency of risk taking on six different types.
 #' Taken from the companion package to 'Market Segmentation Analysis:
-#' Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018).
+#' Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
 #' 
 #' @format
 #' `risk` is a matrix with 563 respondents (rows) and 6 variables (columns) named
@@ -53,7 +49,7 @@
 #'   Sara Dolnicar.
 #'   
 #'   Data and help page are taken from the companion package to 'Market Segmentation
-#'   Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et~al., 2018).
+#'   Analysis: Understanding It, Doing It, and Making It Useful' (Dolnicar et al., 2018).
 #'   
 #'   #url: http://www.marketsegmentationanalysis.org/ #CAUTION, currently unavailable
 "risk"

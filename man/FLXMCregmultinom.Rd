@@ -2,7 +2,7 @@
 % Please edit documentation in R/flxregmultinom.R
 \name{FLXMCregmultinom}
 \alias{FLXMCregmultinom}
-\title{FlexMix driver for regularized multinomial mixtures}
+\title{FlexMix Driver for Regularized Multinomial Mixtures}
 \usage{
 FLXMCregmultinom(formula = . ~ ., size, alpha2 = 0)
 }

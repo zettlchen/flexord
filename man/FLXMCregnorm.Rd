@@ -2,7 +2,7 @@
 % Please edit documentation in R/flxregnorm.R
 \name{FLXMCregnorm}
 \alias{FLXMCregnorm}
-\title{FlexMix driver for regularized multivariate normal mixtures}
+\title{FlexMix Driver for Regularized Multivariate Normal Mixtures}
 \usage{
 FLXMCregnorm(formula = . ~ ., xi_p = NULL, kappa_p = 0.01, nu_p = 3, G = NULL)
 }

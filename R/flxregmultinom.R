@@ -1,4 +1,4 @@
-#' FlexMix driver for regularized multinomial mixtures
+#' FlexMix Driver for Regularized Multinomial Mixtures
 #'
 #' This model driver can be used to cluster data using a multinomial
 #' distribution.

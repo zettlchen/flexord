@@ -1,26 +1,24 @@
 #20.01.25
 
-#' Extending K-Centroids clustering to (mixed-with-)ordinal data
+#' Extending K-Centroids Clustering to (Mixed-with-)Ordinal Data
 #' 
 #' @description
 #' This wrapper creates objects of class `flexclust::kccaFamily`,
 #' which can be used within `flexclust::kcca` to conduct K-centroids
 #' clustering using the following methods:
-#'  - **kModes** (after Weihs et~al., 2005)
+#'  - **kModes** (after Weihs et al., 2005)
 #'  - **kGower** (Gower's distance after Kaufman & Rousseeuw, 1990,
 #'                and a user specified centroid)
-#'  - **kGDM2** (GDM2 distance after Walesiak et~al., 1993, and a
+#'  - **kGDM2** (GDM2 distance after Walesiak et al., 1993, and a
 #'              user specified centroid)
 #'              
 #' @usage
-#' kccaExtendedFamily(which=c('kModes', 'kGDM2', 'kGower'),
-#'                    cent=NULL,
-#'                    preproc=NULL,
-#'                    xrange=NULL,
-#'                    xmethods=NULL,
-#'                    trim=0, groupFun='minSumClusters')
-#' #flexclust::kcca(x, k,
-#' #                 family=kccaExtendedFamily(which=c('kModes', 'kGDM2', 'kGower'), ...))
+#' kccaExtendedFamily(which = c('kModes', 'kGDM2', 'kGower'),
+#'                    cent = NULL,
+#'                    preproc = NULL,
+#'                    xrange = NULL,
+#'                    xmethods = NULL,
+#'                    trim = 0, groupFun = 'minSumClusters')
 #'              
 #' @details
 #' `kccaExtendedFamily(which='kModes')` creates an object that will perform
@@ -29,7 +27,7 @@
 #' User-specified alternative centroids in parameter `cent` are ignored for
 #' this method.
 #' 
-#' An object created with `which='kGower` will use Gower's method as described
+#' An object created with `which='kGower'` will use Gower's method as described
 #' in Kaufman & Rousseeuw (1990) for clustering:
 #' - Numeric and/or ordinal variables are scaled by \eqn{\frac{\mathbf{x}-\min{\mathbf{x}}}{\max{\mathbf{x}-\min{\mathbf{x}}}}}
 #'   (please note that ordinal variables have to be coded so that they represent their ranks
@@ -55,14 +53,14 @@
 #'   will be applied for centroid calculation.
 #'   
 #' An object created with `which=kGDM2` will use the GDM2 distance for ordinal variables,
-#' which was first introduced by Walesiak et~al. (1993), and adapted in Ernst et~al. (2025),
+#' which was first introduced by Walesiak et al. (1993), and adapted in Ernst et al. (2025),
 #' as the distance measure within `flexclust::kcca`.
 #' 
 #' The principle behind it is that the ordinality of a variable will be
 #' respected by conducting only relational operations on them, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}.
 #' By translating \eqn{x} to its relative frequencies and empirical cumulative
 #' distributions, we are able to extend this principle to compare two arbitrary
-#' values, and thus conduct K-Centroids clustering. For more details, see Ernst et~al. (2025).
+#' values, and thus conduct K-Centroids clustering. For more details, see Ernst et al. (2025).
 #' 
 #' Also for this method, if `cent=NULL`, a general purpose optimizer with `NA` omission
 #' will be applied for centroid calculation.
@@ -292,10 +290,11 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
 
 
 
-#' Recreate the family object with updated distance, centroid, ... functions 
+#' Recreate the Family Object with Updated Distance, Centroid, ... Functions 
 #' @param x the data set that kcca was called with
 #' @param family the original family
 #' @param genDist a function that generates a vector of distance functions
+#' @noRd
 kccaExtendedFamilyGenDist = function(x, family, genDist) {
   if(is.data.frame(x)) {
     xclass <- sapply(x, data.class)

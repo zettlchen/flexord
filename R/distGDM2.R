@@ -2,7 +2,7 @@
 
 #script for GDM2 distance and its helper, main documentation block in distSimMatch.R
 
-#' @rdname distance_functions
+#' @rdname distances
 #' @importFrom stats ecdf
 #' @export
 distGDM2 <- function(x, centers, genDist, xrange=NULL) {

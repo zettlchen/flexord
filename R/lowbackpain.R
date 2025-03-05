@@ -1,17 +1,13 @@
-#23.01.25
-
-#docu for the lowbackpain data set(s)
-
-#' Low back pain diagnoses and diagnosis criteria
+#' Low Back Pain Diagnoses and Diagnosis Criteria
 #' 
-#' In a 2011 study, Smart et~al. collected information on 464 Irish and
+#' In a 2011 study, Smart et al. collected information on 464 Irish and
 #' British patients suffering from low back pain regarding:
 #' - the type of low back pain (classified into 'nociceptive', 'peripheral
 #'   neuropathic', and 'central neuropathic')
 #' - the presence/absence of 38 clinical criteria and symptoms relating to low
 #'   back pain.
 #'   
-#' Fop et~al. (2017) conducted Latent Class Analysis on this data set to
+#' Fop et al. (2017) conducted Latent Class Analysis on this data set to
 #' retrieve the experts' classifications; and by comparing nested models they
 #' were able to select 11 out of 38 criteria which contain the most of the
 #' relevant grouping information while avoiding redundancy.
