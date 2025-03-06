@@ -14,20 +14,25 @@ centMin(x, dist, xrange = NULL)
 centOptimNA(x, dist)
 }
 \arguments{
-\item{x}{A numeric matrix or data frame. Categorical/ordinal variables
-need to be coded as \code{1:length(levels(x[,i]))} in steps of one.}
+\item{x}{A numeric matrix or data frame.}
 
-\item{dist}{The distance measure function to be minimized in \code{centMin}.}
+\item{dist}{The distance measure function used in \code{centMin} and \code{centOptimNA}.}
 
-\item{xrange}{Range specification for the variables. Currently only used for \code{centMin}.
-Possible values are:
+\item{xrange}{The range of the data in \code{x}. Currently only used for
+\code{centMin}. Options are:
 \itemize{
-\item \code{NULL} (default): defaults to \code{'all'}.
-\item \code{'all'}: Uses the range of the entire data set.
-\item \code{'columnwise'}: Uses column-specific ranges.
-\item A numeric vector of c(min, max): Applies the specified range to all columns.
-\item A list of numeric vectors of c(min,max): Uses the user-specified columnwise
-ranges, the length of the list must be equal to the number of columns to be scaled.
+\item \code{NULL} (default): defaults to \code{"all"}.
+\item \code{"all"}: uses the same minimum and maximum value for each column
+of \code{x} by determining the whole range of values in the data
+object \code{x}.
+\item \code{"columnwise"}: uses different minimum and maximum values for
+each column of \code{x} by determining the columnwise ranges of
+values in the data object \code{x}.
+\item A vector of \code{c(min, max)}: specifies the same minimum and maximum
+value for each column of \code{x}.
+\item A list of vectors \code{list(c(min1, max1), c(min2, max2),...)} with
+length \code{ncol(x)}: specifies different minimum and maximum
+values for each column of \code{x}.
 }}
 }
 \value{
@@ -38,23 +43,28 @@ Functions to calculate cluster centroids for K-centroids clustering that extend 
 options available in package \pkg{flexclust}.
 
 \code{centMode} calculates centroids based on the mode of each variable.
-\code{centMin} minimizes the applied distance metric to find centroids within a specified range.
-\code{centOptimNA} replicates the exact behaviour of \code{\link[flexclust:distances]{flexclust::centOptim()}}, just with NA removal.
+\code{centMin} determines centroids within a specified range which
+minimize the supplied distance metric.  \code{centOptimNA} replicates
+the behaviour of \code{\link[flexclust:distances]{flexclust::centOptim()}} but removes missing
+values.
 
-These functions are designed for use within \code{\link[flexclust:kcca]{flexclust::kcca()}} or functions that are built
-upon it. Their use is easiest via the wrapper \code{kccaExtendedFamily}, for more information
-see \code{\link[=kccaExtendedFamily]{kccaExtendedFamily()}}.
+These functions are designed for use with \code{\link[flexclust:kcca]{flexclust::kcca()}} or
+functions that are built upon it. Their use is easiest via the
+wrapper \code{\link[=kccaExtendedFamily]{kccaExtendedFamily()}}.
 }
 \details{
 \itemize{
-\item \strong{\code{centMode}}: Column-wise modes are used as centroids, and ties are
+\item \code{centMode}: Column-wise modes are used as centroids, and ties are
 broken randomly. In combination with Simple Matching Distance (\code{distSimMatch}),
 this results in the \code{kmodes} algorithm.
-\item \strong{\code{centMin}}: Column-wise centroids are calculated by minimizing the
-specified distance measure between a value of \code{x}, and all possible levels of \code{x}.
-\item \strong{centOptimNA}: Column-wise centroids are calculated by minimizing the
-specified distance measure via a general purpose optimizer. Unlike in \code{\link[flexclust:distances]{flexclust::centOptim()}},
-NAs are removed from the starting search values.
+\item \code{centMin}: Column-wise centroids are calculated by minimizing
+the specified distance measure between the values in \code{x} and all
+possible levels of \code{x}.
+\item \code{centOptimNA}: Column-wise centroids are calculated by
+minimizing the specified distance measure via a general purpose
+optimizer. Unlike in \code{\link[flexclust:distances]{flexclust::centOptim()}}, NAs are removed
+from the starting search values and disregarded in the distance
+calculation.
 }
 }
 \examples{
@@ -78,7 +88,7 @@ flexclust::kcca(dat, 3,
 nas <- sample(c(TRUE, FALSE), prod(dim(dat)),
               replace=TRUE, prob=c(0.1,0.9)) |> 
        matrix(nrow=nrow(dat))
-dat[nas] <- NA
+is.na(dat[nas]) <- TRUE
 centOptimNA(dat, flexclust::distManhattan)
 ## within kcca
 flexclust::kcca(dat, 3, family=kccaExtendedFamily('kGower')) #default centroid

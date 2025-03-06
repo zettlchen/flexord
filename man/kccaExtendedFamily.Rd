@@ -12,53 +12,58 @@ kccaExtendedFamily(which = c('kModes', 'kGDM2', 'kGower'),
                    trim = 0, groupFun = 'minSumClusters')
 }
 \arguments{
-\item{which}{One of either \code{kModes}, \code{kGDM2} or \code{kGower}, the three predefined
-methods for K-centroids clustering.
-For more information on each of them, see the Details section.}
+\item{which}{One of either \code{'kModes'}, \code{'kGDM2'} or \code{'kGower'}, the three
+predefined methods for K-centroids clustering.  For more
+information on each of them, see the Details section.}
 
-\item{cent}{Function for determining cluster
-centroids (See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}).
-This parameter is ignored for \code{which='kModes'}, and \code{centMode} is used.
-For \code{kGDM2} and \code{kGower}, \code{cent=NULL} defaults to a general purpose optimizer.}
+\item{cent}{Function for determining cluster centroids (See
+\code{\link[flexclust:kcca]{flexclust::kccaFamily()}}).  This parameter is ignored for
+\code{which='kModes'}, and \code{centMode} is used.  For \code{'kGDM2'} and
+\code{'kGower'}, \code{cent=NULL} defaults to a general purpose optimizer.}
 
-\item{preproc}{Preprocessing function to be applied to the data before clustering
-(See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.
-This parameter is ignored for \code{which='kGower'}, instead, the default
-preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw (1990)
-is conducted. For \code{kGDM2} and \code{kModes}, users can specify preprocessing
-steps here, though this is not recommended.}
+\item{preproc}{Preprocessing function to be applied to the data
+before clustering (See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.  This
+parameter is ignored for \code{which='kGower'}, instead, the default
+preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw
+(1990) is conducted. For \code{'kGDM2'} and \code{'kModes'}, users can
+specify preprocessing steps here, though this is not
+recommended.}
 
 \item{xrange}{The range of the data in \code{x}. Options are:
-- 'all', which will use the whole range of the data object \code{x},
-- 'columnwise', which will use columnwise ranges of the data object \code{x},
-- a vector of \code{c(min,max)}, which allows the user to specify the
-absolute possible minimum and maximum of the data object \code{x},
-- or a list of vectors \code{list(c(min,max), c(min,max),...)} with length
-\code{ncol(x)}, where columnwise ranges can be specified by the user.
-This parameter takes effect for \code{which='kGDM2'} and \code{which='kGower'},
-and has no effect for \code{which='kModes'}.
-\code{xrange=NULL} defaults to \code{all} for \code{kGDM2}, and to \code{columnwise} for \code{kGower}.}
+\itemize{
+\item \code{"all"}: uses the same minimum and maximum value for each column
+of \code{x} by determining the whole range of values in the data
+object \code{x}.
+\item \code{"columnwise"}: uses different minimum and maximum values for
+each column of \code{x} by determining the columnwise ranges of
+values in the data object \code{x}.
+\item A vector of \code{c(min, max)}: specifies the same minimum and maximum
+value for each column of \code{x}.
+\item A list of vectors \code{list(c(min1, max1), c(min2, max2),...)} with
+length \code{ncol(x)}: specifies different minimum and maximum
+values for each column of \code{x}.
+}
 
-\item{xmethods}{An optional character vector of length \code{ncol(x)} that specifies
-the distance measure for each column of \code{x}. Currently only used for
-\code{kGower}. For \code{kGower}, \code{xmethods=NULL} results in the use of
-default methods for each column of \code{x}. For more information on
-allowed input values, and default measures, see the Details section.}
+This argument is ignored for \code{which='kModes'}. \code{xrange=NULL}
+defaults to \code{"all"} for \code{'kGDM2'}, and to \code{"columnwise"} for
+\code{'kGower'}.}
 
-\item{trim}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: Proportion of points trimmed in
-robust clustering.}
+\item{xmethods}{An optional character vector of length \code{ncol(x)}
+that specifies the distance measure for each column of
+\code{x}. Currently only used for \code{'kGower'}. For \code{'kGower'},
+\code{xmethods=NULL} results in the use of default methods for each
+column of \code{x}. For more information on allowed input values,
+and default measures, see the Details section.}
 
-\item{groupFun}{See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}: A character string specifying
-the function for clustering. Default is \code{'minSumClusters'}.}
+\item{trim}{Proportion of points trimmed in robust clustering, wee
+\code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.}
+
+\item{groupFun}{A character string specifying the function for
+clustering. Default is \code{'minSumClusters'}, see
+\code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.}
 }
 \value{
-An object of class \code{"kccaFamily"}. When using it within \code{\link[flexclust:kcca]{flexclust::kcca()}},
-\code{kccaExtendedFamily(which='kModes')} will result in an object able to conduct
-kModes clustering, \code{which='kGDM2'} will result in an object for K-centroids clustering using
-GDM2 distance, and \code{which='kGower'} will result in an object for k-centroids clustering using
-Gower's distance.
-The output of \code{\link[flexclust:kcca]{flexclust::kcca()}} will be an object of class \code{"kcca"}, and can thus
-be used in \pkg{flexclust}'s plotting, stepwise-clustering, and bootstrapping methods.
+An object of class \code{"kccaFamily"}.
 }
 \description{
 This wrapper creates objects of class \code{"kccaFamily"},
@@ -73,63 +78,79 @@ user specified centroid)
 }
 }
 \details{
-\code{kccaExtendedFamily(which='kModes')} creates an object that will perform
-\strong{kModes} clustering, that is to say K-centroids clustering using Simple
-Matching Distance (counts of disagreements) and modes as centroids.
-User-specified alternative centroids in parameter \code{cent} are ignored for
-this method.
-
-An object created with \code{which='kGower'} will use Gower's method as described
-in Kaufman & Rousseeuw (1990) for clustering:
+\strong{Wrappers} for defining families are obtained by specifying
+\code{which} using:
 \itemize{
-\item Numeric and/or ordinal variables are scaled by \eqn{\frac{\mathbf{x}-\min{\mathbf{x}}}{\max{\mathbf{x}-\min{\mathbf{x}}}}}
-(please note that ordinal variables have to be coded so that they represent their ranks
-in the way that they start with 1 and go in steps of one up to their maximum level \eqn{m}.)
-\item Distances are calculated for each column \eqn{p} (squared Euclidean distance, \code{distEuclidean},
-is recommended for numeric, Manhattan distance, \code{distManhattan} for ordinal, Simple Matching
-Distance, \code{distSimMatch} for categorical, and Jaccard distance, \code{distJaccard} for asymmetric
-binary variables), and they are summed up as:
-\deqn{d(x_i, x_k) = \frac{\sum_{j=1}^p \delta_{ikj} d(x_{ij}, x_{kj})}{\sum_{j=1}^p \delta_{ikj}}}
-with the weight \eqn{\delta_{ikj}} being 1 if both values \eqn{x_{ij}} and \eqn{x_{kj}} are
-not missing, and in the case of asymmetric binary variables, at least one of them is not 0.
+\item \code{which='kModes'} creates an object for \strong{kModes} clustering,
+i.e., K-centroids clustering using Simple Matching Distance
+(counts of disagreements) and modes as centroids.  Argument
+\code{cent} is ignored for this method.
+\item \code{which='kGower'} creates an object for performing clustering
+using Gower's method as described in Kaufman & Rousseeuw (1990):
+\itemize{
+\item Numeric and/or ordinal variables are scaled by
+\eqn{\frac{\mathbf{x}-\min{\mathbf{x}}}{\max{\mathbf{x}-\min{\mathbf{x}}}}}.
+Note that for ordinal variables the internal coding with values
+from 1 up to their maximum level is used.
+\item Distances are calculated for each column (Euclidean distance,
+\code{distEuclidean}, is recommended for numeric, Manhattan
+distance, \code{distManhattan} for ordinal, Simple Matching
+Distance, \code{distSimMatch} for categorical, and Jaccard distance,
+\code{distJaccard} for asymmetric binary variables), and they are
+summed up as:
 
-The columnwise distances used can be influenced twofold: By passing a character
-vector of length \eqn{p} to \code{xmethods} that specifies the distance for each column.
-Options are: \code{distEuclidean}, \code{distManhattan}, \code{distJaccard}, and \code{distSimMatch}.
-Another option is to not specify any methods within \code{kccaExtendedFamily}, but rather
-in \code{kcca} pass a dataframe to \code{x}, where each column is coded to achieve the desired
-treatment. \code{distEuclidean} is used on numeric and integer columns, \code{distManhattan}
-on columns that are coded as ordered factors, \code{distSimMatch} is the default for categorically
-coded columns, and \code{distJaccard} is the default for binary coded columns.
+\deqn{d(x_i, x_k) = \frac{\sum_{j=1}^p \delta_{ikj} d(x_{ij},
+    x_{kj})}{\sum_{j=1}^p \delta_{ikj}}}
 
-For this method, if \code{cent=NULL}, a general purpose optimizer with \code{NA} omission
-will be applied for centroid calculation.
+where \eqn{p} is the number of variables and with the weight
+\eqn{\delta_{ikj}} being 1 if both values \eqn{x_{ij}} and
+\eqn{x_{kj}} are not missing, and in the case of asymmetric
+binary variables, at least one of them is not 0.
+
+The columnwise distances used can be influenced in two ways: By
+passing a character vector of length \eqn{p} to \code{xmethods} that
+specifies the distance for each column.  Options are:
+\code{distEuclidean}, \code{distManhattan}, \code{distJaccard}, and
+\code{distSimMatch}.  Another option is to not specify any methods
+within \code{kccaExtendedFamily}, but rather pass a \code{"data.frame"}
+as argument \code{x} in \code{kcca}, where the class of the column is
+used to infer the distance measure. \code{distEuclidean} is used on
+numeric and integer columns, \code{distManhattan} on columns that
+are coded as ordered factors, \code{distSimMatch} is the default for
+categorically coded columns, and \code{distJaccard} is the default
+for binary coded columns.
+
+For this method, if \code{cent=NULL}, a general purpose optimizer
+with \code{NA} omission is applied for centroid calculation.
+}
+\item \code{which='kGDM2'} creates an obejct for clustering using the GDM2
+distance for ordinal variables. The GMD2 distance was first
+introduced by Walesiak et al. (1993), and adapted in Ernst et
+al. (2025), as the distance measure within \code{\link[flexclust:kcca]{flexclust::kcca()}}.
+
+This distance respects the ordinal nature of a variable by
+conducting only relational operations to compare values, such as
+\eqn{\leq}, \eqn{\geq} and \eqn{=}. By obtaining the relative
+frequencies and empirical cumulative distributions of \eqn{x}, we
+allow for comparison of two arbitrary values, and thus are able
+to conduct K-centroids clustering. For more details, see Ernst et
+al. (2025).
 }
 
-An object created with \code{which=kGDM2} will use the GDM2 distance for ordinal variables,
-which was first introduced by Walesiak et al. (1993), and adapted in Ernst et al. (2025),
-as the distance measure within \code{\link[flexclust:kcca]{flexclust::kcca()}}.
+Also for this method, if \code{cent=NULL}, a general purpose optimizer
+with \code{NA} omission will be applied for centroid calculation.
 
-The principle behind it is that the ordinality of a variable will be
-respected by conducting only relational operations on them, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}.
-By translating \eqn{x} to its relative frequencies and empirical cumulative
-distributions, we are able to extend this principle to compare two arbitrary
-values, and thus conduct K-Centroids clustering. For more details, see Ernst et al. (2025).
-
-Also for this method, if \code{cent=NULL}, a general purpose optimizer with \code{NA} omission
-will be applied for centroid calculation.
-
-\strong{Scale handling}
-In \code{kModes}, all variables are treated as unordered factors.
-In \code{kGDM2}, all variables are treated as ordered factors, with strict assumptions
+\strong{Scale handling}.
+In \code{'kModes'}, all variables are treated as unordered factors.
+In \code{'kGDM2'}, all variables are treated as ordered factors, with strict assumptions
 regarding their ordinality.
-\code{kGower} is currently the only method designed to handle mixed-type data. For ordinal
+\code{'kGower'} is currently the only method designed to handle mixed-type data. For ordinal
 variables, the assumptions are more lax than with GDM2 distance.
 
-\strong{NA handling}
+\strong{NA handling}.
 NA handling via omission and upweighting non-missing variables is currently
-only implemented for \code{kGower}. Within \code{kModes}, the omission of NA responses
-can be avoided by coding missings as valid factor levels. For \code{kGDM2}, currently
+only implemented for \code{'kGower'}. Within \code{'kModes'}, the omission of NA responses
+can be avoided by coding missings as valid factor levels. For \code{'kGDM2'}, currently
 the only option is to omit missing values completely.
 }
 \examples{
@@ -154,7 +175,7 @@ flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kGDM2',
 flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
 nas <- sample(c(TRUE,FALSE), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
    matrix(nrow=nrow(dat))
-dat[nas] <- NA
+is.na(dat[nas]) <- TRUE
 flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
 flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
                                            xrange='all'))

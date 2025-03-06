@@ -42,36 +42,51 @@ centOptimNA <- function(x, dist) {
 #' options available in package \pkg{flexclust}.
 #' 
 #' `centMode` calculates centroids based on the mode of each variable.
-#' `centMin` minimizes the applied distance metric to find centroids within a specified range.
-#' `centOptimNA` replicates the exact behaviour of [flexclust::centOptim()], just with NA removal.
+#' `centMin` determines centroids within a specified range which
+#' minimize the supplied distance metric.  `centOptimNA` replicates
+#' the behaviour of [flexclust::centOptim()] but removes missing
+#' values.
 #' 
-#' These functions are designed for use within [flexclust::kcca()] or functions that are built
-#' upon it. Their use is easiest via the wrapper `kccaExtendedFamily`, for more information
-#' see [kccaExtendedFamily()].
+#' These functions are designed for use with [flexclust::kcca()] or
+#' functions that are built upon it. Their use is easiest via the
+#' wrapper [kccaExtendedFamily()].
 #'
 #' @details
-#' - **`centMode`**: Column-wise modes are used as centroids, and ties are
+#' - `centMode`: Column-wise modes are used as centroids, and ties are
 #'  broken randomly. In combination with Simple Matching Distance (`distSimMatch`),
 #'  this results in the `kmodes` algorithm.
 #'
-#' - **`centMin`**: Column-wise centroids are calculated by minimizing the
-#'  specified distance measure between a value of `x`, and all possible levels of `x`.
+#' - `centMin`: Column-wise centroids are calculated by minimizing
+#'  the specified distance measure between the values in `x` and all
+#'  possible levels of `x`.
 #'  
-#'  - **centOptimNA**: Column-wise centroids are calculated by minimizing the
-#'  specified distance measure via a general purpose optimizer. Unlike in [flexclust::centOptim()],
-#'  NAs are removed from the starting search values.
+#'  - `centOptimNA`: Column-wise centroids are calculated by
+#'  minimizing the specified distance measure via a general purpose
+#'  optimizer. Unlike in [flexclust::centOptim()], NAs are removed
+#'  from the starting search values and disregarded in the distance
+#'  calculation.
 #'
-#' @param x A numeric matrix or data frame. Categorical/ordinal variables
-#'    need to be coded as `1:length(levels(x[,i]))` in steps of one.
-#' @param dist The distance measure function to be minimized in `centMin`.
-#' @param xrange Range specification for the variables. Currently only used for `centMin`.
-#'   Possible values are:
-#'   - `NULL` (default): defaults to `'all'`.
-#'   - `'all'`: Uses the range of the entire data set.
-#'   - `'columnwise'`: Uses column-specific ranges.
-#'   - A numeric vector of c(min, max): Applies the specified range to all columns.
-#'   - A list of numeric vectors of c(min,max): Uses the user-specified columnwise
-#'       ranges, the length of the list must be equal to the number of columns to be scaled.
+#' @param x A numeric matrix or data frame.
+#' @param dist The distance measure function used in `centMin` and `centOptimNA`.
+#' @param xrange The range of the data in `x`. Currently only used for
+#'     `centMin`. Options are:
+#'
+#' - `NULL` (default): defaults to `"all"`.
+#'
+#' - `"all"`: uses the same minimum and maximum value for each column
+#'     of `x` by determining the whole range of values in the data
+#'     object `x`.
+#' 
+#' - `"columnwise"`: uses different minimum and maximum values for
+#'     each column of `x` by determining the columnwise ranges of
+#'     values in the data object `x`.
+#'
+#' - A vector of `c(min, max)`: specifies the same minimum and maximum
+#'     value for each column of `x`.
+#' 
+#' - A list of vectors `list(c(min1, max1), c(min2, max2),...)` with
+#'     length `ncol(x)`: specifies different minimum and maximum
+#'     values for each column of `x`. 
 #'
 #' @return 
 #' A named numeric vector containing the centroid values for each column of `x`.
@@ -103,7 +118,7 @@ centOptimNA <- function(x, dist) {
 #' nas <- sample(c(TRUE, FALSE), prod(dim(dat)),
 #'               replace=TRUE, prob=c(0.1,0.9)) |> 
 #'        matrix(nrow=nrow(dat))
-#' dat[nas] <- NA
+#' is.na(dat[nas]) <- TRUE
 #' centOptimNA(dat, flexclust::distManhattan)
 #' ## within kcca
 #' flexclust::kcca(dat, 3, family=kccaExtendedFamily('kGower')) #default centroid

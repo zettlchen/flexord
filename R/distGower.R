@@ -13,7 +13,7 @@
 # @param xclass Character vector of length=ncol(x) of classes of variables in x,
 #               for example as obtained by sapply(data.frame(x), data.class).
 #                   Default variable specific methods will be mapped to each variable class:
-#                     - 'numeric' or 'integer': squared Euclidean distance ('distEuclidean'),
+#                     - 'numeric' or 'integer': Euclidean distance ('distEuclidean'),
 #                                               expects data to be scaled previously (f.i. by
 #                                               .ScaleVarSpecific) 
 #                     - 'logical': Jaccard distance ('distJaccard')

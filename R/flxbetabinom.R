@@ -126,9 +126,10 @@ BBmle <- function(x, size=NULL, w=1, alpha2=0, eps=sqrt(.Machine$double.eps))
 #'  component.
 #' @param eps Lower threshold for the shape parameters a and b
 #' @param formula A formula which is interpreted relative to the formula
-#'        specified in the call to `flexmix` using `update.formula`. Only the
-#'        left-hand side (response) of the formula is used. Default is to
-#'        use the original `flexmix` model formula.
+#'        specified in the call to [flexmix::flexmix()] using
+#'        [stats::update.formula()]. Only the left-hand side (response)
+#'        of the formula is used. Default is to
+#'        use the original [flexmix::flexmix()] model formula.
 #' @return an object of class `"FLXC"`
 #' @export
 #' @references

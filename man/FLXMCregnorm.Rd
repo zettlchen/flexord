@@ -7,7 +7,11 @@
 FLXMCregnorm(formula = . ~ ., xi_p = NULL, kappa_p = 0.01, nu_p = 3, G = NULL)
 }
 \arguments{
-\item{formula}{A formula describing the normal components}
+\item{formula}{A formula which is interpreted relative to the formula
+specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
+\code{\link[stats:update.formula]{stats::update.formula()}}. Only the left-hand side (response)
+of the formula is used. Default is to
+use the original \code{\link[flexmix:flexmix]{flexmix::flexmix()}} model formula.}
 
 \item{xi_p}{Scale (hyperparameter for IG prior). If not given the empirical
 variance divided by the square of the number of components
@@ -30,7 +34,7 @@ Fraley and Raftery (2007) for multivariate normal mixtures. Default
 parameters for the regularization are taken from that paper.
 However we only implement the special case where the covariance matrix
 is diagonal and different variance per variable. For more general applications
-of normal mixtures see package \pkg{Mclust}.
+of normal mixtures see package \pkg{mclust}.
 }
 \details{
 For the regularization the conjugate prior distributions for the normal
@@ -49,18 +53,17 @@ components is used as per Fraley and Raftery (2007). In which case the
 number of components (parameter \code{G}) needs to be specified.
 }
 \examples{
-\donttest{
 library("flexmix")
 library("flexord")
 library("flexclust")
 
 # example data
-data("iris")
-my_iris = subset(iris, select=setdiff(colnames(iris), "Species")) |>
+data("iris", package = "datasets")
+my_iris <- subset(iris, select=setdiff(colnames(iris), "Species")) |>
     as.matrix()
 
 # cluster one model with a scale parameter similar to the default for 3 components
-m1 = stepFlexmix(my_iris~1,
+m1 <- stepFlexmix(my_iris~1,
                  model=FLXMCregnorm(xi_p=c(0.23, 0.06, 1.04, 0.19)),
                  k=3)
 
@@ -70,7 +73,7 @@ summary(m1)
 randIndex(clusters(m1), iris$Species)
 
 # cluster one model with default scale parameter
-m2 = stepFlexmix(my_iris~1,
+m2 <- stepFlexmix(my_iris~1,
                  model=FLXMCregnorm(G=3),
                  k=3)
 
@@ -82,7 +85,6 @@ randIndex(clusters(m2), iris$Species)
 
 # rand index between both models (should be around 0.8)
 randIndex(clusters(m1), clusters(m2))
-}
 }
 \references{
 \itemize{

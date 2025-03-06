@@ -14,95 +14,112 @@ distGower(x, centers, genDist)
 distSimMatch(x, centers)
 }
 \arguments{
-\item{x}{A numeric matrix or data frame. Categorical/ordinal variables
-need to be coded as \code{1:length(levels(x[,i]))} in steps of one.}
+\item{x}{A numeric matrix or data frame.}
 
-\item{centers}{A numeric matrix with the same coding scheme as in \code{x},
-\code{ncol(centers)==ncol(x)}, and \code{nrow(centers)<=nrow(x)}.}
+\item{centers}{A numeric matrix with \code{ncol(centers)} equal to
+\code{ncol(x)} and \code{nrow(centers)} smaller or equal to \code{row(x)}.}
 
-\item{genDist}{Additional information on x required for distance calculation.
-Filled automatically if used within \code{\link[flexclust:kcca]{flexclust::kcca()}}.
+\item{genDist}{Additional information on \code{x} required for distance
+calculation.  Filled automatically if used within
+\code{\link[flexclust:kcca]{flexclust::kcca()}}.
 \itemize{
-\item For \code{distGower}: A character vector of variable specific distances to be used,
-f.i. as derived from \code{.ChooseVarDists(x)}. Length
-needs to be equal to \code{ncol(x)}. Can contain the options:
-- \code{distEuclidean}: squared Euclidean distance between the
-scaled variables
-- \code{distManhattan}: absolute distance between the scaled variables
-- \code{distJaccard}: counts of zero if both binary variables are
-equal to 1, and 1 otherwise
-- \code{distSimMatch}: Simple Matching Distance, i.e. the number of agreements
-between variables.
-\item For \code{distGDM2}: Function for creating a distance function that will be
-primed on \code{x}, such as f.i. \code{.projectIntofx}. \code{.projectIntofx} is a helper
-function factory that creates a function that will project an arbitrary object
-\code{centers} into the space of the empirical PDF and CDF of \code{x}.
+\item For \code{distGower}: A character vector of variable specific
+distances to be used with length equal to \code{ncol(x)}. The
+following options are possible:
+\itemize{
+\item \code{distEuclidean}: Euclidean distance between the scaled variables.
+\item \code{distManhattan}: absolute distance between the scaled variables.
+\item \code{distJaccard}: counts of zero if both binary variables are
+equal to 1, and 1 otherwise.
+\item \code{distSimMatch}: Simple Matching Distance, i.e. the number of
+agreements between variables.
+}
+\item For \code{distGDM2}: Function creating a distance function that will
+be primed on \code{x}.
 \item For \code{distSimMatch}: not used.
 }}
 
-\item{xrange}{Range specification for the variables. Currently only used for \code{distGDM2}
-(as \code{distGower} expects \code{x} to be already scaled). Possible values are:
+\item{xrange}{Range specification for the variables. Currently only
+used for \code{distGDM2} (as \code{distGower} expects \code{x} to be already
+scaled). Possible values are:
 \itemize{
-\item \code{NULL} (default): defaults to \code{'all'}.
-\item \code{'all'}: Uses the range of the entire data set.
-\item \code{'columnwise'}: Uses column-specific ranges.
-\item A numeric vector of c(min, max): Applies the specified range to all columns.
-\item A list of numeric vectors of c(min,max): Uses the user-specified columnwise
-ranges, the length of the list must be equal to the number of columns to be scaled.
+\item \code{NULL} (default): defaults to \code{"all"}.
+\item \code{"all"}: uses the same minimum and maximum value for each column
+of \code{x} by determining the whole range of values in the data
+object \code{x}.
+\item \code{"columnwise"}: uses different minimum and maximum values for
+each column of \code{x} by determining the columnwise ranges of
+values in the data object \code{x}.
+\item A vector of \code{c(min, max)}: specifies the same minimum and maximum
+value for each column of \code{x}.
+\item A list of vectors \code{list(c(min1, max1), c(min2, max2),...)} with
+length \code{ncol(x)}: specifies different minimum and maximum
+values for each column of \code{x}.
 }}
 }
 \value{
-A matrix of dimensions \code{c(nrow(x),nrow(centers))} that contains the distance
-between each row of \code{x} from each row of \code{centers}.
+A matrix of dimensions \code{c(nrow(x), nrow(centers))} that contains the distance
+between each row of \code{x} and each row of \code{centers}.
 }
 \description{
-Functions to calculate the distance between a matrix \code{x} and an arbitrary
-matrix \code{c}, which can be used for K-centroids clustering via \code{\link[flexclust:kcca]{flexclust::kcca()}}.
+Functions to calculate the distance between a matrix \code{x} and a
+matrix \code{c}, which can be used for K-centroids clustering via
+\code{\link[flexclust:kcca]{flexclust::kcca()}}.
 
 \code{distSimMatch} implements Simple Matching Distance (most frequently
-used for categorical, or symmetric binary data) into K-centroids
+used for categorical, or symmetric binary data) for K-centroids
 clustering.
 
 \code{distGower} implements Gower's Distance after Gower (1971) and
-Kaufman & Rousseeuw (1990) for mixed-type data with missings into K-centroids
+Kaufman & Rousseeuw (1990) for mixed-type data with missings for K-centroids
 clustering.
 
 \code{distGDM2} implements GDM2 distance for ordinal data introduced by
 Walesiak et al. (1993) and adapted to K-centroids clustering by
 Ernst et al. (2025).
 
-These functions are designed for use within \code{\link[flexclust:kcca]{flexclust::kcca()}} or functions that are built
-upon it. Their use is easiest via the wrapper \code{\link[=kccaExtendedFamily]{kccaExtendedFamily()}}.
-However, they can easily be extended to result
-in a distance matrix of \code{x}, see Examples.
+These functions are designed for use with \code{\link[flexclust:kcca]{flexclust::kcca()}} or
+functions that are built upon it. Their use is easiest via the
+wrapper \code{\link[=kccaExtendedFamily]{kccaExtendedFamily()}}.  However, they can also easily be
+used to obtain a distance matrix of \code{x}, see Examples.
 }
 \details{
 \itemize{
-\item \code{distSimMatch}: Simple Matching Distance between two individuals is calculated as
-the proportion of disagreements out of all variables. Described f.i.
-in Kaufman & Rousseeuw (1990), p.24.
-If this is used in K-centroids analysis in combination with the
-mode (as implemented in \code{centMode}), this results in the \code{kModes}
-algorithm.
-A wrapper for this algorithm is found in \code{kccaExtendedFamily(which='kModes')}.
-\item \code{distGower}: Distances are calculated for each column \eqn{p} (squared Euclidean distance, \code{distEuclidean},
-is recommended for numeric, Manhattan distance, \code{distManhattan} for ordinal, Simple Matching
-Distance, \code{distSimMatch} for categorical, and Jaccard distance, \code{distJaccard} for asymmetric
-binary variables), and they are summed up as:
-\deqn{d(x_i, x_k) = \frac{\sum_{j=1}^p \delta_{ikj} d(x_{ij}, x_{kj})}{\sum_{j=1}^p \delta_{ikj}}}
-with the weight \eqn{\delta_{ikj}} being 1 if both values \eqn{x_{ij}} and \eqn{x_{kj}} are
-not missing, and in the case of asymmetric binary variables, at least one of them is not 0.
-Please note that for calculating Gower's distance, scaling of numeric/ordered
-variables is required (as f.i. by \code{.ScaleVarSpecific}).
-A wrapper for K-centroids analysis using Gower's distance in combination with a numerically
-optimized centroid is found in \code{kccaExtendedFamily(which='kGower')}.
-\item \code{distGDM2}: GDM2 distance for ordinal variables conducts only relational operations
-on the variables, such as \eqn{\leq}, \eqn{\geq} and \eqn{=}. By translating \eqn{x}
-to its relative frequencies and empirical cumulative distributions, we are able to
-extend this principle to compare two arbitrary values, and thus use it within K-Centroids
-clustering. For more details, see Ernst et al. (2025).
-A wrapper for this algorithm in combination with a numerically optimized centroid
-is found in \code{kccaExtendedFamily(which='kGDM2')}.
+\item \code{distSimMatch}: Simple Matching Distance between two observations
+is calculated as the proportion of disagreements acros all
+variables. Described, e.g., in Kaufman & Rousseeuw (1990), p. 24.
+If this is used in K-centroids analysis in combination with mode
+centroids (as implemented in \code{centMode}), this results in the
+\strong{kModes} algorithm.  A wrapper for this algorithm is obtained
+with \code{kccaExtendedFamily(which='kModes')}.
+\item \code{distGower}: Distances are calculated for each column (Euclidean
+distance, \code{distEuclidean}, is recommended for numeric, Manhattan
+distance, \code{distManhattan} for ordinal, Simple Matching Distance,
+\code{distSimMatch} for categorical, and Jaccard distance,
+\code{distJaccard} for asymmetric binary variables), and they are
+summed up as:
+
+\deqn{d(x_i, x_k) = \frac{\sum_{j=1}^p \delta_{ikj} d(x_{ij},
+  x_{kj})}{\sum_{j=1}^p \delta_{ikj}}}
+
+where \eqn{p} is the number of variables and with the weight
+\eqn{\delta_{ikj}} being 1 if both values \eqn{x_{ij}} and
+\eqn{x_{kj}} are not missing, and in the case of asymmetric
+binary variables, at least one of them is not 0.  Please note
+that for calculating Gower's distance, scaling of numeric/ordered
+variables is required (as f.i. by \code{.ScaleVarSpecific}).  A
+wrapper for K-centroids analysis using Gower's distance in
+combination with a numerically optimized centroid is found in
+\code{kccaExtendedFamily(which='kGower')}.
+\item \code{distGDM2}: GDM2 distance for ordinal variables conducts only
+relational operations on the variables, such as \eqn{\leq},
+\eqn{\geq} and \eqn{=}. By translating \eqn{x} to its relative
+frequencies and empirical cumulative distributions, we are able
+to extend this principle to compare two arbitrary values, and
+thus use it within K-centroids clustering. For more details, see
+Ernst et al. (2025).  A wrapper for this algorithm in
+combination with a numerically optimized centroid is found in
+\code{kccaExtendedFamily(which='kGDM2')}.
 }
 
 The distances functions presented here can also be used in clustering algorithms that
@@ -150,7 +167,7 @@ flexclust::kcca(datmat, 3, kccaExtendedFamily('kGower'))
 # Ex. 3.2: single variable type case with missing values:
 nas <- sample(c(TRUE,FALSE), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
    matrix(nrow=nrow(dat))
-dat[nas] <- NA
+is.na(dat[nas]) <- TRUE
 #repeat the steps from above...or just do:
 flexclust::kcca(dat, 3, kccaExtendedFamily('kGower', cent=centMode))
 ##turns into kModes with upweighting of present values
@@ -165,7 +182,7 @@ dat <- data.frame(cont = sample(1:100, 10, replace=TRUE)/10,
                                        levels=1:4, ordered=TRUE),
                   nom = factor(sample(letters[1:4], 10, replace=TRUE),
                                levels=letters[1:4]))
-dat[nas] <- NA
+is.na(dat[nas]) <- TRUE
 xcls <- flexord:::.ChooseVarDists(dat)
 datmat <- flexord:::.ScaleVarSpecific(data.matrix(dat), xclass=xcls,
                                       xrange='columnwise')
@@ -194,14 +211,14 @@ Wiley Series in Probability and Statistics.
 \item Leisch, F (2006). \emph{A Toolbox for K-Centroids Cluster Analysis.}
 Computational Statistics and Data Analysis, 17(3), 526-544.
 \doi{10.1016/j.csda.2005.10.006}
-\item Kaufman L, Rousseeuw, P (1990.) \emph{Finding Groups in Data: An Introduction to Cluster Analysis.}
+\item Kaufman, L, Rousseeuw, P (1990.) \emph{Finding Groups in Data: An Introduction to Cluster Analysis.}
 Wiley Series in Probability and Statistics, New York: John Wiley & Sons.
 \doi{10.1002/9780470316801}
 \item Walesiak, M (1993). \emph{Statystyczna Analiza Wielowymiarowa w Badaniach Marketingowych.}
 Wydawnictwo Akademii Ekonomicznej, 44-46.
 \item Weihs, C, Ligges, U, Luebke, K, Raabe, N (2005). \emph{klaR Analyzing German Business Cycles}.
 In Baier D, Decker, R, Schmidt-Thieme, L (eds.). Data Analysis and Decision Support,
-335-343.Berlin: Springer-Verlag.
+335-343. Berlin: Springer-Verlag.
 \doi{10.1007/3-540-28397-8_36}
 }
 }

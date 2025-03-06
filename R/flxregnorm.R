@@ -5,7 +5,7 @@
 #' parameters for the regularization are taken from that paper.
 #' However we only implement the special case where the covariance matrix
 #' is diagonal and different variance per variable. For more general applications
-#' of normal mixtures see package \pkg{Mclust}.
+#' of normal mixtures see package \pkg{mclust}.
 #'
 #' For the regularization the conjugate prior distributions for the normal
 #' distirbution are used, which are:
@@ -21,7 +21,11 @@
 #' number of components (parameter `G`) needs to be specified.
 #' 
 #'
-#' @param formula A formula describing the normal components
+#' @param formula A formula which is interpreted relative to the formula
+#'        specified in the call to [flexmix::flexmix()] using
+#'        [stats::update.formula()]. Only the left-hand side (response)
+#'        of the formula is used. Default is to
+#'        use the original [flexmix::flexmix()] model formula.
 #' @param G Number of components in the mixture model (not used if xi_p is given)
 #' @param kappa_p Shrinkage parameter. Functions as if you added
 #'                `kappa_p` observations according to the population mean to

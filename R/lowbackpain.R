@@ -2,8 +2,8 @@
 #' 
 #' In a 2011 study, Smart et al. (2011) collected information on 464 Irish and
 #' British patients suffering from low back pain regarding:
-#' - the type of low back pain (classified into 'nociceptive', 'peripheral
-#'   neuropathic', and 'central neuropathic')
+#' - the type of low back pain (classified into "nociceptive", "peripheral
+#'   neuropathic", and "central neuropathic")
 #' - the presence/absence of 38 clinical criteria and symptoms relating to low
 #'   back pain.
 #'   
