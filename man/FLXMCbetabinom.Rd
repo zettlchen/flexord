@@ -12,19 +12,19 @@ FLXMCbetabinom(
 )
 }
 \arguments{
-\item{formula}{A formula which is interpreted relative to the formula
-specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
+\item{formula}{A formula which is interpreted relative to the
+formula specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
 \code{\link[stats:update.formula]{stats::update.formula()}}. Only the left-hand side (response)
-of the formula is used. Default is to
-use the original model formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
+of the formula is used. Default is to use the original model
+formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{size}{number of trials (zero or more)}
+\item{size}{Number of trials (one or more).}
 
-\item{alpha2}{Regularization parameter. Can be regarded the same as
-adding \code{alpha2} observations conforming to the population mean to each
-component.}
+\item{alpha2}{A non-negative scalar acting as regularization
+parameter. Can be regarded as adding \code{alpha2} observations
+equal to the population mean to each component.}
 
-\item{eps}{Lower threshold for the shape parameters a and b}
+\item{eps}{Lower threshold for the shape parameters a and b.}
 }
 \value{
 an object of class \code{"FLXC"}
@@ -34,12 +34,13 @@ This model driver can be used to cluster data using the beta-binomial
 distribution.
 }
 \details{
-Using a regularization parameter \code{alpha2} greater than zero
-acts as adding \code{alpha2} observations conforming to the population
-mean to each component. This can be used to avoid degenerate
-solutions. It also has the effect
-that clusters become more similar to each other the larger
-\code{alpha2} is chosen. For small values it is mostly negligible however.
+Using a regularization parameter \code{alpha2} greater than zero can be
+viewed as adding \code{alpha2} observations equal to the population mean
+to each component. This can be used to avoid degenerate solutions
+(i.e., probabilites of 0 or 1). It also has the effect that
+clusters become more similar to each other the larger \code{alpha2} is
+chosen. For small values this effect is, however, mostly
+negligible.
 }
 \examples{
 library("flexmix")
@@ -82,12 +83,11 @@ randIndex(clusters(m1), true_clusters)
 randIndex(clusters(m2), true_clusters)
 }
 \references{
-\itemize{
-\item Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
-\emph{Ordinal Clustering with the flex-Scheme.}
-Austrian Journal of Statistics. \emph{Submitted manuscript}.
-\item Kondofersky, I (2008).
-\emph{Modellbasiertes Clustern mit der Beta-Binomialverteilung.}
-Bachelor's thesis, Ludwig-Maximilians-Universität München
-}
+Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).  \emph{Ordinal
+Clustering with the flex-Scheme.} Austrian Journal of
+Statistics. \emph{Submitted manuscript}.
+
+Kondofersky, I (2008). \emph{Modellbasiertes Clustern mit der
+Beta-Binomialverteilung.} Bachelor's thesis,
+Ludwig-Maximilians-Universität München.
 }
