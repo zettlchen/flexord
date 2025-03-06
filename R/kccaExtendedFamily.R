@@ -186,24 +186,22 @@
 #' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kModes'))
 #' 
 #' # Example 2: kGDM2
-#' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kGDM2'))
 #' flexclust::kcca(dat, k=3, family=kccaExtendedFamily('kGDM2',
 #'                                                     xrange='columnwise'))
 #' # Example 3: kGower
 #' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
 #' nas <- sample(c(TRUE,FALSE), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
 #'    matrix(nrow=nrow(dat))
-#' is.na(dat[nas]) <- TRUE
-#' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower'))
+#' dat[nas] <- NA
 #' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
 #'                                            xrange='all'))
 #' flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
 #'                                            xmethods=c('distEuclidean',
 #'                                                       'distEuclidean',
 #'                                                       'distJaccard',
-#'                                                        'distManhattan',
-#'                                                        'distManhattan',
-#'                                                        'distSimMatch')))
+#'                                                       'distManhattan',
+#'                                                       'distManhattan',
+#'                                                       'distSimMatch')))
 #' #the case where column 2 is a binary variable, but is symmetric
 #' 
 #' @seealso

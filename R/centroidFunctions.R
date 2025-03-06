@@ -118,7 +118,7 @@ centOptimNA <- function(x, dist) {
 #' nas <- sample(c(TRUE, FALSE), prod(dim(dat)),
 #'               replace=TRUE, prob=c(0.1,0.9)) |> 
 #'        matrix(nrow=nrow(dat))
-#' is.na(dat[nas]) <- TRUE
+#' dat[nas] <- NA
 #' centOptimNA(dat, flexclust::distManhattan)
 #' ## within kcca
 #' flexclust::kcca(dat, 3, family=kccaExtendedFamily('kGower')) #default centroid

@@ -167,7 +167,7 @@ flexclust::kcca(datmat, 3, kccaExtendedFamily('kGower'))
 # Ex. 3.2: single variable type case with missing values:
 nas <- sample(c(TRUE,FALSE), prod(dim(dat)), replace=TRUE, prob=c(0.1,0.9)) |> 
    matrix(nrow=nrow(dat))
-is.na(dat[nas]) <- TRUE
+dat[nas] <- NA
 #repeat the steps from above...or just do:
 flexclust::kcca(dat, 3, kccaExtendedFamily('kGower', cent=centMode))
 ##turns into kModes with upweighting of present values
@@ -182,7 +182,7 @@ dat <- data.frame(cont = sample(1:100, 10, replace=TRUE)/10,
                                        levels=1:4, ordered=TRUE),
                   nom = factor(sample(letters[1:4], 10, replace=TRUE),
                                levels=letters[1:4]))
-is.na(dat[nas]) <- TRUE
+dat[nas] <- NA
 xcls <- flexord:::.ChooseVarDists(dat)
 datmat <- flexord:::.ScaleVarSpecific(data.matrix(dat), xclass=xcls,
                                       xrange='columnwise')
