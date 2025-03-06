@@ -132,10 +132,10 @@ BBmle <- function(x, size=NULL, w=1, alpha2=0, eps=sqrt(.Machine$double.eps))
 #' @return an object of class `"FLXC"`
 #' @export
 #' @references
-#' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-#'   *Ordinal clustering with the flex-Scheme.*
-#'   Austrian Statistics Journal. _Submitted manuscript_.
-#' - Kondofersky, Ivan (2008).
+#' - Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+#'   *Ordinal Clustering with the flex-Scheme.*
+#'   Austrian Journal of Statistics. _Submitted manuscript_.
+#' - Kondofersky, I (2008).
 #'   *Modellbasiertes Clustern mit der Beta-Binomialverteilung.*
 #'   Bachelor's thesis, Ludwig-Maximilians-Universität München
 #' @export

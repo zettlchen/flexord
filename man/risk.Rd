@@ -57,12 +57,12 @@ The six types of risk were:
 \references{
 \itemize{
 \item Hajibaba H, Dolnicar S (2017).
-\emph{Helping when disaster hits}. In: Dolnicar S (ed) Peer-to-Peer Accomodation
+\emph{Helping When Disaster Hits}. In: Dolnicar S (ed) Peer-to-Peer Accomodation
 Networks: Pushing the Boundaries, Goodfellow Publishers, Oxford, chap.21,
 235-243.
 \doi{10.23912/9781911396512-3619}
 \item Hajibaba H, Karlsson L, Dolnicar S (2017)
-\emph{Residents open their homes to tourists when disaster strikes.}
+\emph{Residents Open Their Homes to Tourists When Disaster Strikes.}
 Journal of Travel Research. 58(8), 1065-1078.
 \doi{10.1177/0047287516677167}
 }

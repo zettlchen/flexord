@@ -31,9 +31,9 @@
 #' - Galindo Garre, F, Vermunt, JK (2006).
 #'   *Avoiding Boundary Estimates in Latent Class Analysis by Bayesian Posterior Mode Estimation*
 #'   Behaviormetrika, 33, 43-59.
-#' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-#'   *Ordinal clustering with the flex-Scheme.*
-#'   Austrian Statistics Journal. _Submitted manuscript_.
+#' - Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+#'   *Ordinal Clustering with the flex-Scheme.*
+#'   Austrian Journal of Statistics. _Submitted manuscript_.
 #' @export
 #' @example examples/multinom.R
 FLXMCregmultinom = function(formula=.~., size, alpha2=0) {

@@ -86,10 +86,10 @@ randIndex(clusters(m1), clusters(m2))
 }
 \references{
 \itemize{
-\item Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-\emph{Ordinal clustering with the flex-Scheme.}
-Austrian Statistics Journal. \emph{Submitted manuscript}.
-\item Fraley, C, Raftery AE (2007)
+\item Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+\emph{Ordinal Clustering with the flex-Scheme.}
+Austrian Journal of Statistics. \emph{Submitted manuscript}.
+\item Fraley, C, Raftery, AE (2007)
 \emph{Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering.}
 Journal of Classification, 24(2), 155-181
 }

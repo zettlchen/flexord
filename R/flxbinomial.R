@@ -24,9 +24,9 @@
 #' @return an object of class `"FLXC"`
 #' @export
 #' @references
-#' - Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-#'   *Ordinal clustering with the flex-Scheme.*
-#'   Austrian Statistics Journal. _Submitted manuscript_.
+#' - Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+#'   *Ordinal Clustering with the flex-Scheme.*
+#'   Austrian Journal of Statistics. _Submitted manuscript_.
 #' @example examples/binomial.R
 FLXMCbinomial = function(formula=.~., size=NULL, alpha2=0, eps=0)
 {

@@ -85,10 +85,10 @@ randIndex(clusters(m2), true_clusters)
 }
 \references{
 \itemize{
-\item Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-\emph{Ordinal clustering with the flex-Scheme.}
-Austrian Statistics Journal. \emph{Submitted manuscript}.
-\item Kondofersky, Ivan (2008).
+\item Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+\emph{Ordinal Clustering with the flex-Scheme.}
+Austrian Journal of Statistics. \emph{Submitted manuscript}.
+\item Kondofersky, I (2008).
 \emph{Modellbasiertes Clustern mit der Beta-Binomialverteilung.}
 Bachelor's thesis, Ludwig-Maximilians-Universität München
 }

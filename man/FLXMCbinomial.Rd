@@ -79,8 +79,8 @@ randIndex(clusters(m2), true_clusters)
 }
 \references{
 \itemize{
-\item Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-\emph{Ordinal clustering with the flex-Scheme.}
-Austrian Statistics Journal. \emph{Submitted manuscript}.
+\item Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+\emph{Ordinal Clustering with the flex-Scheme.}
+Austrian Journal of Statistics. \emph{Submitted manuscript}.
 }
 }

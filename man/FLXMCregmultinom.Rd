@@ -89,8 +89,8 @@ randIndex(clusters(m2), true_clusters)
 \item Galindo Garre, F, Vermunt, JK (2006).
 \emph{Avoiding Boundary Estimates in Latent Class Analysis by Bayesian Posterior Mode Estimation}
 Behaviormetrika, 33, 43-59.
-\item Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-\emph{Ordinal clustering with the flex-Scheme.}
-Austrian Statistics Journal. \emph{Submitted manuscript}.
+\item Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+\emph{Ordinal Clustering with the flex-Scheme.}
+Austrian Journal of Statistics. \emph{Submitted manuscript}.
 }
 }

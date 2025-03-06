@@ -170,26 +170,26 @@ flexclust::kcca(dat, 3, kccaExtendedFamily('kGower',
 }
 \references{
 \itemize{
-\item Ernst, D, Ortega Menjivar, L, Scharl T, Grün, B (2025).
-\emph{Ordinal clustering with the flex-Scheme.}
-Austrian Statistics Journal. \emph{Submitted manuscript}.
+\item Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+\emph{Ordinal Clustering with the flex-Scheme.}
+Austrian Journal of Statistics. \emph{Submitted manuscript}.
 \item Gower, JC (1971).
 \emph{A General Coefficient for Similarity and Some of Its Properties.}
 Biometrics, 27(4), 857-871.
-\doi{doi:10.2307/2528823}
+\doi{10.2307/2528823}
 \item Kaufman, L, Rousseeuw, P (1990).
 \emph{Finding Groups in Data: An Introduction to Cluster Analysis.}
 Wiley Series in Probability and Statistics.
-\doi{doi:10.1002/9780470316801}
+\doi{10.1002/9780470316801}
 \item Leisch, F (2006). \emph{A Toolbox for K-Centroids Cluster Analysis.}
 Computational Statistics and Data Analysis, 17(3), 526-544.
-\doi{doi:10.1016/j.csda.2005.10.006}
+\doi{10.1016/j.csda.2005.10.006}
 \item Walesiak, M (1993). \emph{Statystyczna Analiza Wielowymiarowa w Badaniach Marketingowych.}
 Wydawnictwo Akademii Ekonomicznej, 44-46.
 \item Weihs, C, Ligges, U, Luebke, K, Raabe, N (2005).
-\emph{klaR Analyzing German Business Cycles.} In: Data Analysis an
+\emph{klaR Analyzing German Business Cycles.} In: Data Analysis and
 Decision Support, Springer: Berlin. 335-343.
-\doi{doi:10.1007/3-540-28397-8_36}
+\doi{10.1007/3-540-28397-8_36}
 }
 }
 \seealso{
