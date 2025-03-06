@@ -217,64 +217,46 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
                                xrange=NULL, xmethods=NULL,
                                trim=0, groupFun='minSumClusters') { #the last two are unused leftovers from kcca, should probably not provide them
   which <- match.arg(which)
-  if(which=='kModes') {
-    
+  if (which == 'kModes') {
     distGen <- NULL
     dstfnc <- distSimMatch
-    # was this:
-    #cent <- centMode
-    # changed to this, so R CMD check doesn't complain.
     cent <- function(x, genDist) {
         centMode(x)
     }
-
   }
-  
-  if(which=='kGDM2') {
-    
+  if (which == 'kGDM2') {
     if(is.null(xrange)) xrange <- 'all'
     
     rng <- .rangeMatrix(xrange)
     
-    if(is.null(preproc)) preproc <- function(x, xclass) x #added here because xclass also runs for kGDM2, and thus this preproc also needs its own function environment
+    if (is.null(preproc)) {
+        preproc <- function(x, xclass) x #added here because xclass also runs for kGDM2, and thus this preproc also needs its own function environment
+    }
     
     distGen <- function(x, xclass) .projectIntofx(x, rangeMatrix=rng)
     dstfnc <- distGDM2
     
-    if(is.null(cent)) {
+    if (is.null(cent)) {
       cent <- function(x, genDist){
         flexclust::centOptim(x, dist = \(y, centers) {
           distGDM2(y, centers, genDist=genDist)
         }) #filler cent, will be recreated in the function
       }
     }
-    
   }
-  
-  if(which=='kGower') {
+  if (which=='kGower') {
     
     if(is.null(xrange)) xrange <- 'columnwise'
     
     rng <- .rangeMatrix(xrange)
     
-    #old, archived preproc: preproc <- function(x) .ScaleGower(x, rangeMatrix=rng)
-    
-    if(is.null(xmethods)) {
-      # sorry I dont think we should have a warning for the default case
-      #warning('No column-wise distance measures specified, default measures
-      #      for each column will be used.')
+    if (is.null(xmethods)) {
       distGen <- function(x, xclass) {
-        #I apologize for the use of parent.frame(), but didn't know how else to fix it.
-        #however I do think it's ok here because 1) 'xclass' is not a generic method
-        #and 2) because I only use them once in the beginning (unlike the dists),
-        #so I can't really get lost in the frames
-        #xcls <- get('xclass', parent.frame())
         .ChooseVarDists(xclass)
       }
       preproc <- function(x, xclass) {
-        #xcls <- get('xclass', parent.frame())
-        .ScaleVarSpecific(x, rangeMatrix=rng,
-                                    xclass=xclass)
+        .ScaleVarSpecific(x, rangeMatrix = rng,
+                          xclass = xclass)
       }
     } else {
       distGen <- function(x, xclass) {
@@ -283,29 +265,26 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
           stop('Specified columnwise xmethod not implemented!')
         return(xmethods)
       }
-      preproc <- function(x, xclass) .ScaleVarSpecific(x, rangeMatrix=rng,
-                                               xclass=xmethods)
+      preproc <- function(x, xclass) {
+          .ScaleVarSpecific(x, rangeMatrix = rng,
+                            xclass = xmethods)
+      }
     }
     
     dstfnc <- distGower
     
-    #the default combo in the paper for distGower was centMin. now that x is scaled in the beginning, I think centOptim is sufficient
-    if(is.null(cent)) {
-      cent <- function(x, genDist){
+    if (is.null(cent)) {
+      cent <- function(x, genDist) {
         centOptimNA(x, dist = \(y, centers) {
-          distGower(y, centers, genDist=genDist)
+          distGower(y, centers, genDist = genDist)
         }) #filler cent, will be recreated in the function
       }
     }
-    
   }
  
-
   newgendist <- function(x, family) {
     kccaExtendedFamilyGenDist(x, family, genDist = distGen)
   }
-
-
 
   flexclust::kccaFamily(name=which,
                         dist=dstfnc,
@@ -313,10 +292,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
                         genDist=newgendist,
                         preproc=preproc,
                         trim=trim, groupFun=groupFun)
-                              
 }
-
-
 
 #' Recreate the Family Object with Updated Distance, Centroid, ... Functions 
 #' @param x the data set that kcca was called with
@@ -324,7 +300,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
 #' @param genDist a function that generates a vector of distance functions
 #' @noRd
 kccaExtendedFamilyGenDist = function(x, family, genDist) {
-  if(is.data.frame(x)) {
+  if (is.data.frame(x)) {
     xclass <- sapply(x, data.class)
   } else {
     xclass <- rep('numeric', ncol(x))
@@ -363,7 +339,7 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
 
   family <- family_new
 
-  x <- data.matrix(x) #previously: x <- as(x, "matrix")  
+  x <- data.matrix(x) 
   x <- family@preproc(x)
 
   if (!is.null(genDist)) {

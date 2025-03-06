@@ -10,16 +10,16 @@ centMode <- function(x) {
 #' @rdname centroids
 #' @export
 centMin <- function(x, dist, xrange=NULL) {
-  if(is.null(xrange)) xrange <- 'all'
+  if (is.null(xrange)) xrange <- 'all'
   
-  rng <- .rangeMatrix(xrange=xrange)(x)
+  rng <- .rangeMatrix(xrange = xrange)(x)
   
   lvls <- apply(rng, 2, \(y) matrix(seq(y[1], y[2])),
-                simplify = F)
+                simplify = FALSE)
   cntrs <- vector(length = ncol(x)) |> 
     stats::setNames(colnames(x))
   for (i in 1:ncol(x)) {
-    d <- dist(x[, i, drop=F], lvls[[i]]) |> 
+    d <- dist(x[, i, drop=FALSE], lvls[[i]]) |> 
       colSums() |> matrix(nrow=1)
     cntrs[i] <- max.col(-d, ties.method='random')
   }

@@ -10,19 +10,21 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   z <- matrix(0, nrow=nrow(x), ncol=nrow(centers))
   
-  if(is.function(genDist)) {
+  if (is.function(genDist)) {
     if(length(formals(genDist))>1) {#i.e. if genDist is 'unprimed', i.e. the function runs outside of the kcca environment
       genDist <- genDist(x, xrange)
     }
-  } else { stop('No valid genDist object found') }
+  } else {
+      stop('No valid genDist object found')
+  }
   
   N <- nrow(x)
   fx <- get('fx', envir=environment(genDist))
   fc <- genDist(centers)
   
-  for(k in 1:nrow(centers)) {
-    for(i in 1:N) {
-      deltaeq <- x[i,]==centers[k,]
+  for (k in 1:nrow(centers)){
+    for (i in 1:N) {
+      deltaeq <- x[i,] == centers[k,]
       numneq <- (!deltaeq)*(1/N + 2*abs(fx$Ftildex[i,]-fc$Ftildex[k,]))
       numeq <- deltaeq*fx$epdf[i,]
       denom <- sqrt(sum(1-fx$epdf[i,])*sum(1-fc$epdf[k,]))
@@ -39,10 +41,9 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
 # @param xrange is a compatibility parameter so the helper runs outside
 #               of the `kccaFamilyGDM2` concept, but within `kccaFamilyGDM2`,
 #               `.rangeMatrix(xrange)` is run previously
-.projectIntofx <- function(x, rangeMatrix=NULL,
-                           xrange=NULL){
+.projectIntofx <- function(x, rangeMatrix=NULL, xrange=NULL){
   
-  if(is.null(rangeMatrix)) {
+  if (is.null(rangeMatrix)) {
     rng <- .rangeMatrix(xrange)
   } else {
     rng <- rangeMatrix
@@ -51,7 +52,7 @@ distGDM2 <- function(x, centers, genDist, xrange=NULL) {
   rng <- rng(x)
   
   hats <- lapply(1:ncol(x), function(y) {
-    level <- factor(x[,y], levels=seq(rng[1,y], rng[2,y]))
+    level <- factor(x[,y], levels = seq(rng[1,y], rng[2,y]))
     pdf <- table(level)/nrow(x)
     pdf <- as.data.frame.table(pdf)
     pdf$level <- as.numeric(pdf$level)

@@ -29,23 +29,20 @@
 # written after: Gower (1971), Kaufman & Rousseeuw (1990).
 .ChooseVarDists <- function(xclass) {
   
-  if(!is.null(dim(xclass))) {#compatibility option, where .ChooseVarDists is used outside of kcca, and directly on x
-    if(is.data.frame(xclass)) {
+  if (!is.null(dim(xclass))) {#compatibility option, where .ChooseVarDists is used outside of kcca, and directly on x
+    if (is.data.frame(xclass)) {
       xclass <- sapply(xclass, data.class)
     } else {
-      xclass <- rep('numeric', ncol(xclass))
+      xclass <- rep("numeric", ncol(xclass))
     }
   }
-  
-  ifelse(xclass == 'numeric', 'distEuclidean', #data.class returns 'numeric' also for 'integer'
-         ifelse(xclass == 'logical', 'distJaccard',
-                ifelse(xclass == 'ordered', 'distManhattan',
-                       ifelse(xclass == 'factor', 'distSimMatch',
-                              'Error: no default method implemented for this class'
-                       )
-                )
-         )
-  ) |> stats::setNames(names(xclass))
+
+  xclass <- factor(xclass, c("numeric", "logical", "ordered", "factor"))
+  if (anyNA(xclass)) {
+      stop("no default method implement for one of the classes")
+  }
+  c("distEuclidean", "distJaccard", "distManhattan", "distSimMatch")[as.integer(xclass)] |>
+      stats::setNames(names(xclass))
 }
 
 
@@ -65,32 +62,32 @@
 # @param xrange is a compatibility parameter so the helper runs outside
 #               of the `kccaFamilyGower` concept, but within `kccaFamilyGower`,
 #               `.rangeMatrix(xrange)` is run previously
-.ScaleVarSpecific <- function(x, xclass,
-                              rangeMatrix=NULL, xrange=NULL) {
+.ScaleVarSpecific <- function(x, xclass, rangeMatrix = NULL, xrange = NULL) {
   
-  if(is.null(rangeMatrix)) {
+  if (is.null(rangeMatrix)) {
     rng <- .rangeMatrix(xrange)
   } else {
     rng <- rangeMatrix
   }
   
-  if(is.data.frame(x)) { #this happens only within stepFlexclust, within kcca, data.matrix(x) has already been run
+  if (is.data.frame(x)) { #this happens only within stepFlexclust, within kcca, data.matrix(x) has already been run
     x <- data.matrix(x)
   }
   
-  if(is.null(colnames(x))) colnames(x) <- 1:ncol(x) #don't need this here but later in the dist #I think it's actually obsolete now
+  if (is.null(colnames(x))) {
+      colnames(x) <- 1:ncol(x) #don't need this here but later in the dist #I think it's actually obsolete now
+  }
   
   cols2scl <- xclass %in% c('numeric', 'ordered', #compatibility with xclass=sapply(dat, data.class)
                             'distEuclidean', 'distManhattan') #compatibility with xmethods
   
-  if(sum(cols2scl)>0) {
+  if (sum(cols2scl) > 0) {
     
-    rng <- rng(x[, cols2scl, drop=F])
+    rng <- rng(x[, cols2scl, drop=FALSE])
     scl <- apply(rng, 2, diff)
     scl <- ifelse(scl==0, 1, scl)
     
-    x[,cols2scl] <- scale(x[,cols2scl], center=rng[1,], scale=scl)
-    
+    x[, cols2scl] <- scale(x[, cols2scl], center=rng[1,], scale=scl)
   }
 
   return(x)
@@ -129,39 +126,40 @@ distGower <- function(x, centers, genDist) {
   distM <- distances %in% 'distManhattan'
   distS <- distances %in% 'distSimMatch'
   distJ <- distances %in% 'distJaccard'
-  if(sum(distE, distM, distS, distJ)!=ncol(x)) stop('Specified distance(s) not implemented in flexord::distGower')
+  if (sum(distE, distM, distS, distJ) != ncol(x)) {
+      stop('Specified distance(s) not implemented in flexord::distGower')
+  }
   
-  if(any(distE)) {
-    xE <- x[, distE, drop=F]
-    cE <- centers[, distE, drop=F]
-    for(k in 1:K){
+  if (any(distE)) {
+    xE <- x[, distE, drop = FALSE]
+    cE <- centers[, distE, drop = FALSE]
+    for (k in 1:K) {
       z[, distE, k] <- t(sqrt((t(xE) - cE[k,])^2))
     }
   }
-  if(any(distM)) {
-    xM <- x[, distM, drop=F]
-    cM <- centers[, distM, drop=F]
-    for(k in 1:K){
+  if (any(distM)) {
+    xM <- x[, distM, drop = FALSE]
+    cM <- centers[, distM, drop = FALSE]
+    for (k in 1:K) {
       z[, distM, k] <- t(abs(t(xM)-cM[k,]))
     }
   }
-  if(any(distS)) {
-    xS <- x[, distS, drop=F]
-    cS <- centers[, distS, drop=F]
-    for(k in 1:K){
+  if (any(distS)) {
+    xS <- x[, distS, drop = FALSE]
+    cS <- centers[, distS, drop = FALSE]
+    for (k in 1:K) {
       z[, distS, k] <- t(t(xS) != cS[k,])
     }
   }
-  if(any(distJ)) {
-    xJ <- x[, distJ, drop=F]
-    cJ <- centers[, distJ, drop=F]
-    for(k in 1:K){
-      z[, distJ, k] <- t((t(xJ) + cJ[k,])<2)
+  if (any(distJ)) {
+    xJ <- x[, distJ, drop = FALSE]
+    cJ <- centers[, distJ, drop = FALSE]
+    for (k in 1:K) {
+      z[, distJ, k] <- t((t(xJ) + cJ[k,]) < 2)
     }
   }
 
-    z[which(is.na(z))] <- 1 #just a placeholder, NA cases are removed by weights==0
-                            #z <- ifelse(is.na(z), 1, z)
+  z[is.na(z)] <- 1 #just a placeholder, NA cases are removed by weights==0
   z
 }
 
@@ -203,17 +201,19 @@ distGower <- function(x, centers, genDist) {
   dists <- unique(distances)
   p <- ncol(x)
   
-  if(dists=='distEuclidean') {
+  if (dists == 'distEuclidean') {
     dstfnc <- flexclust::distEuclidean
-  } else if(dists=='distManhattan') {
+  } else if (dists == 'distManhattan') {
     dstfnc <- flexclust::distManhattan
-  } else if(dists=='distSimMatch') {
+  } else if (dists == 'distSimMatch') {
     dstfnc <- distSimMatch
-    p <- 1 #da ist colMeans schon drin
-  } else if(dists=='distJaccard') {
+    p <- 1 
+  } else if (dists == 'distJaccard') {
     dstfnc <- flexclust::distJaccard
-    p <- 1 #meine Vermutung ist, dass distJaccard ohne /ncol(x) für singletype noNA passt? Schließlich hat das schon einen Nenner? Und dass nur 1==1 bedacht wird, sollte da auch drin schon behandelt sein
-  } else {stop('Specified distance not implemented in flexord::distGower')}
+    p <- 1 
+  } else {
+      stop('Specified distance not implemented in flexord::distGower')
+  }
 
   dstfnc(x, centers)/p
 }
@@ -236,15 +236,15 @@ distGower <- function(x, centers, genDist) {
   delta <- sapply(1:K,
                   \(k) t(!(is.na(t(x)) | is.na(centers[k,]))),
                   simplify='array')
-  distJ <- distances=='distJaccard'
+  distJ <- distances == 'distJaccard'
   
-  if(any(distJ)) {
-    xJ <- x[, distJ, drop=F]
-    cJ <- centers[, distJ, drop=F]
-    for(k in 1:K){
+  if (any(distJ)) {
+    xJ <- x[, distJ, drop = FALSE]
+    cJ <- centers[, distJ, drop = FALSE]
+    for (k in 1:K) {
       delta[, distJ, k] <- t((t(xJ) + cJ[k,])>0)
     }
-    delta[which(is.na(delta))] <- FALSE
+    delta[is.na(delta)] <- FALSE
   }
   
   delta
@@ -254,19 +254,14 @@ distGower <- function(x, centers, genDist) {
   if (ncol(x) != ncol(centers))
     stop(sQuote('x'), ' and ', sQuote('centers'), ' must have the same number of columns')
   
-  if(length(unique(genDist))==1 && !anyNA(x)) {
-    
-    .distGower_singleTypeNoNAs(x, centers, distances=genDist)
-  
+  if (length(unique(genDist))==1 && !anyNA(x)) {
+    .distGower_singleTypeNoNAs(x, centers, distances = genDist)
   } else {
-
     delta <- .delta(x, centers, distances=genDist)
-    
-    z <- .distGower_mixedType(x, centers, distances=genDist)
-    
-    z <- sapply(1:nrow(centers),
-                \(k) rowSums(z[,,k,drop=F]*delta[,,k,drop=F])/rowSums(delta[,,k,drop=F]))
-    z[which(is.nan(z))] <- 0 #aus distJaccard, dort setzt Fritz diesen Fall auch 0
+    z <- .distGower_mixedType(x, centers, distances = genDist)
+    z <- sapply(1:nrow(centers), \(k) {
+        rowSums(z[,,k,drop = FALSE] * delta[,,k,drop=FALSE]) / rowSums(delta[,,k,drop = FALSE])})
+    z[is.nan(z)] <- 0 # see distJaccard
     
     z
   }
