@@ -15,7 +15,8 @@ formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
 \item{size}{Number of trials (one or more).}
 
-\item{alpha2}{Regularization parameter. Can be regarded as adding
+\item{alpha2}{A non-negative scalar acting as regularization
+parameter. Can be regarded as adding
 \code{alpha2} observations equal to the population mean to each
 component.}
 

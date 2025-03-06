@@ -16,10 +16,10 @@
 #' correspond to the marginal distribution of the variable across all
 #' observations.
 #'
-#' @param size values are assumed to be integers in `1:size`
-#' @param alpha2 Regularization parameter. Can be regarded the same as
-#'  adding `alpha2` observations conforming to the population mean to each
-#'  component.
+#' @param size Values are assumed to be integers in `1:size`.
+#' @param alpha2 A non-negative scalar acting as regularization
+#'     parameter. Can be regarded as adding `alpha2` observations
+#'     equal to the population mean to each component.
 #' @param formula A formula which is interpreted relative to the formula
 #'        specified in the call to [flexmix::flexmix()] using
 #'        [stats::update.formula()]. Only the
@@ -37,8 +37,7 @@
 #' @export
 #' @example examples/multinom.R
 FLXMCregmultinom = function(formula=.~., size, alpha2=0) {
-    stopifnot(length(size) == 1)
-    stopifnot(length(alpha2) == 1)
+    stopifnot(is.numeric(alpha2), length(alpha2) == 1, alpha2 >= 0)
 
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregmultinom")

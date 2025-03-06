@@ -15,7 +15,8 @@
 #' component and variable using a Beta prior.
 #' 
 #' @param size Number of trials (one or more).
-#' @param alpha2 Regularization parameter. Can be regarded as adding
+#' @param alpha2 A non-negative scalar acting as regularization
+#'     parameter. Can be regarded as adding
 #'     `alpha2` observations equal to the population mean to each
 #'     component.
 #' @param eps A numeric value in [0, 1). When greater than zero,
@@ -37,7 +38,7 @@ FLXMCbinomial = function(formula=.~., size = NULL, alpha2=0, eps=0)
              name="FLXMCbinomial")
 
     stopifnot(is.numeric(eps), length(eps) == 1, eps >= 0, eps < 1)
-    stopifnot(is.numeric(alpha2), all(alpha2 >= 0))
+    stopifnot(is.numeric(alpha2), length(alpha2) == 1, alpha2 >= 0)
     
     z@preproc.y <- function(y) {
         if(any(y < 0, na.rm=TRUE))

@@ -13,11 +13,11 @@ specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
 left-hand side (response) of the formula is used. Default is to
 use the original model formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{size}{values are assumed to be integers in \code{1:size}}
+\item{size}{Values are assumed to be integers in \code{1:size}.}
 
-\item{alpha2}{Regularization parameter. Can be regarded the same as
-adding \code{alpha2} observations conforming to the population mean to each
-component.}
+\item{alpha2}{A non-negative scalar acting as regularization
+parameter. Can be regarded as adding \code{alpha2} observations
+equal to the population mean to each component.}
 }
 \value{
 an object of class \code{"FLXC"}
