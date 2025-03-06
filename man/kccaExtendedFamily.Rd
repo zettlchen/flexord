@@ -16,18 +16,22 @@ kccaExtendedFamily(which = c('kModes', 'kGDM2', 'kGower'),
 predefined methods for K-centroids clustering.  For more
 information on each of them, see the Details section.}
 
-\item{cent}{Function for determining cluster centroids (See
-\code{\link[flexclust:kcca]{flexclust::kccaFamily()}}).  This parameter is ignored for
-\code{which='kModes'}, and \code{centMode} is used.  For \code{'kGDM2'} and
-\code{'kGower'}, \code{cent=NULL} defaults to a general purpose optimizer.}
+\item{cent}{Function for determining cluster centroids.
 
-\item{preproc}{Preprocessing function to be applied to the data
-before clustering (See \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.  This
-parameter is ignored for \code{which='kGower'}, instead, the default
-preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw
-(1990) is conducted. For \code{'kGDM2'} and \code{'kModes'}, users can
-specify preprocessing steps here, though this is not
-recommended.}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{This argument is ignored for `which='kModes'`, and `centMode`
+is used.  For `'kGDM2'` and `'kGower'`, `cent=NULL` defaults to
+a general purpose optimizer.
+}\if{html}{\out{</div>}}}
+
+\item{preproc}{Preprocessing function applied to the data before
+clustering.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{This argument is ignored for `which='kGower'`. In this case,
+the default preprocessing proposed by Gower (1971) and Kaufman
+& Rousseeuw (1990) is conducted. For `'kGDM2'` and `'kModes'`,
+users can specify preprocessing steps here, though this is not
+recommended.
+}\if{html}{\out{</div>}}}
 
 \item{xrange}{The range of the data in \code{x}. Options are:
 \itemize{
@@ -59,8 +63,10 @@ and default measures, see the Details section.}
 \code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.}
 
 \item{groupFun}{A character string specifying the function for
-clustering. Default is \code{'minSumClusters'}, see
-\code{\link[flexclust:kcca]{flexclust::kccaFamily()}}.}
+clustering.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Default is `'minSumClusters'`, see [flexclust::kccaFamily()].
+}\if{html}{\out{</div>}}}
 }
 \value{
 An object of class \code{"kccaFamily"}.

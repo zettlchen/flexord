@@ -11,7 +11,7 @@ FLXMCregnorm(formula = . ~ ., xi_p = NULL, kappa_p = 0.01, nu_p = 3, G = NULL)
 specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
 \code{\link[stats:update.formula]{stats::update.formula()}}. Only the left-hand side (response)
 of the formula is used. Default is to
-use the original \code{\link[flexmix:flexmix]{flexmix::flexmix()}} model formula.}
+use the original model formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
 \item{xi_p}{Scale (hyperparameter for IG prior). If not given the empirical
 variance divided by the square of the number of components

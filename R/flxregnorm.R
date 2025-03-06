@@ -25,7 +25,7 @@
 #'        specified in the call to [flexmix::flexmix()] using
 #'        [stats::update.formula()]. Only the left-hand side (response)
 #'        of the formula is used. Default is to
-#'        use the original [flexmix::flexmix()] model formula.
+#'        use the original model formula specified in [flexmix::flexmix()].
 #' @param G Number of components in the mixture model (not used if xi_p is given)
 #' @param kappa_p Shrinkage parameter. Functions as if you added
 #'                `kappa_p` observations according to the population mean to

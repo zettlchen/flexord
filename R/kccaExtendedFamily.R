@@ -100,16 +100,18 @@
 #' @param which One of either `'kModes'`, `'kGDM2'` or `'kGower'`, the three
 #'     predefined methods for K-centroids clustering.  For more
 #'     information on each of them, see the Details section.
-#' @param cent Function for determining cluster centroids (See
-#'     [flexclust::kccaFamily()]).  This parameter is ignored for
-#'     `which='kModes'`, and `centMode` is used.  For `'kGDM2'` and
-#'     `'kGower'`, `cent=NULL` defaults to a general purpose optimizer.
-#' @param preproc Preprocessing function to be applied to the data
-#'     before clustering (See [flexclust::kccaFamily()].  This
-#'     parameter is ignored for `which='kGower'`, instead, the default
-#'     preprocessing proposed by Gower (1971) and Kaufman & Rousseeuw
-#'     (1990) is conducted. For `'kGDM2'` and `'kModes'`, users can
-#'     specify preprocessing steps here, though this is not
+#' @param cent Function for determining cluster centroids.
+#'
+#'     This argument is ignored for `which='kModes'`, and `centMode`
+#'     is used.  For `'kGDM2'` and `'kGower'`, `cent=NULL` defaults to
+#'     a general purpose optimizer.
+#' @param preproc Preprocessing function applied to the data before
+#'     clustering.
+#'
+#'     This argument is ignored for `which='kGower'`. In this case,
+#'     the default preprocessing proposed by Gower (1971) and Kaufman
+#'     & Rousseeuw (1990) is conducted. For `'kGDM2'` and `'kModes'`,
+#'     users can specify preprocessing steps here, though this is not
 #'     recommended.
 #' @param xrange The range of the data in `x`. Options are:
 #'
@@ -141,8 +143,9 @@
 #' @param trim Proportion of points trimmed in robust clustering, wee
 #'     [flexclust::kccaFamily()].
 #' @param groupFun A character string specifying the function for
-#'     clustering. Default is `'minSumClusters'`, see
-#'     [flexclust::kccaFamily()].
+#'     clustering.
+#'
+#'     Default is `'minSumClusters'`, see [flexclust::kccaFamily()].
 #'   
 #' @return An object of class `"kccaFamily"`.
 #' 
