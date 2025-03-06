@@ -324,13 +324,6 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
     origCent
   }
 
-  newgendist <- if("xclass" %in% names(formals(genDist))) {
-    function(x) genDist(x, xclass = xclass)
-  } else {
-    origGenDist
-  }
-
-
   family_new <- kccaFamily(
     name     = family@name,
     dist     = newdist,
@@ -340,16 +333,18 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
     trim     = family@trim,
     groupFun = family@groupFun)
 
-  family_orig <- family
   family <- family_new
 
   x <- data.matrix(x) #previously: x <- as(x, "matrix")  
   x <- family@preproc(x)
 
-  generated_dist = if("xclass" %in% names(formals(genDist))) {
-    genDist(x, xclass = xclass)
-  } else {
-    genDist(x)
+  if (!is.null(genDist)) {
+      generated_dist <-
+          if("xclass" %in% names(formals(genDist))) {
+              genDist(x, xclass = xclass)
+          } else {
+              genDist(x)
+          }
   }
 
   family
