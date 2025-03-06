@@ -15,7 +15,7 @@
 #        list(x1= c(lower, upper), x2=c(lower, upper), ...): list with user
 #                 specified range vectors for each variable to be scaled.
 .rangeMatrix <- function(xrange) {
-  if (identical(xrange, 'all')) {
+  if (is.null(xrange) || identical(xrange, 'all')) {
     rng <- function(x) {
       rep(range(x, na.rm=TRUE), ncol(x)) |>
           matrix(nrow=2)
