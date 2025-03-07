@@ -3,26 +3,17 @@
 
 
 lbeta1 <- function(x, size, a, b) {
-    s <- seq(from=0, to=size, by=1)
-    uniquelb <- lbeta(a+s, b+size-s)
-    res1 <- uniquelb[x+1L]
-    res1
+    lbeta(a+x, b+size-x)
 }
 
 digamma1 <- function(x, a, size) {
-    uniquedg <- digamma(seq(from=0, to=size, by=1) + a)
-    res1 <- uniquedg[x+1L]
-    res1
+    digamma(x + a)
 }
 
 
 dbetabinom <- function(x, size, a, b, log=FALSE) {
     z <- lbeta1(x, size, a, b) - lbeta(a,b)
-    if(!any(is.finite(z))) {
-        warning("z not finite")
-        return(NA)
-    }
-    if(log) z else exp(z)
+    if (log) z else exp(z)
 }
 
 BBlogLikGrad <- function(ab, x, size, w=1) {
@@ -120,31 +111,30 @@ FLXMCbetabinom = function(formula=.~., size, alpha2=0, eps=sqrt(.Machine$double.
     size <- as.integer(size)
     stopifnot(all(size >= 1))
 
-    z@defineComponent <- expression({
-        logLik <- function(x,y) {
-            z <- y
-            for(k in 1:ncol(y)) {
-                z[,k] <- dbetabinom(y[,k], size=size[k], a=ab[1,k], b=ab[2,k], 
-                                    log=TRUE)
-            }
-            rowSums(z, na.rm=TRUE)
-        }
+    z@defineComponent <- function(para) {
         predict <- function(x, ...) {
-            matrix(center, nrow=nrow(x), ncol=length(center), byrow=TRUE)
+            matrix(para$prob * para$size,
+                   nrow=nrow(x), ncol=length(para$prob), byrow=TRUE)
         }
 
+        logLik <- function(x, y) {
+            llh <- dbetabinom(t(y), size = para$size,
+                              a = para$ab[1,], b = para$ab[2,],
+                              log = TRUE)
+            colSums(llh)
+        }
+        
         new("FLXcomponent", 
-            parameters=list(a=ab[1,], b=ab[2,], size=size, prob=prob, center=center),
-            df=length(ab), logLik=logLik, predict=predict)
-    })
+            parameters = list(a = para$ab[1, ], b = para$ab[2, ]),
+            logLik = logLik, predict = predict, df = length(para$ab))
+    }
 
-    z@fit <- function(x,y,w) {
+    z@fit <- function(x, y, w) {
         para <- list(size = rep(size, length=ncol(y)))
-        para$ab = BBmle(y, size=para$size, w=w, alpha2=alpha2, eps=eps)
-
+        para$ab <- BBmle(y, size=para$size, w=w, alpha2=alpha2, eps=eps)
         para$prob <- apply(para$ab, 2, function(z) z[1]/sum(z))
-        para$center <- para$prob * para$size
-        with(para, eval(z@defineComponent))
+
+        z@defineComponent(para = para)
     }
 
     z
