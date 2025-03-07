@@ -29,20 +29,22 @@ each component (hyperparameter for IG prior)}
 an object of class \code{"FLXC"}
 }
 \description{
-This model driver implements the regularization method as introduced by
-Fraley and Raftery (2007) for multivariate normal mixtures. Default
-parameters for the regularization are taken from that paper.
-However we only implement the special case where the covariance matrix
-is diagonal and different variance per variable. For more general applications
-of normal mixtures see package \pkg{mclust}.
+This model driver implements the regularization method as
+introduced by Fraley and Raftery (2007) for univariate normal
+mixtures. Default parameters for the regularization are taken from
+that paper.  We extend this to the multivariate case assuming
+independence between variables within components, i.e., we only
+implement the special case where the covariance matrix is
+diagonal. For more general applications of normal mixtures see
+package \pkg{mclust}.
 }
 \details{
-For the regularization the conjugate prior distributions for the normal
-distirbution are used, which are:
+For the regularization the conjugate prior distributions for the
+normal distribution are used, which are:
 \itemize{
-\item Normal prior with parameter \code{mu_p} and \code{sigma^2/kappa_p} for the mean
-\item Inverse Gamma prior with parameters \code{nu_p/2} and \code{xi_p^2/2} tor the
-variance
+\item Normal prior with parameter \code{mu_p} and \code{sigma^2/kappa_p} for the mean.
+\item Inverse Gamma prior with parameters \code{nu_p/2} and \code{xi_p^2/2} for the
+variance.
 }
 
 \code{mu_p} is computed from the data as the overall means across all components.

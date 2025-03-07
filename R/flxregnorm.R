@@ -1,19 +1,22 @@
 #' FlexMix Driver for Regularized Multivariate Normal Mixtures
 #'
-#' This model driver implements the regularization method as introduced by
-#' Fraley and Raftery (2007) for multivariate normal mixtures. Default
-#' parameters for the regularization are taken from that paper.
-#' However we only implement the special case where the covariance matrix
-#' is diagonal and different variance per variable. For more general applications
-#' of normal mixtures see package \pkg{mclust}.
+#' This model driver implements the regularization method as
+#' introduced by Fraley and Raftery (2007) for univariate normal
+#' mixtures. Default parameters for the regularization are taken from
+#' that paper.  We extend this to the multivariate case assuming
+#' independence between variables within components, i.e., we only
+#' implement the special case where the covariance matrix is
+#' diagonal. For more general applications of normal mixtures see
+#' package \pkg{mclust}.
 #'
-#' For the regularization the conjugate prior distributions for the normal
-#' distirbution are used, which are:
-#' * Normal prior with parameter `mu_p` and `sigma^2/kappa_p` for the mean
-#' * Inverse Gamma prior with parameters `nu_p/2` and `xi_p^2/2` tor the
-#'   variance
+#' For the regularization the conjugate prior distributions for the
+#' normal distribution are used, which are:
+#' 
+#' * Normal prior with parameter `mu_p` and `sigma^2/kappa_p` for the mean.
+#' * Inverse Gamma prior with parameters `nu_p/2` and `xi_p^2/2` for the
+#'   variance.
 #'
-#'  `mu_p` is computed from the data as the overall means across all components.
+#' `mu_p` is computed from the data as the overall means across all components.
 #'
 #' A value for the scale hyperparameter `xi_p` may be specified directly.
 #' Otherwise the empirical variance divided by the square of the number of
