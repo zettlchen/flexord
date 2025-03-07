@@ -32,6 +32,7 @@
 #'     (2025).  *Ordinal Clustering with the flex-Scheme.* Austrian
 #'     Journal of Statistics. _Submitted manuscript_.
 #' @example examples/binomial.R
+#' @importFrom stats dbinom
 FLXMCbinomial = function(formula=.~., size = NULL, alpha2=0, eps=0)
 {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
@@ -46,20 +47,15 @@ FLXMCbinomial = function(formula=.~., size = NULL, alpha2=0, eps=0)
         y
     }
 
-    defineComponent <- function(component, probs, df) {
+    defineComponent <- function(component) {
         predict <- function(x, ...) {
-            stop("not implemented")
+            matrix(component$probs * component$size, nrow = nrow(x), ncol = length(component$probs),
+                   byrow = TRUE)
         }
 
         logLik <- function(x, y) {
-            probs = component$probs
-            ty <- t(y)
-            bc <- lchoose(size, ty)
-
-            l <- bc + ty*log(probs) + (size-ty)*log(1-probs)
-            cs <- colSums(l, na.rm=TRUE)
-            if(any(!is.finite(cs))) stop("non-finite values while calculating log-likelihood")
-            cs
+            llh <- dbinom(t(y), size = component$size, prob = component$probs, log = TRUE)
+            colSums(llh, na.rm = TRUE)
         }
 
         new("FLXcomponent",
@@ -71,7 +67,6 @@ FLXMCbinomial = function(formula=.~., size = NULL, alpha2=0, eps=0)
     z@fit <- function(x, y, w, component) {
         if(length(component) == 0) {
             component$has_na <- anyNA(y)
-            component$which_na <- which(is.na(y))
 
             if(is.null(size)) {
                 component$size <- apply(y, 2, max, na.rm=TRUE)
