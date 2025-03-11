@@ -3,11 +3,11 @@
 #' This model driver can be used to cluster data using the binomial
 #' distribution.
 #'
-#' Using a regularization parameter `alpha2` greater than zero can be
-#' viewed as adding `alpha2` observations equal to the population mean
+#' Using a regularization parameter `alpha` greater than zero can be
+#' viewed as adding `alpha` observations equal to the population mean
 #' to each component. This can be used to avoid degenerate solutions
 #' (i.e., probabilites of 0 or 1). It also has the effect that
-#' clusters become more similar to each other the larger `alpha2` is
+#' clusters become more similar to each other the larger `alpha` is
 #' chosen. For small values this effect is, however, mostly
 #' negligible.
 #'
@@ -15,9 +15,9 @@
 #' component and variable using a Beta prior.
 #' 
 #' @param size Number of trials (one or more).
-#' @param alpha2 A non-negative scalar acting as regularization
+#' @param alpha A non-negative scalar acting as regularization
 #'     parameter. Can be regarded as adding
-#'     `alpha2` observations equal to the population mean to each
+#'     `alpha` observations equal to the population mean to each
 #'     component.
 #' @param eps A numeric value in [0, 1). When greater than zero,
 #'     probabilities are truncated to be within in \[eps, 1-eps\].
@@ -33,13 +33,13 @@
 #'     Journal of Statistics. _Submitted manuscript_.
 #' @example examples/binomial.R
 #' @importFrom stats dbinom
-FLXMCbinomial = function(formula=.~., size = NULL, alpha2=0, eps=0)
+FLXMCbinomial = function(formula=.~., size = NULL, alpha=0, eps=0)
 {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCbinomial")
 
     stopifnot(is.numeric(eps), length(eps) == 1, eps >= 0, eps < 1)
-    stopifnot(is.numeric(alpha2), length(alpha2) == 1, alpha2 >= 0)
+    stopifnot(is.numeric(alpha), length(alpha) == 1, alpha >= 0)
     
     z@preproc.y <- function(y) {
         if(any(y < 0, na.rm=TRUE))
@@ -74,8 +74,8 @@ FLXMCbinomial = function(formula=.~., size = NULL, alpha2=0, eps=0)
                 component$size = size
             }
             component$ymarg <- colMeans(y, na.rm=TRUE)/component$size
-            component$b_alpha <- component$ymarg*alpha2
-            component$b_beta <- (1-component$ymarg)*alpha2
+            component$b_alpha <- component$ymarg*alpha
+            component$b_beta <- (1-component$ymarg)*alpha
         }
 
         if(component$has_na) {
