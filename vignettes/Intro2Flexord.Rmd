@@ -338,9 +338,10 @@ can be used also in the further capabilities of **flexclust**.
 
 We also offer drivers for two distributions for ordinal data:
 ```{r ordinal_m2}
-flexmix(risk~1,  k = 3, model = FLXMCbinomial(size = 5))
-flexmix(risk~1, k = 3,
-        model = FLXMCbetabinom(size = 6, alpha2 = 1)) #the hypothetical example where response level 6 was never picked
+flexmix(risk~1,  k=3,
+        model=FLXMCbinomial(size=5))
+flexmix(risk~1, k=3,
+        model=FLXMCbetabinom(size=5, alpha2=1))
 ```
 @Dominik, bitte bring du hier was sinnvolles zum herzeigen ein, falls was fehlt.
 Also here, we can of course use the capabilities of `stepFlexmix`, and plotting and booting functions
