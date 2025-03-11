@@ -51,9 +51,9 @@
 #'   *Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering.*
 #'   Journal of Classification, 24(2), 155-181
 #' @example examples/regnorm.R
-FLXMCregmvnorm <- function(formula=.~., zeta_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
+FLXMCregnorm <- function(formula=.~., zeta_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
-             name="FLXMCregmvnorm")
+             name="FLXMCregnorm")
 
 
     if(is.null(zeta_p) && is.null(G)) {
