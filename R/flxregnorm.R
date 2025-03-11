@@ -38,7 +38,6 @@
 #'             variance divided by the square of the number of components
 #'             is used as per Fraley and Raftery (2007).
 #' @importFrom methods new
-#' @importFrom stats cov.wt
 #' @importFrom mvtnorm dmvnorm
 #' @import flexmix
 #' @export
