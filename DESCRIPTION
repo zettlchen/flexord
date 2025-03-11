@@ -13,7 +13,8 @@ Authors@R:
              comment=c(ORCID='0000-0001-8850-3312')),
       person("Bettina", "Gruen", role = c('ctb'),
              email = "Bettina.Gruen@R-project.org",
-             comment = c(ORCID = "0000-0001-7265-4773")))
+             comment = c(ORCID = "0000-0001-7265-4773")),
+      person("Ivan", "Kondofersky", role = c('ctb')))
 Description: Extends the capabilities for flexible partitioning and model-based clustering
        available in the packages 'flexclust' and 'flexmix' to handle ordinal and
        mixed-with-ordinal data types via new distance, centroid and driver functions that
