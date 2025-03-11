@@ -329,8 +329,6 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
     origCent
   }
 
-<<<<<<< Updated upstream
-=======
   newgendist <- if("xclass" %in% names(formals(genDist))) {
     function(x) genDist(x, xclass = xclass)
   } else {
@@ -338,7 +336,6 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
   }
 
 
->>>>>>> Stashed changes
   family_new <- kccaFamily(
     name     = family@name,
     dist     = newdist,
