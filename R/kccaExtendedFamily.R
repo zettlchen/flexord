@@ -217,8 +217,9 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
                                xrange=NULL, xmethods=NULL,
                                trim=0, groupFun='minSumClusters') { #the last two are unused leftovers from kcca, should probably not provide them
   which <- match.arg(which)
-  if (which == 'kModes') {
-    distGen <- NULL
+  if(which=='kModes') {
+    
+    distGen <- \(x) NULL
     dstfnc <- distSimMatch
     cent <- function(x, genDist) {
         centMode(x)
@@ -328,6 +329,16 @@ kccaExtendedFamilyGenDist = function(x, family, genDist) {
     origCent
   }
 
+<<<<<<< Updated upstream
+=======
+  newgendist <- if("xclass" %in% names(formals(genDist))) {
+    function(x) genDist(x, xclass = xclass)
+  } else {
+    genDist
+  }
+
+
+>>>>>>> Stashed changes
   family_new <- kccaFamily(
     name     = family@name,
     dist     = newdist,
