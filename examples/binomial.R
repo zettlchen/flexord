@@ -22,10 +22,10 @@ dat <- lapply(probs, \(p) {
 true_clusters <- rep(1:4, rep(N, k))
 
 # Cluster without regularization
-m1 <- stepFlexmix(dat~1, model=FLXMCbinomial(size=size, alpha2=0), k=k)
+m1 <- stepFlexmix(dat~1, model=FLXMCregbinom(size=size, alpha=0), k=k)
 
 # Cluster with regularization
-m2 <- stepFlexmix(dat~1, model=FLXMCbinomial(size=size, alpha2=1), k=k)
+m2 <- stepFlexmix(dat~1, model=FLXMCregbinom(size=size, alpha=1), k=k)
 
 # Both models are mostly able to reconstruct the true clusters (ARI ~ 0.96)
 # (it's a very easy clustering problem)

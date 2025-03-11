@@ -9,7 +9,7 @@ my_iris <- subset(iris, select=setdiff(colnames(iris), "Species")) |>
 
 # cluster one model with a scale parameter similar to the default for 3 components
 m1 <- stepFlexmix(my_iris~1,
-                 model=FLXMCregnorm(xi_p=c(0.23, 0.06, 1.04, 0.19)),
+                 model=FLXMCregmvnorm(zeta_p=c(0.23, 0.06, 1.04, 0.19)),
                  k=3)
 
 summary(m1)

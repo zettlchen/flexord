@@ -13,12 +13,12 @@
 #' normal distribution are used, which are:
 #' 
 #' * Normal prior with parameter `mu_p` and `sigma^2/kappa_p` for the mean.
-#' * Inverse Gamma prior with parameters `nu_p/2` and `xi_p^2/2` for the
+#' * Inverse Gamma prior with parameters `nu_p/2` and `zeta_p^2/2` for the
 #'   variance.
 #'
 #' `mu_p` is computed from the data as the overall means across all components.
 #'
-#' A value for the scale hyperparameter `xi_p` may be specified directly.
+#' A value for the scale hyperparameter `zeta_p` may be specified directly.
 #' Otherwise the empirical variance divided by the square of the number of
 #' components is used as per Fraley and Raftery (2007). In which case the
 #' number of components (parameter `G`) needs to be specified.
@@ -29,12 +29,12 @@
 #'        [stats::update.formula()]. Only the left-hand side (response)
 #'        of the formula is used. Default is to
 #'        use the original model formula specified in [flexmix::flexmix()].
-#' @param G Number of components in the mixture model (not used if xi_p is given)
+#' @param G Number of components in the mixture model (not used if zeta_p is given)
 #' @param kappa_p Shrinkage parameter. Functions as if you added
 #'                `kappa_p` observations according to the population mean to
 #'                each component (hyperparameter for IG prior)
 #' @param nu_p Degress of freedom (hyperparameter for IG prior)
-#' @param xi_p Scale (hyperparameter for IG prior). If not given the empirical
+#' @param zeta_p Scale (hyperparameter for IG prior). If not given the empirical
 #'             variance divided by the square of the number of components
 #'             is used as per Fraley and Raftery (2007).
 #' @importFrom methods new
@@ -51,13 +51,13 @@
 #'   *Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering.*
 #'   Journal of Classification, 24(2), 155-181
 #' @example examples/regnorm.R
-FLXMCregnorm <- function(formula=.~., xi_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
+FLXMCregmvnorm <- function(formula=.~., zeta_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
-             name="FLXMCregnorm")
+             name="FLXMCregmvnorm")
 
 
-    if(is.null(xi_p) && is.null(G)) {
-        stop("either parameter xi_p or G is needed")
+    if(is.null(zeta_p) && is.null(G)) {
+        stop("either parameter zeta_p or G is needed")
     }
 
     z@defineComponent <- function(para) {
@@ -88,10 +88,10 @@ FLXMCregnorm <- function(formula=.~., xi_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
             }, double(1))
         }
 
-        if(is.null(xi_p) && !is.null(G)) {
-            xi_p2 = component$var_data / G^2
+        if(is.null(zeta_p) && !is.null(G)) {
+            zeta_p2 = component$var_data / G^2
         } else {
-            xi_p2 = xi_p
+            zeta_p2 = zeta_p
         }
 
 
@@ -100,7 +100,7 @@ FLXMCregnorm <- function(formula=.~., xi_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
 
         muhat1 = (nk*ykbar + kappa_p*component$mu_p)/(kappa_p + nk)
 
-        s2hat_numer1 = xi_p2 + (kappa_p*nk)/(kappa_p+nk)*(ykbar - component$mu_p)^2
+        s2hat_numer1 = zeta_p2 + (kappa_p*nk)/(kappa_p+nk)*(ykbar - component$mu_p)^2
         s2hat_numer2 = rowSums(w * (t(y) - ykbar)^2)
         s2hat_denom = nu_p + nk + 3
         s2hat = (s2hat_numer1+s2hat_numer2) / s2hat_denom

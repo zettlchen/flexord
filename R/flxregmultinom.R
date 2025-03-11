@@ -3,12 +3,12 @@
 #' This model driver can be used to cluster data using a multinomial
 #' distribution.
 #' 
-#' Using a regularization parameter `alpha2` greater than zero
-#' acts as adding `alpha2` observations conforming to the population
+#' Using a regularization parameter `alpha` greater than zero
+#' acts as adding `alpha` observations conforming to the population
 #' mean to each component. This can be used to avoid degenerate
 #' solutions. It also has the effect
 #' that clusters become more similar to each other the larger
-#' `alpha2` is chosen. For small values it is mostly negligible however.
+#' `alpha` is chosen. For small values it is mostly negligible however.
 #'
 #' For regularization we compute the MAP estimates for the multinomial
 #' distribution using the Dirichlet distribution as prior, which is 
@@ -16,9 +16,9 @@
 #' correspond to the marginal distribution of the variable across all
 #' observations.
 #'
-#' @param size Values are assumed to be integers in `1:size`.
-#' @param alpha2 A non-negative scalar acting as regularization
-#'     parameter. Can be regarded as adding `alpha2` observations
+#' @param r Number of different categories. Values are assumed to be integers in `1:r`.
+#' @param alpha A non-negative scalar acting as regularization
+#'     parameter. Can be regarded as adding `alpha` observations
 #'     equal to the population mean to each component.
 #' @param formula A formula which is interpreted relative to the formula
 #'        specified in the call to [flexmix::flexmix()] using
@@ -36,8 +36,8 @@
 #'   Austrian Journal of Statistics. _Submitted manuscript_.
 #' @export
 #' @example examples/multinom.R
-FLXMCregmultinom = function(formula=.~., size, alpha2=0) {
-    stopifnot(is.numeric(alpha2), length(alpha2) == 1, alpha2 >= 0)
+FLXMCregmultinom = function(formula=.~., r, alpha=0) {
+    stopifnot(is.numeric(alpha), length(alpha) == 1, alpha >= 0)
 
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregmultinom")
@@ -46,7 +46,7 @@ FLXMCregmultinom = function(formula=.~., size, alpha2=0) {
         # as matrix in 0/1 coding
         yd = lapply(seq_len(ncol(y)), \(col) {
             #uvalues = sort(unique(y[, col]))
-            uvalues = seq_len(size)
+            uvalues = seq_len(r)
             cns = paste0(colnames(y)[col], uvalues)
 
             xx = lapply(uvalues, \(value) {
@@ -60,11 +60,11 @@ FLXMCregmultinom = function(formula=.~., size, alpha2=0) {
 
     z@preproc.y <- function(y) {
         if (any(y < 1, na.rm=TRUE)) {
-            stop("values < 1 not allowed (values need to be in 1:size)")
+            stop("values < 1 not allowed (values need to be in 1:r)")
         }
 
-        if(any(y > size)) {
-            stop("values larger than size not allowed (values need to be in 1:size)")
+        if(any(y > r)) {
+            stop("values larger than size not allowed (values need to be in 1:r)")
         }
 
         y
@@ -94,12 +94,12 @@ FLXMCregmultinom = function(formula=.~., size, alpha2=0) {
         if(length(component) == 0) {
             component$yd = .as01(y)
             component$ymarg = colMeans(component$yd) |> unname()
-            component$b_alpha = component$ymarg*alpha2
-            component$b_beta = (1-component$ymarg)*alpha2
+            component$b_alpha = component$ymarg*alpha
+            component$b_beta = (1-component$ymarg)*alpha
         }
 
         p = with(component, (b_alpha + colSums(w*yd, na.rm=TRUE)) / (b_alpha+b_beta+sum(w))) |>
-            matrix(ncol=ncol(y), nrow=size)
+            matrix(ncol=ncol(y), nrow=r)
         component$probs = p
         component$df = ncol(y)
         defineComponent(component)
