@@ -43,10 +43,14 @@ FLXMCregmultinom = function(formula=.~., r, alpha=0) {
              name="FLXMCregmultinom")
 
     .as01 = function(y) {
+        if(length(r) == 1) {
+            r = rep(r, ncol(y))
+        }
+
         # as matrix in 0/1 coding
         yd = lapply(seq_len(ncol(y)), \(col) {
             #uvalues = sort(unique(y[, col]))
-            uvalues = seq_len(r)
+            uvalues = seq_len(r[col])
             cns = paste0(colnames(y)[col], uvalues)
 
             xx = lapply(uvalues, \(value) {
@@ -63,8 +67,12 @@ FLXMCregmultinom = function(formula=.~., r, alpha=0) {
             stop("values < 1 not allowed (values need to be in 1:r)")
         }
 
-        if(any(y > r)) {
+        if(any(apply(y, 2, max) > r)) {
             stop("values larger than size not allowed (values need to be in 1:r)")
+        }
+
+        if(length(r) != 1 && length(r) != ncol(y)) {
+            stop("r must be either a scalar or a vector of length ncol(y)")
         }
 
         y
@@ -78,7 +86,8 @@ FLXMCregmultinom = function(formula=.~., r, alpha=0) {
 
         logLik <- function(x, y) {
             probmat = lapply(seq.int(ncol(y)), \(col) {
-                probs[, col][y[, col]]
+                #probs[, col][y[, col]]
+                probs[[col]][y[, col]]
             }) |> do.call(cbind, args=_) |>
                 `colnames<-`(colnames(y))
             rowSums(log(probmat))
@@ -98,10 +107,19 @@ FLXMCregmultinom = function(formula=.~., r, alpha=0) {
             component$b_beta = (1-component$ymarg)*alpha
         }
 
-        p = with(component, (b_alpha + colSums(w*yd, na.rm=TRUE)) / (b_alpha+b_beta+sum(w))) |>
-            matrix(ncol=ncol(y), nrow=r)
-        component$probs = p
-        component$df = ncol(y)
+        p = with(component, (b_alpha + colSums(w*yd, na.rm=TRUE)) / (b_alpha+b_beta+sum(w)))
+
+        csr = cumsum(r)
+        csrlag = c(1, head(csr, -1)+1)
+
+        # probabilities as list, so it's easier to compute the loglik
+        pl = mapply(\(a,b) {
+            p[a:b]
+        }, csrlag, csr, SIMPLIFY=FALSE)
+
+        component$probs = pl
+        #component$df = ncol(y)
+        component$df = sum(r-1)
         defineComponent(component)
     }
 
