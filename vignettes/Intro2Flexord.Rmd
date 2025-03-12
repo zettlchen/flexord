@@ -53,7 +53,7 @@ knitr::kable(
       "`kccaExtendedFamily`",
       "`FLXMCregnorm`",
       "`FLXMCregmultinom`",
-      "`FLXMCbinomial`",
+      "`FLXMCregbinom`",
       "`FLXMCbetabinomial`"
     ),    
     Method = c(
@@ -215,19 +215,19 @@ clustering of unordered categorical data via a regularized multinomial
 distribution. For this, we plug in the driver we provide into `flexmix`:
 
 ```{r nominal_m2}
+titanic_ncats = apply(data.matrix(titanic_df), 2, max)
 flexmix(formula = data.matrix(titanic_df) ~ 1, k = 3,
-        model = FLXMCregmultinom(size = 4)) 
+        model = FLXMCregmultinom(r = titanic_ncats)) 
 ```
 
 If in our application we are likely to obtain degenerate solutions, we
-can mitigate this risk by setting the $\alpha_2$ parameter
-greater 0. With this, we add $\alpha_2$ observations which are equal
+can mitigate this risk by setting the $\alpha$ parameter
+greater 0. With this, we pretend adding $\alpha$ observations which are equal
 to the population mean to each component (=cluster):
 
 ```{r nominal_m3}
 flexmix(data.matrix(titanic_df) ~ 1, k = 3,
-        model=FLXMCregmultinom(size = 4, alpha2 = (nrow(titanic_df)/3)*0.1)) #a moderate amount of noise
-
+        model=FLXMCregmultinom(r = titanic_ncats, alpha = 1)) #"add" 1 observation per component
 ```
 
 `flexmix` also offers a `step` method, where the EM algorithm for each `k` is
@@ -235,7 +235,7 @@ restarted `nrep` times, and only the maximum likelihood solution is retained:
 ```{r nominal_m4}
 (nom <- stepFlexmix(data.matrix(titanic_df)~1, k = 2:4,
                     nrep = 3, #please increase for real-life use
-                    model = FLXMCregmultinom(size = 4)))
+                    model = FLXMCregmultinom(r = titanic_ncats)))
 ```
 The output of this is the best out of three clusterings for 3 different values
 of `k`. We are also already provided with with different model selection criteria,
@@ -338,10 +338,10 @@ can be used also in the further capabilities of **flexclust**.
 
 We also offer drivers for two distributions for ordinal data:
 ```{r ordinal_m2}
-flexmix(risk~1,  k=3,
-        model=FLXMCbinomial(size=5))
 flexmix(risk~1, k=3,
-        model=FLXMCbetabinom(size=5, alpha2=1))
+        model=FLXMCregbinom(size=5))
+flexmix(risk~1, k=3,
+        model=FLXMCbetabinom(size=5, alpha=1))
 ```
 @Dominik, bitte bring du hier was sinnvolles zum herzeigen ein, falls was fehlt.
 Also here, we can of course use the capabilities of `stepFlexmix`, and plotting and booting functions
