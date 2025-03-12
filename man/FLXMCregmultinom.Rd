@@ -4,7 +4,7 @@
 \alias{FLXMCregmultinom}
 \title{FlexMix Driver for Regularized Multinomial Mixtures}
 \usage{
-FLXMCregmultinom(formula = . ~ ., size, alpha2 = 0)
+FLXMCregmultinom(formula = . ~ ., r, alpha = 0)
 }
 \arguments{
 \item{formula}{A formula which is interpreted relative to the formula
@@ -13,10 +13,10 @@ specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
 left-hand side (response) of the formula is used. Default is to
 use the original model formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{size}{Values are assumed to be integers in \code{1:size}.}
+\item{r}{Number of different categories. Values are assumed to be integers in \code{1:r}.}
 
-\item{alpha2}{A non-negative scalar acting as regularization
-parameter. Can be regarded as adding \code{alpha2} observations
+\item{alpha}{A non-negative scalar acting as regularization
+parameter. Can be regarded as adding \code{alpha} observations
 equal to the population mean to each component.}
 }
 \value{
@@ -27,12 +27,12 @@ This model driver can be used to cluster data using a multinomial
 distribution.
 }
 \details{
-Using a regularization parameter \code{alpha2} greater than zero
-acts as adding \code{alpha2} observations conforming to the population
+Using a regularization parameter \code{alpha} greater than zero
+acts as adding \code{alpha} observations conforming to the population
 mean to each component. This can be used to avoid degenerate
 solutions. It also has the effect
 that clusters become more similar to each other the larger
-\code{alpha2} is chosen. For small values it is mostly negligible however.
+\code{alpha} is chosen. For small values it is mostly negligible however.
 
 For regularization we compute the MAP estimates for the multinomial
 distribution using the Dirichlet distribution as prior, which is
