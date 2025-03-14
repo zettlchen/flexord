@@ -1,4 +1,6 @@
+*.swp
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+dontgit

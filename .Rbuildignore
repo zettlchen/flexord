@@ -11,3 +11,4 @@ figure-html/.+\.png$
 ^vignettes/.+_files$
 ^docs/
 ^flexord\.Rcheck
+^dontgit
