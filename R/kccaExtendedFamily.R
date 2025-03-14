@@ -219,7 +219,7 @@ kccaExtendedFamily <- function(which=c('kModes', 'kGDM2', 'kGower'),
   which <- match.arg(which)
   if(which=='kModes') {
     
-    distGen <- \(x) NULL
+    distGen <- \(x, xclass) NULL
     dstfnc <- distSimMatch
     cent <- function(x, genDist) {
         centMode(x)
