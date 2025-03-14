@@ -12,3 +12,5 @@ figure-html/.+\.png$
 ^docs/
 ^flexord\.Rcheck
 ^dontgit
+^doc$
+^Meta$
