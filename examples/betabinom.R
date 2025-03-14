@@ -24,19 +24,17 @@ true_clusters <- rep(1:4, rep(N, k))
 # Sample data is drawn from a binomial distribution but we fit
 # beta-binomial which is a slight mis-specification but the
 # beta-binomial can be seen as a generalized binomial.
-m <- flexmix(dat~1, model=FLXMCbetabinom(size=size, alpha2=0),
+m <- flexmix(dat~1, model=FLXMCregbetabinom(size=size, alpha=0),
              cluster = true_clusters)
 
-\donttest{
 # Cluster without regularization
-m1 <- stepFlexmix(dat~1, model=FLXMCbetabinom(size=size, alpha2=0), k=k)
+m1 <- stepFlexmix(dat~1, model=FLXMCregbetabinom(size=size, alpha=0), k=k)
 
 # Cluster with regularization
-m2 <- stepFlexmix(dat~1, model=FLXMCbetabinom(size=size, alpha2=1), k=k)
+m2 <- stepFlexmix(dat~1, model=FLXMCregbetabinom(size=size, alpha=1), k=k)
 
 # Both models are mostly able to reconstruct the true clusters (ARI ~ 0.95)
 # (it's a very easy clustering problem)
 # Small values for the regularization don't seem to affect the ARI (much)
 randIndex(clusters(m1), true_clusters)
 randIndex(clusters(m2), true_clusters)
-}
