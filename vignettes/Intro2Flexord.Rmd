@@ -212,7 +212,9 @@ tools. For this, we refer to the documentation available in
 
 We also offer an algorithm specifically designed for model-based
 clustering of unordered categorical data via a regularized multinomial
-distribution. For this, we plug in the driver we provide into `flexmix`:
+distribution. The multinomial driver also supports varying number of categories
+between variables. Then we call `flexmix` with a model driver
+specifying the number of categories:
 
 ```{r nominal_m2}
 titanic_ncats = apply(data.matrix(titanic_df), 2, max)
@@ -220,14 +222,15 @@ flexmix(formula = data.matrix(titanic_df) ~ 1, k = 3,
         model = FLXMCregmultinom(r = titanic_ncats)) 
 ```
 
-If in our application we are likely to obtain degenerate solutions, we
-can mitigate this risk by setting the $\alpha$ parameter
-greater 0. With this, we pretend adding $\alpha$ observations which are equal
-to the population mean to each component (=cluster):
+As we have to estimate many category probabilities across multiple
+clusters some of those may become numerically zero. To avoid this
+we may use the regularization parameter $\alpha$, which acts if we
+added $\alpha$ observations according to the population mean to each
+component:
 
 ```{r nominal_m3}
 flexmix(data.matrix(titanic_df) ~ 1, k = 3,
-        model=FLXMCregmultinom(r = titanic_ncats, alpha = 1)) #"add" 1 observation per component
+        model=FLXMCregmultinom(r = titanic_ncats, alpha = 1))
 ```
 
 `flexmix` also offers a `step` method, where the EM algorithm for each `k` is
@@ -238,9 +241,13 @@ restarted `nrep` times, and only the maximum likelihood solution is retained:
                     model = FLXMCregmultinom(r = titanic_ncats)))
 ```
 The output of this is the best out of three clusterings for 3 different values
-of `k`. We are also already provided with with different model selection criteria,
+of `k`. We are also already provided with different model selection criteria,
+namely, AIC, BIC and ICL.
+<!--
+TODO: I dont find that very clear here
 and, depending on the criterion, we would choose either the 2 or the 4 cluster
 solution.
+-->
 
 Similar to package **flexclust** in the partitioning case, package
 **flexmix** also offers various plotting methods for the returned
@@ -336,16 +343,27 @@ can be used also in the further capabilities of **flexclust**.
 
 ### Model-based approach
 
-We also offer drivers for two distributions for ordinal data:
+We also offer drivers for two distributions for ordinal data, which
+are the binomial distribution and its extension the beta-binomial distribution:
 ```{r ordinal_m2}
-flexmix(risk~1, k=3,
-        model=FLXMCregbinom(size=5))
-flexmix(risk~1, k=3,
-        model=FLXMCbetabinom(size=5, alpha=1))
+flexmix(risk~1, k=3, model=FLXMCregbinom(size=5))
+flexmix(risk~1, k=3, model=FLXMCregbetabinom(size=5, alpha=1))
 ```
-@Dominik, bitte bring du hier was sinnvolles zum herzeigen ein, falls was fehlt.
-Also here, we can of course use the capabilities of `stepFlexmix`, and plotting and booting functions
-that are built upon it. For example usage see **Example 1**.
+
+In both cases we specify the number of trials of the binomial distribution
+(`size`). For both distributions we can also use a regularization parameter
+`alpha` that draws the component estimates towards the population mean. While
+this incurs small distortions it can be helpful to avoid
+boundary estimates.
+
+The beta-binomial distribution is parameterized by two parameters `a` and
+`b` and is therefore more flexible than the binomial. It may potentially
+perform better in more difficult clustering scenarios even if we assume
+the original data was drawn from a binomial mixture (@ernst_ordinal_2025).
+Your mileage may vary.
+
+We can further use the capabilities of `stepFlexmix` and the
+corresponding plot functions. See **Example 1**.
 
 ### Treating the data as purely nominal
 
@@ -376,11 +394,25 @@ avoid degenerate solutions):
 
 ```{r numerical}
 flexmix(risk ~ 1, k = 3,
-        model = FLXMCregnorm(kappa_p = (nrow(risk)/3)*0.1, #regularization parameter
+        model = FLXMCregnorm(kappa_p = 0.1, #regularization parameter
                              G = 3)) #number of clusters, used for scale calculation
 ```
-@Dominik, please help me out here. I have no idea what to do with all of these
-parameters, and how to usefully present them.
+
+This implements the univariate case with different variances from
+@fraley2007bayesian . In the source paper they use an inverse gamma distribution
+as conjugate prior. Using the prior we can again avoid boundary estimates. Most
+notably the shrinkage parameter `kappa_p` (the suffix `_p` stands for prior),
+acts as if we added `kappa_p` observations according to the population mean
+to each component.
+
+The scale parameter `zeta_p` is computed by default as the empirical
+variance divided by the square of the number of components. In this
+case we need to pass `G=3`. We could however specify a value for
+`zeta_p` and then omit the parameter `G` (we can't have both
+parameter at the same time, therefore `zeta_p` takes precedence if both were
+given).
+
+For more details see @fraley2007bayesian or package `Mclust`.
 
 Again, the model can be plugged into all of the further tools offered by **flexmix**,
 for some example usages see **Example 1**.
