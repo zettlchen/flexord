@@ -24,9 +24,8 @@ methods we provide [here](https://dernst.github.io/flexord/articles/Intro2Flexor
 
 You can install the developer version of the package via:
 
-<code>
+```
 devtools::install_github("dernst/flexord")
-</code>
-
+```
 
 The stable version will soon be available on CRAN (via `install.packages("flexord")`).
