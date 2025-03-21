@@ -4,7 +4,7 @@
 \alias{FLXMCregbinom}
 \title{FlexMix Driver for Regularized Binomial Mixtures}
 \usage{
-FLXMCregbinom(formula = . ~ ., size = NULL, alpha = 0, eps = 0)
+FLXMCregbinom(formula = . ~ ., size = NULL, has_na = FALSE, alpha = 0, eps = 0)
 }
 \arguments{
 \item{formula}{A formula which is interpreted relative to the
@@ -14,6 +14,11 @@ of the formula is used. Default is to use the original model
 formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
 \item{size}{Number of trials (one or more).}
+
+\item{has_na}{Boolean whether the data set may contain NA values. Default
+is FALSE. For data sets without NAs this parameter does not
+influence the estimates except that it's slightly faster
+when the absence of NAs can be assumed.}
 
 \item{alpha}{A non-negative scalar acting as regularization
 parameter. Can be regarded as adding
