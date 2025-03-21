@@ -2,6 +2,8 @@
 title: "Introduction to Flexible Clustering of (Mixed-With-)Ordinal Data"
 output:
   rmarkdown::html_vignette:
+    fig_width: 8 
+    fig_height: 6
     toc: true
     toc_depth: 2
 bibliography: vignettes.bib
@@ -14,6 +16,7 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  out.width = "60%",
   comment = "#>"
 )
 ```
@@ -146,7 +149,7 @@ kcca(titanic_df, k = 4, family = kccaExtendedFamily('kModes'))
 ```
 Let us assume that for some reason we are unhappy with the mode as a centroid,
 and rather want to use an optimized centroid value, by choosing the factor level
-for which Simple Matching distance^[i.e., the mean disagreement count] is minimal:
+for which Simple Matching distance^[I.e., the mean disagreement count.] is minimal:
 ```{r nominal_p3}
 kcca(titanic_df, k = 4,
      family = kccaFamily(dist = distSimMatch, 
@@ -165,7 +168,8 @@ the solution with the minimum within cluster distance. This can be
 done for one specific number of clusters `k` or several values `k`:
 
 ```{r nominal_p4}
-stepFlexclust(data.matrix(titanic_df), k = 2:4, nrep = 3, 
+titanic_dm <- data.matrix(titanic_df)
+stepFlexclust(titanic_dm, k = 2:4, nrep = 3, 
               family = kccaExtendedFamily('kModes')) 
 ```
 
@@ -188,11 +192,11 @@ the original data set, and the stability of these partitions is tested
 via the Adjusted Rand Index [@hubert_arabie_1985]:
 
 ```{r nominal_p5}
-(nom <- bootFlexclust(data.matrix(titanic_df),
-                      k = 2:4, nrep = 3, nboot = 5, 
+(nom <- bootFlexclust(titanic_dm, k = 2:4, nrep = 3, nboot = 5, 
                       family = kccaExtendedFamily('kModes')))
 ```
-Note that ridiculously few repetitions are used for the sake of having a short run time. 
+Note that ridiculously few repetitions are used for the sake of having
+a short run time. Clearly `nboot` should be increased in applications. 
 
 The resulting ARIs can be quickly visualized via a predefined plotting method:
 ```{r nominal_p6}
@@ -202,8 +206,8 @@ plot(nom)
 Our plot indicates that out of the 2 to 4 cluster solutions, a three
 cluster solution has the highest median ARI out of 5 runs.
 
-Now, after deciding on a suitable cluster number, we could select the
-corresponding cluster solution from `kcca` or `stepFlexclust`, and
+Now, after deciding on a suitable number of clusters, we could select
+the corresponding cluster solution from `kcca` or `stepFlexclust`, and
 make use of the further visualization, prediction, and other
 tools. For this, we refer to the documentation available in
 @leisch_toolbox_2006 and @dolnicar_market_2018.
@@ -212,46 +216,49 @@ tools. For this, we refer to the documentation available in
 
 We also offer an algorithm specifically designed for model-based
 clustering of unordered categorical data via a regularized multinomial
-distribution. The multinomial driver also supports varying number of categories
-between variables. Then we call **flexmix** with a model driver
-specifying the number of categories:
+distribution. The multinomial driver also supports varying number of
+categories between variables. We call **flexmix** using the model
+driver `FLXMCregmultinom()` where we specify via the argument `r` the
+number of categories for each variable:
 
 ```{r nominal_m2}
-titanic_ncats = apply(data.matrix(titanic_df), 2, max)
-flexmix(formula = data.matrix(titanic_df) ~ 1, k = 3,
+titanic_ncats <- apply(titanic_dm, 2, max)
+flexmix(formula = titanic_dm ~ 1, k = 3,
         model = FLXMCregmultinom(r = titanic_ncats)) 
 ```
 
-As we have to estimate many category probabilities across multiple
-clusters some of those may become numerically zero. To avoid this
-we may use the regularization parameter $\alpha$, which acts if we
-added $\alpha$ observations according to the population mean to each
-component:
+As we are estimating many category probabilities across multiple
+clusters, some of those may become numerically zero, resulting in a
+degenerate distribution. To avoid this we may use the regularization
+parameter $\alpha$, which acts if we added $\alpha$ observations
+according to the population mean to each component:
 
 ```{r nominal_m3}
-flexmix(data.matrix(titanic_df) ~ 1, k = 3,
-        model=FLXMCregmultinom(r = titanic_ncats, alpha = 1))
+flexmix(titanic_dm ~ 1, k = 3,
+        model = FLXMCregmultinom(r = titanic_ncats, alpha = 1))
 ```
 
-**flexmix** also offers a `step` method, where the EM algorithm for each `k` is
-restarted `nrep` times, and only the maximum likelihood solution is retained:
+**flexmix** also provides function `stepFlexmix()`, where the EM
+algorithm for each `k` is restarted `nrep` times, and only the maximum
+likelihood solution is retained:
 ```{r nominal_m4}
-(nom <- stepFlexmix(data.matrix(titanic_df)~1, k = 2:4,
-                    nrep = 3, #please increase for real-life use
+(nom <- stepFlexmix(titanic_dm ~ 1, k = 2:4,
+                    nrep = 3, # please increase for real-life use
                     model = FLXMCregmultinom(r = titanic_ncats)))
 ```
-The output of this is the best out of three clusterings for 3 different values
-of `k`. We are also already provided with different model selection criteria,
-namely, AIC, BIC and ICL.
-<!--
-TODO: I dont find that very clear here
-and, depending on the criterion, we would choose either the 2 or the 4 cluster
-solution.
--->
+
+The output provides an overview on the best solutions out of three EM
+runs for 3 different values of `k`. For each solution, it is indicated
+how many iterations of the EM algorithm were performed (`iter`), if
+the EM algorithm converged (`converged`), the number of components in
+the final solution (`k`) and the number of components the EM algorithm
+was initialized with (`k0`) as well as the maximum log-likelihood
+(`logLik`) and results for different model selection criteria, namely,
+AIC, BIC and ICL.
 
 Similar to package **flexclust** in the partitioning case, package
 **flexmix** also offers various plotting methods for the returned
-objects. We just showcase one here for simplicity:
+objects. We just showcase here one:
 
 ```{r nominal_m5}
 plot(nom)
@@ -259,7 +266,7 @@ plot(nom)
 
 For more information on the further methods and utilities offered,
 check out the documentation for **flexmix**
-(`browseVignettes('flexmix')`).
+(see for example `browseVignettes('flexmix')`).
 
 ## Example 2: Clustering purely ordinal data
 
@@ -267,8 +274,8 @@ Our next example data set is from a survey conducted among 563
 Australians in 2015 where they indicated on a scale from 1-5 how
 inclined they are to take 6 types of risks.  It consists of purely
 ordinal variables without missing values, and the response level
-length is the same for all variables. 
-
+length is the same for all variables. We load the data set and inspect
+it:
 
 ```{r ordinal_1}
 data("risk", package = "flexord")
@@ -279,14 +286,16 @@ colnames(risk)
 ### Partitioning approach
 
 In our package, we offer two partitioning methods designed for ordinal
-data: Firstly, we can apply Gower's distance from `distGower` to
-purely ordinal data, which results in using Manhattan distance (as
-provided also in `flexclust::distManhattan`) with previous scaling as
-described by @kaufman_finding_1990 and Gower's upweighing of
-non-missing values:
+data based on either Gower's distance or GDM2 distance. 
+
+Applying Gower's distance as implemented in `distGower` to purely
+ordinal data corresponds to using Manhattan distance (as provided also
+in `flexclust::distManhattan`) with previous scaling as described by
+@kaufman_finding_1990 and Gower's upweighing of non-missing
+values. The clustering can be performed using:
 
 ```{r ordinal_p2}
-kcca(risk, k = 4, family = kccaExtendedFamily('kGower'))
+kcca(risk, k = 3, family = kccaExtendedFamily('kGower'))
 ```
 
 The default centroid for this family is the general purpose optimizer
@@ -296,42 +305,43 @@ ordinal data with no missing values, we could also choose the median
 as a centroid:
 
 ```{r ordinal_p3}
-kcca(risk, k = 4,
+kcca(risk, k = 3,
      family = kccaExtendedFamily('kGower', cent = centMedian))
 ```
 
 This results in kMedians with previous scaling, and non-missing value
-upweighing^[Note to selves: Strictly, it doesn't, as Fritz never made
-his centMedianNA public]. In our `risk` example with no NAs and equal
-level lengths for all variables, `flexclust::kccaFamily('kmedians')`
-would suffice, but there are still many data situations where the
-`kGower` approach will be preferable.
+upweighing. In our `risk` example with no NAs and equal response level
+lengths for all variables, `flexclust::kccaFamily('kmedians')` would
+suffice, but there are still many data situations where the `"kGower"`
+approach will be preferable.
 
 As a second alternative designed specifically for ordinal data without
-missing values, we implement the GDM2 distance for ordinal data by
-@walesiak_finding_2010, which conduct only relational operations on
-ordinal variables.  We have reformulated it for use in K-centroids
-analysis in @ernst_ordinal_2025, and implemented it in the package:
+missing values, we implement the GDM2 distance for ordinal data
+suggested by @walesiak_finding_2010, which conducts only relational
+operations on ordinal variables.  We reformulated this distance for
+use in K-centroids clustering in @ernst_ordinal_2025, and implemented
+it in the package such that one can use it for clustering via:
 
 ```{r ordindal_p4}
 kcca(risk, k = 3, family = kccaExtendedFamily('kGDM2'))
 ```
 
-Same as in `kGower`, a default general optimizer centroid is applied,
+Similar to `"kGower"`, a default general optimizer centroid is applied,
 which we could replace as desired.
 
-Another parameter used in both `kGower` and `kGDM2` is `xrange`. Both
-algorithms require information on the range of the data object for
-data preprocessing, one for scaling, the other for transforming the
-data to empirical distributions. The range calculation can be
-influenced in the following ways: We can use the range of the whole
-`x` (argument `all`, the default for `kGDM2`), columnwise ranges
-(`xrange=columnwise`), a vector specifying the range of the data set,
-or a list of length `ncol(x)` with range vectors for each column.  Let
-us assume that the highest possible response to the `risk` questions
-was `Extremely often (6)`, but it was never chosen by any of the
-respondents. We can take the new assumed full range of the data into
-account:
+Another parameter used in both `"kGower"` and `"kGDM2"` is
+`xrange`. Both algorithms require information on the range of the
+variables of the data object for data pre-processing: `"kGower"` uses
+this for scaling, while `"kGDM2"` for transforming the data to
+empirical distributions. The range calculation can be influenced in
+the following ways: We can use the range of the whole `x` (argument
+`all`, the default for `"kGDM2"`), columnwise ranges (`xrange =
+"columnwise"`), a vector specifying the range across all variables in
+the data set, or a list of length `ncol(x)` with range vectors for
+each column.  Let us assume that the highest possible response to the
+`risk` questions was `Extremely often (6)`, but it was never chosen by
+any of the respondents. We can take the new assumed full range of the
+data into account:
 
 ```{r ordinal_p5}
 kcca(risk, k = 3,
@@ -343,27 +353,28 @@ can be used also in the further capabilities of **flexclust**.
 
 ### Model-based approach
 
-We also offer drivers for two distributions for ordinal data, which
-are the binomial distribution and its extension the beta-binomial distribution:
+We also offer model drivers for two component distributions suitable
+for ordinal data, which are the binomial distribution and its
+extension the beta-binomial distribution:
 ```{r ordinal_m2}
-flexmix(risk~1, k=3, model=FLXMCregbinom(size=5))
-flexmix(risk~1, k=3, model=FLXMCregbetabinom(size=5, alpha=1))
+flexmix(risk ~ 1, k = 3, model = FLXMCregbinom(size = 5))
+flexmix(risk ~ 1, k = 3, model = FLXMCregbetabinom(size = 5, alpha = 1))
 ```
 
 In both cases we specify the number of trials of the binomial distribution
 (`size`). For both distributions we can also use a regularization parameter
-`alpha` that draws the component estimates towards the population mean. While
+`alpha` that shrinkgs the component estimates towards the population mean. While
 this incurs small distortions it can be helpful to avoid
 boundary estimates.
 
 The beta-binomial distribution is parameterized by two parameters `a` and
 `b` and is therefore more flexible than the binomial. It may potentially
 perform better in more difficult clustering scenarios even if we assume
-the original data was drawn from a binomial mixture (@ernst_ordinal_2025).
+the original data was drawn from a binomial mixture [@ernst_ordinal_2025].
 Your mileage may vary.
 
 We can further use the capabilities of `stepFlexmix` and the
-corresponding plot functions. See **Example 1**.
+corresponding plot functions. 
 
 ### Treating the data as purely nominal
 
@@ -371,50 +382,47 @@ Treating ordered categorical data as unordered is a frequent approach. In fact,
 in our simulation study it was a quite competitive approach for model-based
 methods. However, applying `kmodes` to ordered data brought subpar results in
 the partitioning ambit [@ernst_ordinal_2025].
-For How-Tos, please look at **Example 1**.
 
 ### Treating the data as equidistant (=integer)
 
 Also treating ordered categorical data as integer values is at least
 as common as nominalization. In fact, some of the methods presented
-above, such as `kGower` - as used above on purely ordinal data without
+above, such as `"kGower"` - as used above on purely ordinal data without
 missing values - make only lax concessions towards
-ordinality. Depending on data characteristics and method group
+ordinality. Depending on data characteristics and specific method
 applied, this approach may also be a very good choice
 [@ernst_ordinal_2025].
 
 We do not offer any new methods for this in the partitioning ambit, as
-already many options are available in **flexclust**.
-
-In the model-based ambit we offer additional capabilities via
-`FLXMCregnorm`, which, as mentioned, is a driver for clustering with
-multivariate normal distributions while allowing for regularization
-(same as is the case for `FLXMCregmultinom`, regularization can help
-avoid degenerate solutions):
+already many options are available in **flexclust**. In the
+model-based ambit we offer additional capabilities via `FLXMCregnorm`,
+which, as mentioned, is a driver for clustering with multivariate
+normal distributions (assuming conditional independence) while
+allowing for regularization (as in the case for `FLXMCregmultinom` to
+help avoid degenerate solutions). One can proceed as follows to use
+the data-driven default regularization parameters as proposed by
+@fraley2007bayesian:
 
 ```{r numerical}
 params <- FLXMCregnorm_defaults(risk, kappa_p = 0.1, k = 3)
 flexmix(risk ~ 1, k = 3, model = FLXMCregnorm(params = params))
 ```
 
-This implements the univariate case with different variances from
-@fraley2007bayesian . In the source paper they use an inverse gamma distribution
-as conjugate prior. Using the prior we can again avoid boundary estimates. Most
-notably the shrinkage parameter `kappa_p` (the suffix `_p` stands for prior),
-acts as if we added `kappa_p` observations according to the population mean
-to each component.
+For details on the parameters used for regularization, see
+@fraley2007bayesian or package **mclust**. Here, we would only like to
+point out that the shrinkage parameter `kappa_p` (the suffix `_p`
+stands for prior), acts as if we added `kappa_p` observations
+according to the population mean to each component. Using
+`FLXMCregnorm_defaults` with the data and the number of components
+determines the scale parameter `zeta_p` by dividing the empirical
+variance by the square of the number of components. Thus we need to
+pass the data and `k = 3`. Alternatively, we could also specify a
+value for `zeta_p` and then omit the parameter `k`. Note that we
+cannot set both parameters at the same time and therefore, `zeta_p`
+takes precedence if both are given.
 
-The scale parameter `zeta_p` is computed by default as the empirical
-variance divided by the square of the number of components. In this
-case we need to pass `k = 3`. We could however specify a value for
-`zeta_p` and then omit the parameter `k` (we can't have both parameter
-at the same time, therefore `zeta_p` takes precedence if both were
-given).
-
-For more details see @fraley2007bayesian or package **Mclust**.
-
-Again, the model can be plugged into all of the further tools offered by **flexmix**,
-for some example usages see **Example 1**.
+Again, the model can be plugged into all of the further tools offered
+by **flexmix**.
 
 ## Example 3: Clustering mixed-type data with missing values
 ```{r mixed_1}
@@ -428,22 +436,23 @@ str(vacmot2)
 colMeans(is.na(vacmot2))*100 
 ```
 
-For our last example, we chose a merged data set that is shared in
-**flexclust**.  In **flexclust**, it is provided in the object
-`vacmot` as a $1000 \times 20$ matrix of binary responses to questions
-on travel motives posed to Australians in 2006, plus a separate data
-frame `vacmotdesc` with 12 demographic variables for each respondent.
+For our last example, we use a data set which is obtained by merging
+two data sets shared in package **flexclust**.  **flexclust** provides
+object `vacmot` consisting of a $1000 \times 20$ matrix of binary
+responses to questions on travel motives asked Australian tourists in
+2006, plus a separate data frame `vacmotdesc` with 12 demographic
+variables for each respondent.
 
-This data set has been thoroughly explored for clustering in the field
-of market segmentation research, see for example
+This data set has been thoroughly explored using clustering methods in
+the field of market segmentation research, see for example
 @dolnicar_investigation_2008. We now use it as a data example for a
 mixed-data case with a moderate amount of missingness.  For this, we
-chose 1 symmetric binary variable (Gender, which was collected as
-Male/Female in 2006), 2 numeric variables (Age and Vacation
-Behaviour^[Mean environmental friendly behaviour score, ranging from 1
-to 5]), 1 unordered categorical variable (Relationship Status), 1
+select one symmetric binary variable (Gender, which was collected as
+Male/Female in 2006), two numeric variables (Age and Vacation
+Behaviour^[Mean environmental friendly behavior score, ranging from 1
+to 5.]), one unordered categorical variable (Relationship Status), one
 ordered categorical variable (Income2, which is a recoding of
-`Income`), and 3 randomly selected asymmmetric binary variables (3 of
+`Income`), and three randomly selected asymmetric binary variables (3 of
 the 20 questions on whether a specific travel motive applies to a
 respondent). Missing values are present, but the percentage is
 low^[This is by choice. While Gower's distance is designed to handle
@@ -458,7 +467,7 @@ missingness percentages need to be treated with caution.].
 ### Partitioning approach
 
 Currently, we only offer one method for mixed-type data with missing
-values, which is `kGower` (scaling and distances as proposed by
+values, which is `"kGower"` (scaling and distances as proposed by
 @gower_1971 and @kaufman_finding_1990, and a general purpose optimizer
 centroid as provided in **flexclust**, but with NA omission): 
 
@@ -467,20 +476,21 @@ kcca(vacmot2, k = 3, family = kccaExtendedFamily('kGower'))
 ```
 
 In our example above, the default methods for each variable type are
-used (Simple Matching Distance for the categorically coded variables,
-squared Euclidean distance for the numerically/integer coded
-variables, Manhattan distance for ordinal variables, and Jaccard
-distance for logically coded variables).
+used (Simple Matching Distance for the categorical variables, squared
+Euclidean distance for the numerical/integer variables, Manhattan
+distance for ordinal variables, and Jaccard distance for logical
+variables).
 
 We could instead provide a vector of length `ncol(vacmot2)` where each
 distance measure to be used is specified. Let us assume that we have
-many outliers in the variable `Age`, that we consider
-`Vacation.Behaviour` an ordered factor as well, and that the three
-binary responses to vacation motives are symmetric instead of
-asymmetric^[meaning that 2 disagreements are just as important as 2
-agreements], and for this reason want to evaluate the first with
-Manhattan distance, and the latter with Euclidean distance^[we could
-achieve symmetric treatment also via Simple Matching Distance]:
+many outliers in the variable `Age`, that we woud like to consider
+`Vacation.Behaviour` an ordered factor as well in addition to
+`Income2`, and that the three binary responses to vacation motives
+should be treated symmetric instead of asymmetric^[Meaning that 2
+disagreements are just as important as 2 agreements.], and for this
+reason want to evaluate the first three with Manhattan distance, and
+the latter three with Euclidean distance^[We could achieve symmetric
+treatment also via Simple Matching Distance.]:
 
 ```{r mixed_3}
 colnames(vacmot2)
@@ -490,13 +500,13 @@ kcca(vacmot2, k = 3,
      family = kccaExtendedFamily('kGower', xmethods = xmthds))
 ```
 
-For `kGower`, all numeric/integer and ordered variables are scaled as
-proposed by @kaufman_finding_1990, by centering around their minimum
-and dividing by the range. This means that also for `kGower`, the
+For `"kGower"`, all numeric/integer and ordered variables are scaled as
+proposed by @kaufman_finding_1990, by shifting by the minimum
+and dividing by the range. This means that also for `"kGower"`, the
 range of the variables will influence the clustering results. Same as
-for `kGDM2` (**Example 2**), we can specify the range to be used in
-parameter `xrange`. In the case of `kGower`, the default value is
-`columnwise`, where the range for each column is calculated
+for `"kGDM2"` (**Example 2**), we can specify the range to be used in
+parameter `xrange`. In the case of `"kGower"`, the default value is
+`"columnwise"`, where the range for each column is calculated
 separately.
 
 Again, the distance, centroid and wrapper functions can be used in the
