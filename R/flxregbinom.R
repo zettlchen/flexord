@@ -16,20 +16,19 @@
 #' 
 #' @param size Number of trials (one or more).
 #' @param alpha A non-negative scalar acting as regularization
-#'     parameter. Can be regarded as adding
-#'     `alpha` observations equal to the population mean to each
-#'     component.
+#'     parameter. Can be regarded as adding `alpha` observations equal
+#'     to the population mean to each component.
 #' @param eps A numeric value in [0, 1). When greater than zero,
-#'     probabilities are truncated to be within in \[eps, 1-eps\].
+#'     probabilities are truncated to be within in \[`eps`, 1-`eps`\].
 #' @param formula A formula which is interpreted relative to the
 #'     formula specified in the call to [flexmix::flexmix()] using
 #'     [stats::update.formula()]. Only the left-hand side (response)
 #'     of the formula is used. Default is to use the original model
 #'     formula specified in [flexmix::flexmix()].
-#' @param has_na Boolean whether the data set may contain NA values. Default
-#'               is FALSE. For data sets without NAs this parameter does not
-#'               influence the estimates except that it's slightly faster
-#'               when the absence of NAs can be assumed.
+#' @param hasNA Boolean whether the data set may contain NA
+#'     values. Default is FALSE. For data sets without NAs, the same
+#'     results are obtained but it runs slightly faster when the
+#'     absence of NAs can be assumed.
 #' @return an object of class `"FLXC"`
 #' @export
 #' @references - Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B
@@ -37,7 +36,7 @@
 #'     Journal of Statistics. _Submitted manuscript_.
 #' @example examples/binomial.R
 #' @importFrom stats dbinom
-FLXMCregbinom = function(formula=.~., size = NULL, has_na=FALSE, alpha=0, eps=0)
+FLXMCregbinom = function(formula=.~., size = NULL, hasNA=FALSE, alpha=0, eps=0)
 {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregbinom")
@@ -70,8 +69,6 @@ FLXMCregbinom = function(formula=.~., size = NULL, has_na=FALSE, alpha=0, eps=0)
 
     z@fit <- function(x, y, w, component) {
         if(length(component) == 0) {
-            #component$has_na <- anyNA(y)
-
             if(is.null(size)) {
                 component$size <- apply(y, 2, max, na.rm=TRUE)
             } else {
@@ -82,7 +79,7 @@ FLXMCregbinom = function(formula=.~., size = NULL, has_na=FALSE, alpha=0, eps=0)
             component$b_beta <- (1-component$ymarg)*alpha
         }
 
-        if(has_na) {
+        if(hasNA) {
             p <- with(component,
                       (b_alpha + colSums(w*y, na.rm=TRUE)) /
                       (b_alpha+b_beta+size*colSums(w * !is.na(y))))

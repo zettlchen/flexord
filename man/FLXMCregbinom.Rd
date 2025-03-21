@@ -4,7 +4,7 @@
 \alias{FLXMCregbinom}
 \title{FlexMix Driver for Regularized Binomial Mixtures}
 \usage{
-FLXMCregbinom(formula = . ~ ., size = NULL, has_na = FALSE, alpha = 0, eps = 0)
+FLXMCregbinom(formula = . ~ ., size = NULL, hasNA = FALSE, alpha = 0, eps = 0)
 }
 \arguments{
 \item{formula}{A formula which is interpreted relative to the
@@ -15,18 +15,17 @@ formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
 \item{size}{Number of trials (one or more).}
 
-\item{has_na}{Boolean whether the data set may contain NA values. Default
-is FALSE. For data sets without NAs this parameter does not
-influence the estimates except that it's slightly faster
-when the absence of NAs can be assumed.}
+\item{hasNA}{Boolean whether the data set may contain NA
+values. Default is FALSE. For data sets without NAs, the same
+results are obtained but it runs slightly faster when the
+absence of NAs can be assumed.}
 
 \item{alpha}{A non-negative scalar acting as regularization
-parameter. Can be regarded as adding
-\code{alpha} observations equal to the population mean to each
-component.}
+parameter. Can be regarded as adding \code{alpha} observations equal
+to the population mean to each component.}
 
 \item{eps}{A numeric value in [0, 1). When greater than zero,
-probabilities are truncated to be within in [eps, 1-eps].}
+probabilities are truncated to be within in [\code{eps}, 1-\code{eps}].}
 }
 \value{
 an object of class \code{"FLXC"}
