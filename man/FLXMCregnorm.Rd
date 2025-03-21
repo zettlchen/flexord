@@ -13,9 +13,9 @@ specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
 of the formula is used. Default is to
 use the original model formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{params}{Prior parameters for normal mixtures. You may obtain default
-defaults from Fraley and Raftery (2007) using the function
-\code{FLXMCregnorm_defaults}.
+\item{params}{Prior parameters for normal mixtures. You may obtain
+default values according to Fraley and Raftery (2007) using
+\code{FLXMCregnorm_defaults()}.
 As the prior depends on the number of components it is probably not
 advisable to run \code{stepFlexmix} with more than one value of \code{k} at
 a time.}
@@ -26,12 +26,12 @@ an object of class \code{"FLXC"}
 \description{
 This model driver implements the regularization method as
 introduced by Fraley and Raftery (2007) for univariate normal
-mixtures. Default parameters for the regularization are taken from
-that paper.  We extend this to the multivariate case assuming
-independence between variables within components, i.e., we only
-implement the special case where the covariance matrix is
-diagonal. For more general applications of normal mixtures see
-package \pkg{mclust}.
+mixtures. Default parameters for the regularization according to
+that paper may be obtained using \code{FLXMCregnorm_defaults()}. We
+extend this to the multivariate case assuming independence between
+variables within components, i.e., we only implement the special
+case where the covariance matrix is diagonal. For more general
+applications of normal mixtures see package \pkg{mclust}.
 }
 \details{
 For the regularization the conjugate prior distributions for the
@@ -41,13 +41,6 @@ normal distribution are used, which are:
 \item Inverse Gamma prior with parameters \code{nu_p/2} and \code{zeta_p^2/2} for the
 variance.
 }
-
-\code{mu_p} is computed from the data as the overall means across all components.
-
-A value for the scale hyperparameter \code{zeta_p} may be specified directly.
-Otherwise the empirical variance divided by the square of the number of
-components is used as per Fraley and Raftery (2007). In which case the
-number of components (parameter \code{G}) needs to be specified.
 }
 \examples{
 library("flexmix")
@@ -60,32 +53,22 @@ my_iris <- subset(iris, select=setdiff(colnames(iris), "Species")) |>
     as.matrix()
 
 # cluster one model with a scale parameter similar to the default for 3 components
-m1 <- stepFlexmix(
-    my_iris~1,
-    model=FLXMCregnorm(
-        params=FLXMCregnorm_defaults(my_iris, zeta_p=c(0.23, 0.06, 1.04, 0.19))
-    ),
-    k=3)
-
-
+params <- FLXMCregnorm_defaults(my_iris, zeta_p = c(0.23, 0.06, 1.04, 0.19))
+m1 <- stepFlexmix(my_iris ~ 1, k = 3, 
+    model=FLXMCregnorm(params = params))
 summary(m1)
 
 # rand index of clusters vs species
 randIndex(clusters(m1), iris$Species)
 
 # cluster one model with default scale parameter
-m2 <- stepFlexmix(
-    my_iris~1,
-    model=FLXMCregnorm(
-        params=FLXMCregnorm_defaults(my_iris, G=3)
-    ),
-    k=3)
-
+params <- FLXMCregnorm_defaults(my_iris, k = 3)
+m2 <- stepFlexmix(my_iris ~ 1, k = 3,
+    model = FLXMCregnorm(params = params))
 summary(m2)
 
 # rand index of clusters vs species
 randIndex(clusters(m2), iris$Species)
-
 
 # rand index between both models (should be >= 0.8)
 randIndex(clusters(m1), clusters(m2))

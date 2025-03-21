@@ -393,7 +393,8 @@ multivariate normal distributions while allowing for regularization
 avoid degenerate solutions):
 
 ```{r numerical}
-flexmix(risk ~ 1, k = 3, model = FLXMCregnorm(params = FLXMCregnorm_defaults(risk, kappa_p=0.1, G=3)))
+params <- FLXMCregnorm_defaults(risk, kappa_p = 0.1, k = 3)
+flexmix(risk ~ 1, k = 3, model = FLXMCregnorm(params = params))
 ```
 
 This implements the univariate case with different variances from
@@ -405,9 +406,9 @@ to each component.
 
 The scale parameter `zeta_p` is computed by default as the empirical
 variance divided by the square of the number of components. In this
-case we need to pass `G=3`. We could however specify a value for
-`zeta_p` and then omit the parameter `G` (we can't have both
-parameter at the same time, therefore `zeta_p` takes precedence if both were
+case we need to pass `k = 3`. We could however specify a value for
+`zeta_p` and then omit the parameter `k` (we can't have both parameter
+at the same time, therefore `zeta_p` takes precedence if both were
 given).
 
 For more details see @fraley2007bayesian or package **Mclust**.
