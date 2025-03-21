@@ -3,13 +3,12 @@
 
 
 lbeta1 <- function(x, size, a, b) {
-    s <- 0:size #seq(from=0, to=size, by=1)
+    s <- 0:size
     uniquelb <- lbeta(a+s, b+size-s)
     uniquelb[x+1L]
 }
 
 digamma1 <- function(x, a, size) {
-    #s <- 0:size #seq(from=0, to=size, by=1)
     uniquedg <- digamma((0:size) + a)
     uniquedg[x+1L]
 }
