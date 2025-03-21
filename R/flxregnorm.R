@@ -29,14 +29,12 @@
 #'        [stats::update.formula()]. Only the left-hand side (response)
 #'        of the formula is used. Default is to
 #'        use the original model formula specified in [flexmix::flexmix()].
-#' @param G Number of components in the mixture model (not used if zeta_p is given)
-#' @param kappa_p Shrinkage parameter. Functions as if you added
-#'                `kappa_p` observations according to the population mean to
-#'                each component (hyperparameter for IG prior)
-#' @param nu_p Degress of freedom (hyperparameter for IG prior)
-#' @param zeta_p Scale (hyperparameter for IG prior). If not given the empirical
-#'             variance divided by the square of the number of components
-#'             is used as per Fraley and Raftery (2007).
+#' @param params Prior parameters for normal mixtures. You may obtain default
+#'        defaults from Fraley and Raftery (2007) using the function
+#'        `FLXMCregnorm_defaults`.
+#'        As the prior depends on the number of components it is probably not
+#'        advisable to run `stepFlexmix` with more than one value of `k` at
+#'        a time.
 #' @importFrom methods new
 #' @importFrom mvtnorm dmvnorm
 #' @import flexmix
@@ -49,15 +47,11 @@
 #' - Fraley, C, Raftery, AE (2007)
 #'   *Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering.*
 #'   Journal of Classification, 24(2), 155-181
+#' @seealso FLXMCregnorm_defaults
 #' @example examples/regnorm.R
-FLXMCregnorm <- function(formula=.~., zeta_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
+FLXMCregnorm <- function(formula=.~., params) {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregnorm")
-
-
-    if(is.null(zeta_p) && is.null(G)) {
-        stop("either parameter zeta_p or G is needed")
-    }
 
     z@defineComponent <- function(para) {
         predict <- function(x, ...){
@@ -80,28 +74,19 @@ FLXMCregnorm <- function(formula=.~., zeta_p=NULL, kappa_p=0.01, nu_p=3, G=NULL)
         n = nrow(y)
 
         if(length(component) == 0L) {
-            component$mu_p = colMeans(y)
-            #component$var_data = diag(cov.wt(y, method="unbiased")$cov)
-            component$var_data = 1/(n-1) * vapply(seq_len(ncol(y)), \(i) {
-                sum((y[,i] - component$mu_p[i])^2)
-            }, double(1))
+            #component = params
         }
-
-        if(is.null(zeta_p) && !is.null(G)) {
-            zeta_p2 = component$var_data / G^2
-        } else {
-            zeta_p2 = zeta_p
-        }
-
 
         nk = sum(w)
         ykbar = colSums(w*y)/nk
 
-        muhat1 = (nk*ykbar + kappa_p*component$mu_p)/(kappa_p + nk)
+        muhat1 = (nk*ykbar + params$kappa_p*params$mu_p)/(params$kappa_p + nk)
 
-        s2hat_numer1 = zeta_p2 + (kappa_p*nk)/(kappa_p+nk)*(ykbar - component$mu_p)^2
+        s2hat_numer1 =
+            params$zeta_p +
+            (params$kappa_p*nk)/(params$kappa_p+nk)*(ykbar - params$mu_p)^2
         s2hat_numer2 = rowSums(w * (t(y) - ykbar)^2)
-        s2hat_denom = nu_p + nk + 3
+        s2hat_denom = params$nu_p + nk + 3
         s2hat = (s2hat_numer1+s2hat_numer2) / s2hat_denom
 
 
@@ -111,5 +96,46 @@ FLXMCregnorm <- function(formula=.~., zeta_p=NULL, kappa_p=0.01, nu_p=3, G=NULL)
 
     z
 }
+
+
+#' Default parameters for regularized normal mixtures based on the data set
+#' @param x The data set to be clustered. Should be the same data set as is 
+#'          used in flexmix's model formula.
+#' @param G Number of components in the mixture model (not used if zeta_p is given)
+#' @param kappa_p Shrinkage parameter. Functions as if you added
+#'                `kappa_p` observations according to the population mean to
+#'                each component (hyperparameter for IG prior)
+#' @param nu_p Degress of freedom (hyperparameter for IG prior)
+#' @param zeta_p Scale (hyperparameter for IG prior). If not given the empirical
+#'             variance divided by the square of the number of components
+#'             is used as per Fraley and Raftery (2007).
+#' @export
+FLXMCregnorm_defaults <- function(x, zeta_p=NULL, kappa_p=0.01, nu_p=3, G=NULL) {
+    if(is.null(zeta_p) && is.null(G)) {
+        stop("either parameter zeta_p or G is needed")
+    }
+
+    params = list()
+    params$mu_p = colMeans(x)
+
+    n = nrow(x)
+
+    params$var_data = 1/(n-1) * vapply(seq_len(ncol(x)), \(i) {
+        sum((x[,i] - params$mu_p[i])^2)
+    }, double(1))
+
+    if(is.null(zeta_p) && !is.null(G)) {
+        zeta_p2 = params$var_data / G^2
+    } else {
+        zeta_p2 = zeta_p
+    }
+
+
+    params$kappa_p = kappa_p
+    params$nu_p = nu_p
+    params$zeta_p = zeta_p2
+    params
+}
+
 
 

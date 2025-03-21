@@ -4,13 +4,7 @@
 \alias{FLXMCregnorm}
 \title{FlexMix Driver for Regularized Multivariate Normal Mixtures}
 \usage{
-FLXMCregnorm(
-  formula = . ~ .,
-  zeta_p = NULL,
-  kappa_p = 0.01,
-  nu_p = 3,
-  G = NULL
-)
+FLXMCregnorm(formula = . ~ ., params)
 }
 \arguments{
 \item{formula}{A formula which is interpreted relative to the formula
@@ -19,17 +13,12 @@ specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
 of the formula is used. Default is to
 use the original model formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{zeta_p}{Scale (hyperparameter for IG prior). If not given the empirical
-variance divided by the square of the number of components
-is used as per Fraley and Raftery (2007).}
-
-\item{kappa_p}{Shrinkage parameter. Functions as if you added
-\code{kappa_p} observations according to the population mean to
-each component (hyperparameter for IG prior)}
-
-\item{nu_p}{Degress of freedom (hyperparameter for IG prior)}
-
-\item{G}{Number of components in the mixture model (not used if zeta_p is given)}
+\item{params}{Prior parameters for normal mixtures. You may obtain default
+defaults from Fraley and Raftery (2007) using the function
+\code{FLXMCregnorm_defaults}.
+As the prior depends on the number of components it is probably not
+advisable to run \code{stepFlexmix} with more than one value of \code{k} at
+a time.}
 }
 \value{
 an object of class \code{"FLXC"}
@@ -71,9 +60,13 @@ my_iris <- subset(iris, select=setdiff(colnames(iris), "Species")) |>
     as.matrix()
 
 # cluster one model with a scale parameter similar to the default for 3 components
-m1 <- stepFlexmix(my_iris~1,
-                 model=FLXMCregnorm(zeta_p=c(0.23, 0.06, 1.04, 0.19)),
-                 k=3)
+m1 <- stepFlexmix(
+    my_iris~1,
+    model=FLXMCregnorm(
+        params=FLXMCregnorm_defaults(my_iris, zeta_p=c(0.23, 0.06, 1.04, 0.19))
+    ),
+    k=3)
+
 
 summary(m1)
 
@@ -81,9 +74,12 @@ summary(m1)
 randIndex(clusters(m1), iris$Species)
 
 # cluster one model with default scale parameter
-m2 <- stepFlexmix(my_iris~1,
-                 model=FLXMCregnorm(G=3),
-                 k=3)
+m2 <- stepFlexmix(
+    my_iris~1,
+    model=FLXMCregnorm(
+        params=FLXMCregnorm_defaults(my_iris, G=3)
+    ),
+    k=3)
 
 summary(m2)
 
@@ -91,7 +87,7 @@ summary(m2)
 randIndex(clusters(m2), iris$Species)
 
 
-# rand index between both models (should be around 0.8)
+# rand index between both models (should be >= 0.8)
 randIndex(clusters(m1), clusters(m2))
 }
 \references{
@@ -103,4 +99,7 @@ Austrian Journal of Statistics. \emph{Submitted manuscript}.
 \emph{Bayesian Regularization for Normal Mixture Estimation and Model-Based Clustering.}
 Journal of Classification, 24(2), 155-181
 }
+}
+\seealso{
+FLXMCregnorm_defaults
 }

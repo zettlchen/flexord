@@ -393,9 +393,7 @@ multivariate normal distributions while allowing for regularization
 avoid degenerate solutions):
 
 ```{r numerical}
-flexmix(risk ~ 1, k = 3,
-        model = FLXMCregnorm(kappa_p = 0.1, #regularization parameter
-                             G = 3)) #number of clusters, used for scale calculation
+flexmix(risk ~ 1, k = 3, model = FLXMCregnorm(params = FLXMCregnorm_defaults(risk, kappa_p=0.1, G=3)))
 ```
 
 This implements the univariate case with different variances from
