@@ -76,7 +76,8 @@ m <- flexmix(dat~1, model=FLXMCregbetabinom(size=size, alpha=0),
 m1 <- stepFlexmix(dat~1, model=FLXMCregbetabinom(size=size, alpha=0), k=k)
 
 # Cluster with regularization
-m2 <- stepFlexmix(dat~1, model=FLXMCregbetabinom(size=size, alpha=1), k=k)
+m2 <- flexmix(dat~1, model=FLXMCregbetabinom(size=size, alpha=1), k=k,
+              cluster = posterior(m1))
 
 # Both models are mostly able to reconstruct the true clusters (ARI ~ 0.95)
 # (it's a very easy clustering problem)
