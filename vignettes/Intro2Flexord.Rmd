@@ -357,8 +357,9 @@ We also offer model drivers for two component distributions suitable
 for ordinal data, which are the binomial distribution and its
 extension the beta-binomial distribution:
 ```{r ordinal_m2}
-flexmix(risk ~ 1, k = 3, model = FLXMCregbinom(size = 5))
-flexmix(risk ~ 1, k = 3, model = FLXMCregbetabinom(size = 5, alpha = 1))
+risk1 <- risk - 1
+flexmix(risk1 ~ 1, k = 3, model = FLXMCregbinom(size = 4))
+flexmix(risk1 ~ 1, k = 3, model = FLXMCregbetabinom(size = 4, alpha = 1))
 ```
 
 In both cases we specify the number of trials of the binomial distribution
