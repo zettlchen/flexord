@@ -69,7 +69,7 @@ FLXMCregmultinom = function(formula=.~., r, alpha=0) {
         }
 
         if(any(apply(y, 2, max) > r)) {
-            stop("values larger than size not allowed (values need to be in 1:r)")
+            stop("values larger than r not allowed (values need to be in 1:r)")
         }
 
         if(length(r) != 1 && length(r) != ncol(y)) {
