@@ -213,7 +213,7 @@ tools. For this, we refer to the documentation available in
 We also offer an algorithm specifically designed for model-based
 clustering of unordered categorical data via a regularized multinomial
 distribution. The multinomial driver also supports varying number of categories
-between variables. Then we call `flexmix` with a model driver
+between variables. Then we call **flexmix** with a model driver
 specifying the number of categories:
 
 ```{r nominal_m2}
@@ -233,7 +233,7 @@ flexmix(data.matrix(titanic_df) ~ 1, k = 3,
         model=FLXMCregmultinom(r = titanic_ncats, alpha = 1))
 ```
 
-`flexmix` also offers a `step` method, where the EM algorithm for each `k` is
+**flexmix** also offers a `step` method, where the EM algorithm for each `k` is
 restarted `nrep` times, and only the maximum likelihood solution is retained:
 ```{r nominal_m4}
 (nom <- stepFlexmix(data.matrix(titanic_df)~1, k = 2:4,
@@ -410,7 +410,7 @@ case we need to pass `G=3`. We could however specify a value for
 parameter at the same time, therefore `zeta_p` takes precedence if both were
 given).
 
-For more details see @fraley2007bayesian or package `Mclust`.
+For more details see @fraley2007bayesian or package **Mclust**.
 
 Again, the model can be plugged into all of the further tools offered by **flexmix**,
 for some example usages see **Example 1**.
