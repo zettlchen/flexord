@@ -31,6 +31,9 @@ observations according to the population mean to each component
 \item{k}{Number of components assumed for the mixture model (not
 used if \code{zeta_p} is given).}
 }
+\value{
+a named list with values for \code{mu_p}, \code{kappa_p}, \code{nu_p} and \code{zeta_p}
+}
 \description{
 Determines the default values for regularized univariate normal
 mixtures as proposed by Fraley and Raftery (2007) based on the data
