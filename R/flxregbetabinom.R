@@ -3,11 +3,15 @@
 
 
 lbeta1 <- function(x, size, a, b) {
-    lbeta(a+x, b+size-x)
+    s <- 0:size #seq(from=0, to=size, by=1)
+    uniquelb <- lbeta(a+s, b+size-s)
+    uniquelb[x+1L]
 }
 
 digamma1 <- function(x, a, size) {
-    digamma(x + a)
+    #s <- 0:size #seq(from=0, to=size, by=1)
+    uniquedg <- digamma((0:size) + a)
+    uniquedg[x+1L]
 }
 
 
@@ -118,10 +122,10 @@ FLXMCregbetabinom = function(formula=.~., size, alpha=0, eps=sqrt(.Machine$doubl
         }
 
         logLik <- function(x, y) {
-            llh <- dbetabinom(t(y), size = para$size,
-                              a = para$ab[1,], b = para$ab[2,],
-                              log = TRUE)
-            colSums(llh)
+            z = lapply(seq_len(ncol(y)), \(j) {
+                dbetabinom(y[,j], size=para$size[j], a=para$ab[1,j], b=para$ab[2,j], log=TRUE)
+            }) |> do.call(cbind, args=_)
+            rowSums(z, na.rm=TRUE)
         }
         
         new("FLXcomponent", 
