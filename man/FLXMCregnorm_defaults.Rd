@@ -2,26 +2,38 @@
 % Please edit documentation in R/flxregnorm.R
 \name{FLXMCregnorm_defaults}
 \alias{FLXMCregnorm_defaults}
-\title{Default parameters for regularized normal mixtures based on the data set}
+\title{Data-Driven Default Parameters for Regularized Normal Mixtures}
 \usage{
-FLXMCregnorm_defaults(x, zeta_p = NULL, kappa_p = 0.01, nu_p = 3, G = NULL)
+FLXMCregnorm_defaults(x, zeta_p = NULL, kappa_p = 0.01, nu_p = 3, k = NULL)
 }
 \arguments{
-\item{x}{The data set to be clustered. Should be the same data set as is
-used in flexmix's model formula.}
+\item{x}{The data set to be clustered. Should be the same data set
+as is used in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}'s model formula.}
 
-\item{zeta_p}{Scale (hyperparameter for IG prior). If not given the empirical
-variance divided by the square of the number of components
-is used as per Fraley and Raftery (2007).}
+\item{zeta_p}{Scale (hyperparameter for IG prior). If not given the
+empirical variance divided by the square of the number of
+components is used as per Fraley and Raftery (2007).
 
-\item{kappa_p}{Shrinkage parameter. Functions as if you added
-\code{kappa_p} observations according to the population mean to
-each component (hyperparameter for IG prior)}
+\code{mu_p} is computed from the data as the overall means across all
+components.
+
+A value for the scale hyperparameter \code{zeta_p} may be specified directly.
+Otherwise the empirical variance divided by the square of the number of
+components is used as per Fraley and Raftery (2007). In which case the
+number of components (parameter \code{k}) needs to be specified.}
+
+\item{kappa_p}{Shrinkage parameter. Corresponds to adding \code{kappa_p}
+observations according to the population mean to each component
+(hyperparameter for IG prior)}
 
 \item{nu_p}{Degress of freedom (hyperparameter for IG prior)}
 
-\item{G}{Number of components in the mixture model (not used if zeta_p is given)}
+\item{k}{Number of components assumed for the mixture model (not
+used if \code{zeta_p} is given).}
 }
 \description{
-Default parameters for regularized normal mixtures based on the data set
+Determines the default values for regularized univariate normal
+mixtures as proposed by Fraley and Raftery (2007) based on the data
+set to be clustered and the number of components in the mixture
+model.
 }
