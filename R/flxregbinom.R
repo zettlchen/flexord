@@ -26,6 +26,10 @@
 #'     [stats::update.formula()]. Only the left-hand side (response)
 #'     of the formula is used. Default is to use the original model
 #'     formula specified in [flexmix::flexmix()].
+#' @param has_na Boolean whether the data set may contain NA values. Default
+#'               is FALSE. For data sets without NAs this parameter does not
+#'               influence the estimates except that it's slightly faster
+#'               when the absence of NAs can be assumed.
 #' @return an object of class `"FLXC"`
 #' @export
 #' @references - Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B
@@ -33,7 +37,7 @@
 #'     Journal of Statistics. _Submitted manuscript_.
 #' @example examples/binomial.R
 #' @importFrom stats dbinom
-FLXMCregbinom = function(formula=.~., size = NULL, alpha=0, eps=0)
+FLXMCregbinom = function(formula=.~., size = NULL, has_na=FALSE, alpha=0, eps=0)
 {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregbinom")
@@ -66,7 +70,7 @@ FLXMCregbinom = function(formula=.~., size = NULL, alpha=0, eps=0)
 
     z@fit <- function(x, y, w, component) {
         if(length(component) == 0) {
-            component$has_na <- anyNA(y)
+            #component$has_na <- anyNA(y)
 
             if(is.null(size)) {
                 component$size <- apply(y, 2, max, na.rm=TRUE)
@@ -78,7 +82,7 @@ FLXMCregbinom = function(formula=.~., size = NULL, alpha=0, eps=0)
             component$b_beta <- (1-component$ymarg)*alpha
         }
 
-        if(component$has_na) {
+        if(has_na) {
             p <- with(component,
                       (b_alpha + colSums(w*y, na.rm=TRUE)) /
                       (b_alpha+b_beta+size*colSums(w * !is.na(y))))
