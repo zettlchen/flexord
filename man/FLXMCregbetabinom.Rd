@@ -6,7 +6,7 @@
 \usage{
 FLXMCregbetabinom(
   formula = . ~ .,
-  size,
+  size = NULL,
   alpha = 0,
   eps = sqrt(.Machine$double.eps)
 )
@@ -18,7 +18,9 @@ formula specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()
 of the formula is used. Default is to use the original model
 formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{size}{Number of trials (one or more).}
+\item{size}{Number of trials (one or more). Default \code{NULL} implies
+that the number of trials is inferred columnwise by the
+maximum value observed.}
 
 \item{alpha}{A non-negative scalar acting as regularization
 parameter. Can be regarded as adding \code{alpha} observations

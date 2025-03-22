@@ -4,20 +4,23 @@
 \alias{FLXMCregmultinom}
 \title{FlexMix Driver for Regularized Multinomial Mixtures}
 \usage{
-FLXMCregmultinom(formula = . ~ ., r, alpha = 0)
+FLXMCregmultinom(formula = . ~ ., r = NULL, alpha = 0)
 }
 \arguments{
-\item{formula}{A formula which is interpreted relative to the formula
-specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
-\code{\link[stats:update.formula]{stats::update.formula()}}. Only the
-left-hand side (response) of the formula is used. Default is to
-use the original model formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
+\item{formula}{A formula which is interpreted relative to the
+formula specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()}} using
+\code{\link[stats:update.formula]{stats::update.formula()}}. Only the left-hand side (response)
+of the formula is used. Default is to use the original model
+formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{r}{Number of different categories. Values are assumed to be integers in \code{1:r}.}
+\item{r}{Number of different categories. Values are assumed to be
+integers in \code{1:r}. Default \code{NULL} implies that the number of
+different categories is inferred columnwise by the maximum
+value observed.}
 
 \item{alpha}{A non-negative scalar acting as regularization
-parameter. Can be regarded as adding \code{alpha} observations
-equal to the population mean to each component.}
+parameter. Can be regarded as adding \code{alpha} observations equal
+to the population mean to each component.}
 }
 \value{
 an object of class \code{"FLXC"}
@@ -82,11 +85,11 @@ randIndex(clusters(m2), true_clusters)
 }
 \references{
 \itemize{
-\item Galindo Garre, F, Vermunt, JK (2006).
-\emph{Avoiding Boundary Estimates in Latent Class Analysis by Bayesian Posterior Mode Estimation}
-Behaviormetrika, 33, 43-59.
-\item Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
-\emph{Ordinal Clustering with the flex-Scheme.}
-Austrian Journal of Statistics. \emph{Submitted manuscript}.
+\item Galindo Garre, F, Vermunt, JK (2006).  \emph{Avoiding
+Boundary Estimates in Latent Class Analysis by Bayesian
+Posterior Mode Estimation} Behaviormetrika, 33, 43-59.  -
+Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
+\emph{Ordinal Clustering with the flex-Scheme.} Austrian Journal of
+Statistics. \emph{Submitted manuscript}.
 }
 }

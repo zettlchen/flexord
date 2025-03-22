@@ -81,7 +81,9 @@ BBmle <- function(x, size=NULL, w=1, alpha=0, eps=sqrt(.Machine$double.eps)) {
 #' chosen. For small values this effect is, however, mostly
 #' negligible.
 #'
-#' @param size Number of trials (one or more).
+#' @param size Number of trials (one or more). Default `NULL` implies
+#'     that the number of trials is inferred columnwise by the
+#'     maximum value observed.
 #' @param alpha A non-negative scalar acting as regularization
 #'     parameter. Can be regarded as adding `alpha` observations
 #'     equal to the population mean to each component.
@@ -105,14 +107,31 @@ BBmle <- function(x, size=NULL, w=1, alpha=0, eps=sqrt(.Machine$double.eps)) {
 #' 
 #' @export
 #' @example examples/betabinom.R
-FLXMCregbetabinom = function(formula=.~., size, alpha=0, eps=sqrt(.Machine$double.eps)) {
+FLXMCregbetabinom = function(formula=.~., size=NULL, alpha=0, eps=sqrt(.Machine$double.eps)) {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregbetabinom")
 
     stopifnot(is.numeric(eps), length(eps) == 1, eps >= 0)
     stopifnot(is.numeric(alpha), length(alpha) == 1, alpha >= 0)
-    size <- as.integer(size)
-    stopifnot(all(size >= 1))
+
+    z@preproc.y <- function(y) {
+        if (anyNA(y)) 
+            stop("NAs are not allowed")
+        if (any(y < 0))
+            stop("negative values are not allowed for the binomial family")
+        if (is.null(size)) {
+            size <- apply(y, 2, max)
+        } else {
+            size <- as.integer(size)
+            size <- rep(size, length = ncol(y))
+            if (any(apply(y, 2, max) > size)) 
+                stop("values larger than size not allowed (values need to be in 0:size)")
+        }
+        stopifnot(size >= 1)
+        
+        attr(y, "size") <- size
+        y
+    }
 
     z@defineComponent <- function(para) {
         predict <- function(x, ...) {
@@ -133,7 +152,7 @@ FLXMCregbetabinom = function(formula=.~., size, alpha=0, eps=sqrt(.Machine$doubl
     }
 
     z@fit <- function(x, y, w) {
-        para <- list(size = rep(size, length=ncol(y)))
+        para <- list(size = attr(y, "size"))
         para$ab <- BBmle(y, size=para$size, w=w, alpha=alpha, eps=eps)
         para$prob <- apply(para$ab, 2, function(z) z[1]/sum(z))
 

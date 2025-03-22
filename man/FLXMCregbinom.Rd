@@ -13,7 +13,9 @@ formula specified in the call to \code{\link[flexmix:flexmix]{flexmix::flexmix()
 of the formula is used. Default is to use the original model
 formula specified in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}.}
 
-\item{size}{Number of trials (one or more).}
+\item{size}{Number of trials (one or more). Default \code{NULL} implies
+that the number of trials is inferred columnwise by the
+maximum value observed.}
 
 \item{hasNA}{Boolean whether the data set may contain NA
 values. Default is FALSE. For data sets without NAs, the same

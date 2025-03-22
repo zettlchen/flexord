@@ -14,7 +14,9 @@
 #' Parameter estimation is achieved using the MAP estimator for each
 #' component and variable using a Beta prior.
 #' 
-#' @param size Number of trials (one or more).
+#' @param size Number of trials (one or more). Default `NULL` implies
+#'     that the number of trials is inferred columnwise by the
+#'     maximum value observed.
 #' @param alpha A non-negative scalar acting as regularization
 #'     parameter. Can be regarded as adding `alpha` observations equal
 #'     to the population mean to each component.
@@ -36,66 +38,70 @@
 #'     Journal of Statistics. _Submitted manuscript_.
 #' @example examples/binomial.R
 #' @importFrom stats dbinom
-FLXMCregbinom = function(formula=.~., size = NULL, hasNA=FALSE, alpha=0, eps=0)
+FLXMCregbinom = function(formula=.~., size=NULL, hasNA=FALSE, alpha=0, eps=0)
 {
     z <- new("FLXMC", weighted=TRUE, formula=formula,
              name="FLXMCregbinom")
 
     stopifnot(is.numeric(eps), length(eps) == 1, eps >= 0, eps < 1)
     stopifnot(is.numeric(alpha), length(alpha) == 1, alpha >= 0)
+    b_alpha <- 0
     
     z@preproc.y <- function(y) {
-        if(any(y < 0, na.rm=TRUE))
+        if (any(y < 0, na.rm=TRUE))
             stop("negative values are not allowed for the binomial family")
+        if (is.null(size)) {
+            size <- apply(y, 2, max, na.rm=TRUE)
+        } else {
+            size <- as.integer(size)
+            size <- rep(size, length = ncol(y))
+            if (any(apply(y, 2, max, na.rm=TRUE) > size)) 
+                stop("values larger than size not allowed (values need to be in 0:size)")
+        }
+        stopifnot(all(size >= 1))
+        
+        attr(y, "ymarg") <- colMeans(y, na.rm = TRUE)/size
+        attr(y, "size") <- size
         y
     }
 
-    defineComponent <- function(component) {
+    z@defineComponent <- function(para) {
         predict <- function(x, ...) {
-            matrix(component$probs * component$size, nrow = nrow(x), ncol = length(component$probs),
+            matrix(para$prob * para$size, nrow = nrow(x), ncol = length(para$prob),
                    byrow = TRUE)
         }
 
         logLik <- function(x, y) {
-            llh <- dbinom(t(y), size = component$size, prob = component$probs, log = TRUE)
+            llh <- dbinom(t(y), size = para$size, prob = para$prob, log = TRUE)
+            if (is.null(dim(llh))) browser()
             colSums(llh, na.rm = TRUE)
         }
 
         new("FLXcomponent",
-            parameters=component,
-            logLik=logLik, predict=predict,
-            df=component$df)
+            parameters = list(p = para$prob),
+            logLik = logLik, predict = predict,
+            df = para$df)
     }
 
-    z@fit <- function(x, y, w, component) {
-        if(length(component) == 0) {
-            if(is.null(size)) {
-                component$size <- apply(y, 2, max, na.rm=TRUE)
-            } else {
-                component$size = size
-            }
-            component$ymarg <- colMeans(y, na.rm=TRUE)/component$size
-            component$b_alpha <- component$ymarg*alpha
-            component$b_beta <- (1-component$ymarg)*alpha
+    z@fit <- function(x, y, w) {
+        if (alpha > 0) {
+            b_alpha <- attr(y, "ymarg") * alpha
         }
+        size <- attr(y, "size")
 
-        if(hasNA) {
-            p <- with(component,
-                      (b_alpha + colSums(w*y, na.rm=TRUE)) /
-                      (b_alpha+b_beta+size*colSums(w * !is.na(y))))
+        if (hasNA) {
+            p <- (b_alpha + colSums(w*y, na.rm = TRUE)) /
+                (alpha + size*colSums(w * !is.na(y)))
         } else {
-            p <- with(component,
-                      (b_alpha + colSums(w*y)) /
-                      (b_alpha+b_beta+size*sum(w)))
+            p <- (b_alpha + colSums(w*y)) / (alpha + size*sum(w))
         }
 
-        if(eps > 0) {
+        if (eps > 0) {
             p <- ifelse(p >= 1-eps, 1-eps, ifelse(p <= eps, eps, p))
         }
 
-        component$probs = p
-        component$df = ncol(y)
-        defineComponent(component)
+        para <- list(prob = p, df = ncol(y), size = size)
+        z@defineComponent(para)
     }
 
     z
