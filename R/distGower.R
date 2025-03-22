@@ -108,7 +108,7 @@ distGower <- function(x, centers, genDist) {
 # @param distances character vector of variable specific distances,
 #                  f.i. as derived from `.ChooseVarDists(x)`. Length
 #                  needs to be equal to `ncol(x)`.
-# @return a numeric array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`
+# @return A numeric array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`
 #         that in each `ijk` contains the distance between `x[i,j]`
 #         and `centers[k,j]`. Weighting with `delta`, and summing up
 #         over `j` happens in the next step.
@@ -175,9 +175,9 @@ distGower <- function(x, centers, genDist) {
 # @param distances character vector of distance to be used on all variables.
 #                  Length needs to be equal to `ncol(x)`, but needs to be the
 #                  same for all columns. Can f.i. be derived from `.ChooseVarDists(x)`.
-# @return a numeric matrix of dim `nrow(x)`X`nrow(centers)`
+# @return A numeric matrix of dim `nrow(x)`X`nrow(centers)`
 #         that in each `ik` contains the distance between `x[i,]`
-#         and `centers[k,]`
+#         and `centers[k,]`.
 # @details
 # This helper is added for the speed increase it provides when using
 # Gower's distance on all numeric or all ordered variables without
@@ -226,7 +226,7 @@ distGower <- function(x, centers, genDist) {
 # @param distances character vector of variable specific distances,
 #                  f.i. as derived from `.ChooseVarDists(x)`. Length
 #                  needs to be equal to `ncol(x)`.
-# @return a logical array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`.
+# @return A logical array of dim `nrow(x)`X`ncol(x)`X`nrow(centers)`.
 #         `TRUE` in `ijk` if `x[i,j]` and `centers[k,j]` are both non-
 #         missing, and, in the case of logical variables calculated with
 #         `distJaccard`, not more than one variables is equal to 0; `FALSE`

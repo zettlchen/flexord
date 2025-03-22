@@ -31,7 +31,7 @@
 #' @importFrom mvtnorm dmvnorm
 #' @import flexmix
 #' @export
-#' @return an object of class `"FLXC"`
+#' @return An object of class `"FLXC"`.
 #' @references
 #' - Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B (2025).
 #'   *Ordinal Clustering with the flex-Scheme.*
@@ -107,7 +107,7 @@ FLXMCregnorm <- function(formula=.~., params) {
 #' Otherwise the empirical variance divided by the square of the number of
 #' components is used as per Fraley and Raftery (2007). In which case the
 #' number of components (parameter `k`) needs to be specified.
-#' @return a named list with values for `mu_p`, `kappa_p`, `nu_p` and `zeta_p`
+#' @return A named list with values for `mu_p`, `kappa_p`, `nu_p` and `zeta_p`.
 #' 
 #' @export
 FLXMCregnorm_defaults <- function(x, zeta_p=NULL, kappa_p=0.01, nu_p=3, k=NULL) {

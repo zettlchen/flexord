@@ -32,7 +32,7 @@ observations according to the population mean to each component
 used if \code{zeta_p} is given).}
 }
 \value{
-a named list with values for \code{mu_p}, \code{kappa_p}, \code{nu_p} and \code{zeta_p}
+A named list with values for \code{mu_p}, \code{kappa_p}, \code{nu_p} and \code{zeta_p}.
 }
 \description{
 Determines the default values for regularized univariate normal

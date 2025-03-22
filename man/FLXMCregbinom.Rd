@@ -30,7 +30,7 @@ to the population mean to each component.}
 probabilities are truncated to be within in [\code{eps}, 1-\code{eps}].}
 }
 \value{
-an object of class \code{"FLXC"}
+An object of class \code{"FLXC"}.
 }
 \description{
 This model driver can be used to cluster data using the binomial

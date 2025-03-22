@@ -29,7 +29,7 @@ equal to the population mean to each component.}
 \item{eps}{Lower threshold for the shape parameters a and b.}
 }
 \value{
-an object of class \code{"FLXC"}
+An object of class \code{"FLXC"}.
 }
 \description{
 This model driver can be used to cluster data using the beta-binomial

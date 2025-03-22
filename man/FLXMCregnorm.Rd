@@ -21,7 +21,7 @@ advisable to run \code{stepFlexmix} with more than one value of \code{k} at
 a time.}
 }
 \value{
-an object of class \code{"FLXC"}
+An object of class \code{"FLXC"}.
 }
 \description{
 This model driver implements the regularization method as

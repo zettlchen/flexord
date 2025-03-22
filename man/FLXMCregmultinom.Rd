@@ -23,7 +23,7 @@ parameter. Can be regarded as adding \code{alpha} observations equal
 to the population mean to each component.}
 }
 \value{
-an object of class \code{"FLXC"}
+An object of class \code{"FLXC"}.
 }
 \description{
 This model driver can be used to cluster data using a multinomial

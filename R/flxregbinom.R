@@ -31,7 +31,7 @@
 #'     values. Default is FALSE. For data sets without NAs, the same
 #'     results are obtained but it runs slightly faster when the
 #'     absence of NAs can be assumed.
-#' @return an object of class `"FLXC"`
+#' @return An object of class `"FLXC"`.
 #' @export
 #' @references - Ernst, D, Ortega Menjivar, L, Scharl, T, Grün, B
 #'     (2025).  *Ordinal Clustering with the flex-Scheme.* Austrian

@@ -93,7 +93,7 @@ BBmle <- function(x, size=NULL, w=1, alpha=0, eps=sqrt(.Machine$double.eps)) {
 #'     [stats::update.formula()]. Only the left-hand side (response)
 #'     of the formula is used. Default is to use the original model
 #'     formula specified in [flexmix::flexmix()].
-#' @return an object of class `"FLXC"`
+#' @return An object of class `"FLXC"`.
 #' @export
 #' @references
 #'
