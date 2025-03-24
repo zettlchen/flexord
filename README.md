@@ -14,7 +14,7 @@ We wrote this package to accompany the paper "Ordinal clustering in the flex-sch
 by Ernst D, Ortega Menjivar L, Scharl T, Grün B, currently submitted to [AJS](https://ajs.or.at).
 In this paper, we reviewed methods available for ordinal data clustering and applied many
 of the methods in our extensive simulation study. The replication code for the simulation study itself is collected
-in the repository [`AJS-flexord`](https://github.com/zettlchen/AJS-flexord). <replace with Zenodo DOI>
+in the repository [`AJS-flexord`](https://doi.org/10.5281/zenodo.15074618).
 
 You can find a more end user friendly introduction to the package, and a listing of the new
 methods we provide [here](https://dernst.github.io/flexord/articles/Intro2Flexord.html).
