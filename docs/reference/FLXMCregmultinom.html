@@ -159,10 +159,10 @@ Statistics. <em>Submitted manuscript</em>.</p></li>
 <span class="r-in"><span><span class="co"># Both models are mostly able to reconstruct the true clusters (ARI ~ 0.95)</span></span></span>
 <span class="r-in"><span><span class="co"># (it's a very easy clustering problem)</span></span></span>
 <span class="r-in"><span><span class="co"># Small values for the regularization don't seem to affect the ARI (much)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/modeltools/man/Generics.html" class="external-link">clusters</a></span><span class="op">(</span><span class="va">m1</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu">clusters</span><span class="op">(</span><span class="va">m1</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       ARI </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 0.9933165 </span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/modeltools/man/Generics.html" class="external-link">clusters</a></span><span class="op">(</span><span class="va">m2</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu">clusters</span><span class="op">(</span><span class="va">m2</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       ARI </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 0.9867009 </span>
 </code></pre></div>

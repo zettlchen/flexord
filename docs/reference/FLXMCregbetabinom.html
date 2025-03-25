@@ -128,9 +128,6 @@ Ludwig-Maximilians-Universität München.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: lattice</span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/dernst/flexord" class="external-link">"flexord"</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"flexclust"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: grid</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: modeltools</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: stats4</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Sample data</span></span></span>
 <span class="r-in"><span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fl">4</span>     <span class="co"># nr of clusters</span></span></span>
@@ -163,15 +160,15 @@ Ludwig-Maximilians-Universität München.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Cluster with regularization</span></span></span>
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/flexmix/man/flexmix.html" class="external-link">flexmix</a></span><span class="op">(</span><span class="va">dat</span><span class="op">~</span><span class="fl">1</span>, model<span class="op">=</span><span class="fu">FLXMCregbetabinom</span><span class="op">(</span>size<span class="op">=</span><span class="va">size</span>, alpha<span class="op">=</span><span class="fl">1</span><span class="op">)</span>, k<span class="op">=</span><span class="va">k</span>,</span></span>
-<span class="r-in"><span>              cluster <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/modeltools/man/Generics.html" class="external-link">posterior</a></span><span class="op">(</span><span class="va">m1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>              cluster <span class="op">=</span> <span class="fu">posterior</span><span class="op">(</span><span class="va">m1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Both models are mostly able to reconstruct the true clusters (ARI ~ 0.95)</span></span></span>
 <span class="r-in"><span><span class="co"># (it's a very easy clustering problem)</span></span></span>
 <span class="r-in"><span><span class="co"># Small values for the regularization don't seem to affect the ARI (much)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/modeltools/man/Generics.html" class="external-link">clusters</a></span><span class="op">(</span><span class="va">m1</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu">clusters</span><span class="op">(</span><span class="va">m1</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       ARI </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 0.9475751 </span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/modeltools/man/Generics.html" class="external-link">clusters</a></span><span class="op">(</span><span class="va">m2</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/flexclust/man/randIndex.html" class="external-link">randIndex</a></span><span class="op">(</span><span class="fu">clusters</span><span class="op">(</span><span class="va">m2</span><span class="op">)</span>, <span class="va">true_clusters</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       ARI </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 0.9475751 </span>
 </code></pre></div>
